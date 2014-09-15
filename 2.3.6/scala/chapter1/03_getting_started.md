@@ -100,24 +100,69 @@ SBT安装指导 https://github.com/harrah/xsbt/wiki/Setup
 	libraryDependencies +=
 	  "com.typesafe.akka" %% "akka-actor" % "2.3.6"
 
-注意：以上的`libraryDependencies`设置需要SBT 0.12.x或更高的版本。如果你使用更老版本的SBT，`libraryDependencies`需啊哟这样设置：
+注意：以上的`libraryDependencies`设置需要SBT 0.12.x或更高的版本。如果你使用更老版本的SBT，`libraryDependencies`需要这样设置：
 
 	libraryDependencies +=
 	  "com.typesafe.akka" % "akka-actor_2.10" % "2.3.6"
 
 
+###Using Akka with Gradle
+
+需要 [Gradle](http://gradle.org/) 1.4 及以上的版本来使用 [Scala 插件](http://gradle.org/docs/current/userguide/scala_plugin.html)
+
+	apply plugin: 'scala'
+	 
+	repositories {
+	  mavenCentral()
+	}
+	 
+	dependencies {
+	  compile 'org.scala-lang:scala-library:2.10.4'
+	}
+	 
+	tasks.withType(ScalaCompile) {
+	  scalaCompileOptions.useAnt = false
+	}
+	 
+	dependencies {
+	  compile group: 'com.typesafe.akka', name: 'akka-actor_2.10', version: '2.3.6'
+	  compile group: 'org.scala-lang', name: 'scala-library', version: '2.10.4'
+	}
 
 
+###通过Eclipse使用Akka
+建好SBT项目并使用 [sbteclipse](https://github.com/typesafehub/sbteclipse) 来创建Eclipse项目。
+
+###通过IntelliJ IDEA使用Akka
+建好SBT项目并使用 [sbt-idea](https://github.com/mpeltonen/sbt-idea) 来创建IntelliJ IDEA 项目。
+
+###通过NetBeans使用Akka
+建好SBT项目并使用 [nbsbt](https://github.com/dcaoyuan/nbsbt) 来创建NetBeans项目。
+
+你也应该使用[nbscala](https://github.com/dcaoyuan/nbscala)提供的scala IDE支持
+
+###不要使用scala编译器的-optimize选项
+
+警告
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Akka并没有在scala编译器的`-optimize`选项下编译和测试过。尝试过这种方式的用户发现了Akka的奇怪行为。</p>
+</div>
 
 
+###从源码编译
 
+Akka使用Git并托管在 [Github](http://github.com/)。
 
+* Akka: 从 http://github.com/akka/akka 克隆 Akka 的资源库
 
+具体请参考 [Building Akka](http://doc.akka.io/docs/akka/2.3.6/dev/building-akka.html#building-akka)。
 
+###需要帮助?
 
+如果有问题，你可以在 [Akka Mailing List](http://groups.google.com/group/akka-user) 获得帮助。
 
+也可以寻求 [商业支持](http://www.typesafe.com/?_ga=1.62701036.1776884365.1398499694)。
 
-
-
-
+感谢你成为Akka社区的一部分。
 

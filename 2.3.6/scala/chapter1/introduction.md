@@ -24,7 +24,7 @@
   * 通过Eclipse使用Akka
   * 通过IntelliJ IDEA使用Akka
   * 通过NetBeans使用Akka
-  * 不要使用scala编译器的-optimize标志
+  * 不要使用scala编译器的-optimize选项
   * 从源码编译
   * 需要帮助?
 * 必修的“Hello World”
