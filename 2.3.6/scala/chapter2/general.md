@@ -11,21 +11,13 @@
 
 
 
-
-Terminology, Concepts
-Concurrency vs. Parallelism
-Asynchronous vs. Synchronous
-Non-blocking vs. Blocking
-Deadlock vs. Starvation vs. Live-lock
-Race Condition
-Non-blocking Guarantees (Progress Conditions)
-Recommended literature
 Actor Systems
 Hierarchical Structure
 Configuration Container
 Actor Best Practices
 Blocking Needs Careful Management
 What you should not concern yourself with
+
 What is an Actor?
 Actor Reference
 State

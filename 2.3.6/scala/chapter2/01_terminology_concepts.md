@@ -29,15 +29,44 @@
 
 ###竟态条件
 
+当一组事件的顺序假设可能被外部不确定因素影响，我们称之为 *竞态条件*。竞态条件经常在多个线程共享一个可变状态时出现，一个线程对这个状态的操作可能被交织从而导致意外的行为。尽管这是常见的情况，但是共享状态并不一定会导致竞态条件。例如一个客户端向服务器发送无序的包（例如UDP数据包）`P1`，`P2`。由于包可能经过不同的网络路由器传送，所以服务器可能先收到`P2`，后收到`P1`。如果消息中没有包含发送顺序的相关信息的话，服务器是不可能确定包是否是按照发送顺序接收的。根据包的内容这可能会导致竞态条件。
 
 
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The only guarantee that Akka provides about messages sent between a given pair of actors is that their order is
+always preserved. see <a class="reference internal" href="message-delivery-reliability.html#message-delivery-reliability"><em>Message Delivery Reliability</em></a></p>
+</div>
+注意
 
-We call it a Race condition when an assumption about the ordering of a set of events might be violated by external non-deterministic effects. Race conditions often arise when multiple threads have a shared mutable state, and the operations of thread on the state might be interleaved causing unexpected behavior. While this is a common case, shared state is not necessary to have race conditions. One example could be a client sending unordered packets (e.g UDP datagrams) P1, P2 to a server. As the packets might potentially travel via different network routes, it is possible that the server receives P2 first and P1 afterwards. If the messages contain no information about their sending order it is impossible to determine by the server that they were sent in a different order. Depending on the meaning of the packets this can cause race conditions.
+对两个actor之间的消息发送，Akka唯一提供的保证是消息的发送顺序是被保留的。详见 [消息传送可靠性Message Delivery Reliability](http://doc.akka.io/docs/akka/2.3.6/general/message-delivery-reliability.html#message-delivery-reliability)
 
 
 ###非阻塞担保（进展条件）
+
+就像前几个章节描述的，阻塞是不受欢迎的，因为它有可能导致死锁并降低系统的吞吐量。在下面几节，我们将从不同深度讨论各种无阻塞特性。
+
+
+#####无等待（Wait-freedom）
+
+如果一个方法的调用可以保证在有限步骤内完成，则称该方法是 *无等待* 的。如果方法是 *有界无等待* 的，则方法的执行步数有一个确定的上界。
+
+从这个定义可以得出无等待的方法永远不会阻塞，因此死锁是不可能发生的。此外，因为每个参与者都可以经过有限步后继续执行（当调用完成），所以无等待方法也不会出现饥饿的情况。
+
+#####无锁（Lock-freedom）
+
+*无锁* 是比 *无等待* 更弱的特性。在无锁调用的情况下，无限地经常有一些方法在有限步骤内完成。这个定义暗示着对无锁调用是不可能出现死锁的。另一方面，*部分方法调用* 在有限步骤内 *结束*，不足以保证*所有调用最终完成*。换句话说，无锁不足以保证不会出现饥饿。
+
+#####无阻碍（Obstruction-freedom）
+
+*无阻碍* 是这里讨论的最弱的无阻塞保证。对一个方法，当在某一个它独自执行的时间点（其他线程不在执行，例如都挂起了），之后它在有限步后能够结束，我们称之为 *无阻碍*。所有无锁的对象都是无阻碍的，但反之一般不成立。
+
+*乐观并发模型OCC（Optimistic concurrency control ）* 的方法通常是无阻碍的。OCC的做法是，每一位参与者都试图在共享对象上执行操作，但是如果参与者检测到来自其他参与者的冲突，它回滚修改，并根据调度再次尝试。如果在某一个时间点，其中一个参与者，是唯一一个尝试修改的点，则其操作就会成功。
+
 ###推荐文献
 
+* The Art of Multiprocessor Programming, M. Herlihy and N Shavit, 2008. ISBN 978-0123705914 （注：中文译[《多处理器编程的艺术》](http://book.douban.com/subject/3901836/)）
+* Java Concurrency in Practice, B. Goetz, T. Peierls, J. Bloch, J. Bowbeer, D. Holmes and D. Lea, 2006. ISBN 978-0321349606（注：中文译[《Java并发编程实战》](http://book.douban.com/subject/10484692/)）
 
 
 
