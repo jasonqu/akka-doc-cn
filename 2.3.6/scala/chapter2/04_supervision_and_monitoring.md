@@ -35,41 +35,61 @@ Warning
 
 #####`/system`: 系统守护者
 
-这个特殊的守护者被引入，是为了实现正确的关闭顺序，即日志（logging）要保持可用直到所有普通actor终止，即使日志本身也是用actor实现的。其实现方法是：系统守护者观察user守护者，并且观看该用户的监护人，并在收到`Terminated`消息初始化其自己的关闭过程。
+这个特殊的守护者被引入，是为了实现正确的关闭顺序，即日志（logging）要保持可用直到所有普通actor终止，即使日志本身也是用actor实现的。其实现方法是：系统守护者观察user守护者，并在收到`Terminated`消息初始化其自己的关闭过程。顶级的系统actor被监管的策略是，对收到的所有除`ActorInitializationException`和`ActorKilledException`之外的`Exception`无限地执行重启，这也将终止其所有子actor。所有其他`Throwable`被上升，然后将导致整个actor系统的关闭。
+
+#####`/`: 根守护者
+
+根守护者所谓“顶级”actor的祖父，它监督所有在[顶级路径:ref:`toplevel-paths`]()定义的特殊actor，使用发现任何`Exception`就终止子actor的`SupervisorStrategy.stoppingStrategy`策略。其他所有Throwable都会被上升……但是上升给谁？所有的真实actor都有一个监管者，但是根守护者没有父actor，因为它就是整个树结构的根。因此这里使用一个虚拟的`ActorRef`，在发现问题后立即停掉其子actor，并在根守护者完全终止之后（所有子actor递归停止），立即把actor系统的`isTerminated`置为`true`。
+
+###重启的含义
+当actor在处理某条消息时失败时，失败的原因可以分成以下三类:
+
+* 对收到的特定消息的系统错误（即程序错误）
+* 处理消息时一些外部资源的（临时性）失败
+* actor内部状态崩溃了
+
+除非故障能被专门识别，否则所述的第三个原因不能被排除，从而引出内部状态需要被清除的结论。如果监管者决定它的其他儿童或本身不会受到崩溃的影响——例如使用了错误内核模式的自恢复应用——因此最好只重启这个孩子。具体实现是通过建立底层`Actor`类的新实例，并用新的`ActorRef`更换故障实例；能做到这一点是因为将actor兜风装载了特殊的引用中。然后新actor恢复处理其邮箱，这意味着该启动在actor外部是不可见的，显着的例外是在发生失败期间的消息不会被重新处理。
+
+重启过程中发生的事件的精确次序是：
+
+1 actor被挂起（意味着它不会处理正常消息直到被恢复），并递归挂起其所有子actor
+1 调用旧实例的 `preRestart` hook (缺省实现是向所有子actor发送终止请求并调用 `postStop`)
+1 等待所有子actor终止（使用`context.stop()`）直到 `preRestart` 最终结束；这里所有的actor操作都是非阻塞的，最后被杀掉的子actor的终止通知会影响下一步的执行
+1 再次调用原来提供的工厂生成actor的新实例
+1 调用新实例的`postRestart`方法（其默认实现是调用`preStart`方法）
+1 对步骤3中没有被杀死的所有子actor发送重启请求；重启的actor会遵循相同的过程，从步骤2开始
+1 恢复这个actor
+
+###生命周期监管的含义
+
+.. note::
+
+    生命周期监管在Akka中经常被引作`DeathWatch`
+
+与上面所描述的特殊父子关系相对的，每一个actor都可以监控其他任意actor。由于actor从创建到完全可用和重启都是除了监管者之外都不可见的，所以唯一可用于监视的状态变化是可用到失效的转变。监视因此被用于绑两个actor，使监控者能对另一个actor的终止做出响应，而相应的，监督者是对失败做出响应。
+
+生命周期监控是通过监管actor收到`Terminated`消息实现的，其默认行为是抛出一个`DeathPactException`。要开始监听`Terminated`消息，需要调用`ActorContext.watch(targetActorRef)`。要停止监听，需要调用`ActorContext.unwatch(targetActorRef)`。一个重要的特性是，消息将不考虑监控请求和目标终止发生的顺序，也就是说，即使在登记的时候目标已经死了，你仍然会得到消息。
+
+如果一个监管者不能简单地重启其子actor，而必须终止它们，这时监控就特别有用，例如在actor初始化时发生错误。在这种情况下，它应该监控这些子actor并重新创建它们，或安排自己在稍后的时间重试。 
+
+另一个常见的应用情况是，一个actor需要在没有外部资源时失败，该资源也可能是它的子actor之一。如果第三方通过`system.stop(child)`或发送`PoisonPill`的方式终止子actor，其监管者很可能会受到影响。
+
+###一对一策略 vs. 多对一策略
+
+Akka中有两种类型的监管策略：`OneForOneStrategy` 和`AllForOneStrategy`。两者都配置有从异常类型监管指令间的映射（见[上文ref:`above <supervision-directives>`]()），并限制了一个孩子被终止之前允许失败的次数。它们之间的区别在于，前者只将所获得的指令应用在发生故障的子actor上，而后者则是应用在所有孩子上。通常情况下，你应该使用`OneForOneStrategy`，这也是默认的。 
+
+`AllForOneStrategy`适用的情况是，子actor之间有很紧密的依赖，以至于一个actor的失败会影响其他孩子，即他们是不可分开的。由于重启不清除邮箱，所以往往最好是失败时终止孩子并在监管者显式地重建它们（通过观察孩子们的生命周期）；否则你必须确保重启前入队的消息在重启后处理是没有问题的。
+
+通常停止一个孩子（即不响应失败）不会自动终止多对一策略中其他的孩子；可以很容易地通过观察它们的生命周期来做到这点：如果`Terminated`的消息不能被监管者处理，它会抛出一个`DeathPactException`，并（这取决于其监管者）将重新启动，默认`preRestart`操作会终止所有的孩子。当然这也可以被显式地处理。 
+
+请注意，在多对一监管者下创建一个临时的actor会导致一个问题：临时actor的失败上升会使所有永久actor受到影响。如果这不是所期望的，安装一个中间监管者；这可以很容易地通过为工作者声明大小为1的路由器来完成，请参阅[routing-scala]()或路由[routing-java`]()。
 
 
 
-并开始在接收到终止消息的其自己的关断来实现。顶级系统参与者使用的是这将无限期地重新启动后，所有类型的异常，除了ActorInitializationException和ActorKilledException，这将终止在孩子问题上的战略监督。所有其他可抛出都升级，这将关闭整个系统的演员。
 
 
 
 
-
-
-
-
-
-
-
-
-重启的意思
-当actor在处理消息时出现失败，失败的原因分成以上三类:
-
-对收到的特定消息的系统错误（i.e. 程序错误）
-处理消息时一些外部资源的（临时性）失败
-actor内部状态崩溃了
-Unless the failure is specifically recognizable, the third cause cannot be ruled out, which leads to the conclusion that the internal state needs to be cleared out. If the supervisor decides that its other children or itself is not affected by the corruption—e.g. because of conscious application of the error kernel pattern—it is therefore best to restart the child. This is carried out by creating a new instance of the underlying Actor class and replacing the failed instance with the fresh one inside the child’s ActorRef; the ability to do this is one of the reasons for encapsulating actors within special references. The new actor then resumes processing its mailbox, meaning that the restart is not visible outside of the actor itself with the notable exception that the message during which the failure occurred is not re-processed.
-
-以下是重启过程中发生的事件的精确次序：
-
-actor被挂起
-调用旧实例的 supervisionStrategy.handleSupervisorFailing 方法 (缺省实现为挂起所有的子actor)
-调用旧实例的 preRestart hook (缺省实现为向所有的子actor发送终止请求并调用 postStop)
-等待所有子actor终止直到 preRestart 最终结束
-调用旧实例的 supervisionStrategy.handleSupervisorRestarted 方法 (缺省实现为向所有剩下的子actor发送重启请求)
-再次调用之前提供的actor工厂创建新的actor实例
-对新实例调用 postRestart
-恢复运行新的actor
 
 
 
