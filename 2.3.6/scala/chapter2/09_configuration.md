@@ -25,49 +25,27 @@ Akka的所有配置都保存在`ActorSystem`的实例中，或者换一种说法
 
   appConfig.withFallback(ConfigFactory.defaultReference(classLoader))
 
+其哲学是代码永远不包含缺省值，相反是依赖于随库提供的 `reference.conf` 中的配置。
 
-
-
-The philosophy is that code never contains default values, but instead relies
-upon their presence in the ``reference.conf`` supplied with the library in
-question.
-
-Highest precedence is given to overrides given as system properties, see `the
-HOCON specification
-<https://github.com/typesafehub/config/blob/master/HOCON.md>`_ (near the
-bottom). Also noteworthy is that the application configuration—which defaults
-to ``application``—may be overridden using the ``config.resource`` property
-(there are more, please refer to the `Config docs
-<https://github.com/typesafehub/config/blob/master/README.md>`_).
+系统属性中覆盖的配置具有最高优先级，参见 `HOCON 规范
+<https://github.com/typesafehub/config/blob/master/HOCON.md>`（靠近末尾的位置）。此外值得注意的是，应用程序配置——缺省为``application``——可以使用``config.resource``属性重写 （还有更多，请参阅`配置文档
+<https://github.com/typesafehub/config/blob/master/README.md>`）。
 
 .. note::
 
-  If you are writing an Akka application, keep you configuration in
-  ``application.conf`` at the root of the class path. If you are writing an
-  Akka-based library, keep its configuration in ``reference.conf`` at the root
-  of the JAR file.
+如果您正在编写一个Akka 应用，将你的配置保存类路径的根目录下的``application.conf``文件中。如果您正在编写一个基于Akka的库，将其配置保存在JAR包根目录下的``reference.conf``文件中。
 
-
-When using JarJar, OneJar, Assembly or any jar-bundler
-------------------------------------------------------
-
+###当使用JarJar,，OneJar，Assembly或任何jar打包命令（jar-bundler）
 .. warning::
+Akka的配置方法重度依赖于这个理念——每一模块/jar都有它自己的 `reference.conf`文件，所有这些都将会被配置发现并加载。不幸的是，这也意味着如果你放置/合并多个jar到相同的 jar中，您页需要合并所有的`reference.conf`文件。否则所有的默认设置将会丢失，Akka将无法工作。
 
-    Akka's configuration approach relies heavily on the notion of every
-    module/jar having its own reference.conf file, all of these will be
-    discovered by the configuration and loaded. Unfortunately this also means
-    that if you put/merge multiple jars into the same jar, you need to merge all the
-    reference.confs as well. Otherwise all defaults will be lost and Akka will not function.
+如果你使用 Maven 打包应用程序，你还可以使用`Apache Maven Shade Plugin
+<http://maven.apache.org/plugins/maven-shade-plugin>`中对`资源转换（Resource
+Transformers）
+<http://maven.apache.org/plugins/maven-shade-plugin/examples/resource-transformers.html#AppendingTransformer>`的支持，来将所有构建类路径中的`reference.conf`合并为一个文件。
 
+插件配置可能如下所示：
 
-If you are using Maven to package your application, you can also make use of
-the `Apache Maven Shade Plugin
-<http://maven.apache.org/plugins/maven-shade-plugin>`_ support for `Resource
-Transformers
-<http://maven.apache.org/plugins/maven-shade-plugin/examples/resource-transformers.html#AppendingTransformer>`_
-to merge all the reference.confs on the build classpath into one. 
-
-The plugin configuration might look like this::
 
     <plugin>
      <groupId>org.apache.maven.plugins</groupId>

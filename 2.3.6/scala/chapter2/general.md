@@ -38,17 +38,19 @@
 ###路径中的地址部分用来做什么？
 ###Actor路径的顶级作用域
 * [位置透明性](06_location_transparency.md)
+###天生的分布式
+###破坏透明性的方式
+###远程调用如何使用？
+###Peer-to-Peer vs. Client-Server
+###使用路由来进行垂直扩展的标记点
 * [Akka与Java内存模型](07_akka_and_the_java_memory_model.md)
+###Java内存模型
+###Actors与Java内存模型
+###Future与Java内存模型
 * [消息发送语义](08_message_delivery_reliability.md)
 * [配置](09_configuration.md)
 
 
-Location Transparency
-Distributed by Default
-Ways in which Transparency is Broken
-How is Remoting Used?
-Peer-to-Peer vs. Client-Server
-Marking Points for Scaling Up with Routers
 Akka and the Java Memory Model
 The Java Memory Model
 Actors and the Java Memory Model
