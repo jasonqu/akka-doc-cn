@@ -8,39 +8,25 @@
 * 路由器定义
 * 调度的调整
 
-Akka uses the `Typesafe Config Library
-<https://github.com/typesafehub/config>`_, which might also be a good choice
-for the configuration of your own application or library built with or without
-Akka. This library is implemented in Java with no external dependencies; you
-should have a look at its documentation (in particular about `ConfigFactory
-<http://typesafehub.github.io/config/v1.2.0/com/typesafe/config/ConfigFactory.html>`_),
-which is only summarized in the following.
+Akka使用`Typesafe配置库
+<https://github.com/typesafehub/config>`，这可能也是你自己的应用或库的不错选择，不管用不用Akka。这个库由Java实现，没有外部的依赖；本文后面将只对这个库有一些归纳，你应该查看其文档参考具体的使用（尤其是`ConfigFactory
+<http://typesafehub.github.io/config/v1.2.0/com/typesafe/config/ConfigFactory.html>`）。
+
 
 .. warning::
 
-   If you use Akka from the Scala REPL from the 2.9.x series,
-   and you do not provide your own ClassLoader to the ActorSystem,
-   start the REPL with "-Yrepl-sync" to work around a deficiency in
-   the REPLs provided Context ClassLoader.
+如果你在Scala REPL的2.9.x系列版本中使用Akka，并且你不提供自己的ClassLoader给ActorSystem，则需要以“-Yrepl-sync”选项启动REPL来解决上下文ClassLoader的缺陷。
 
+###配置读取的地方
 
-Where configuration is read from
---------------------------------
-
-All configuration for Akka is held within instances of :class:`ActorSystem`, or
-put differently, as viewed from the outside, :class:`ActorSystem` is the only
-consumer of configuration information. While constructing an actor system, you
-can either pass in a :class:`Config` object or not, where the second case is
-equivalent to passing ``ConfigFactory.load()`` (with the right class loader).
-This means roughly that the default is to parse all ``application.conf``,
-``application.json`` and ``application.properties`` found at the root of the
-class path—please refer to the aforementioned documentation for details. The
-actor system then merges in all ``reference.conf`` resources found at the root
-of the class path to form the fallback configuration, i.e. it internally uses
+Akka的所有配置都保存在`ActorSystem`的实例中，或者换一种说法，从外界来看，`ActorSystem`是配置信息的唯一消费者。在构造一个actor系统时，你可以选择传进一个`Config`对象，如果不传则等效于传入``ConfigFactory.load()``（通过正确的类加载器）。粗略的讲，这意味着默认会解析classpath根目录下所有的`application.conf`，`application.json`和`application.properties`文件——请参考前面提到的文档以获取细节。然后actor系统会合并classpath根目录下的所有 ``reference.conf``行成后备配置，也就是说，它在内部使用
 
 .. code-block:: scala
 
   appConfig.withFallback(ConfigFactory.defaultReference(classLoader))
+
+
+
 
 The philosophy is that code never contains default values, but instead relies
 upon their presence in the ``reference.conf`` supplied with the library in

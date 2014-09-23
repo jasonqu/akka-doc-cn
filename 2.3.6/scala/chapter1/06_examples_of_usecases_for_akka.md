@@ -16,7 +16,7 @@
 运行正确，方便使用，只需要将jar包添加到现有的JVM项目中（可使用Scala，Java, Groovy或JRuby)
 
 #####仿真
-主/从，计算网格，MapReduce等等.
+主/从，计算网格，MapReduce等等
 
 #####批处理 (任何行业)
 Camel集成来连接批处理数据源，Actor分治批处理工作负载

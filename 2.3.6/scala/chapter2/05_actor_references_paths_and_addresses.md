@@ -84,7 +84,7 @@ actor引用的获取方法分为两类：通过创建actor，或者通过查找a
 也能正确运行。
 
 
-###查询逻辑Actor树
+#####查询逻辑Actor树
 由于actor系统是一个类似文件系统的树形结构，对actor路径的匹配与Unix shell中支持的一样：你可以将路径（中的一部分）用通配符(«*» 和 «?»)替换，来组成对0个或多个实际actor的选择。由于匹配的结果不是一个单一的actor引用，它拥有一个不同的类型`ActorSelection`，这个类型不完全支持`ActorRef`的所有操作。选择也可以用`ActorSystem.actorSelection`或`ActorContext.actorSelection`两种方式来获得，并且支持发送消息：
 
 	context.actorSelection("../*") ! msg
