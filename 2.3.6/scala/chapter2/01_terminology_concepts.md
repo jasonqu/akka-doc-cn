@@ -21,7 +21,7 @@
 
 ###死锁 vs. 饥饿 vs. 活锁
 
-当多个参与者互相等待别人达到某个特殊的状态才能继续处理的时候，*死锁* 出现了。因为如果一些参与者不达到特定状态，所有的参与者都不能执行（就像[《第二十二条军规》](http://en.wikipedia.org/wiki/Catch-22)描述的[那样](http://en.wikipedia.org/wiki/Catch-22_\(logic\))），所有相关子系统都停顿了。死锁和阻塞息息相关，因为阻塞使得一个参与者线程可以无限期地推迟其他线程的处理。
+当多个参与者互相等待别人达到某个特殊的状态才能继续处理的时候，*死锁* 出现了。因为如果一些参与者不达到特定状态，所有的参与者都不能执行（就像[《第二十二条军规》](http://en.wikipedia.org/wiki/Catch-22)描述的<a href="http://en.wikipedia.org/wiki/Catch-22_(logic)">那样</a>，所有相关子系统都停顿了。死锁和阻塞息息相关，因为阻塞使得一个参与者线程可以无限期地推迟其他线程的处理。
 
 在死锁中，没有参与者可以处理，然而相对的 *饥饿* 可能发生，当有些参与者可以不断地处理，而另一些可能不行。一个典型的场景是一个幼稚的调度算法——总是选择高优先级的任务。如果高优先级的任务数量一直足够多，则低优先级的任务永远不会被完成。
 
@@ -31,15 +31,9 @@
 
 当一组事件的顺序假设可能被外部不确定因素影响，我们称之为 *竞态条件*。竞态条件经常在多个线程共享一个可变状态时出现，一个线程对这个状态的操作可能被交织从而导致意外的行为。尽管这是常见的情况，但是共享状态并不一定会导致竞态条件。例如一个客户端向服务器发送无序的包（例如UDP数据包）`P1`，`P2`。由于包可能经过不同的网络路由器传送，所以服务器可能先收到`P2`，后收到`P1`。如果消息中没有包含发送顺序的相关信息的话，服务器是不可能确定包是否是按照发送顺序接收的。根据包的内容这可能会导致竞态条件。
 
+> 注意
 
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The only guarantee that Akka provides about messages sent between a given pair of actors is that their order is
-always preserved. see <a class="reference internal" href="message-delivery-reliability.html#message-delivery-reliability"><em>Message Delivery Reliability</em></a></p>
-</div>
-注意
-
-对两个actor之间的消息发送，Akka唯一提供的保证是消息的发送顺序是被保留的。详见 [消息传送可靠性Message Delivery Reliability](http://doc.akka.io/docs/akka/2.3.6/general/message-delivery-reliability.html#message-delivery-reliability)
+> 对两个actor之间的消息发送，Akka唯一提供的保证是消息的发送顺序是被保留的。详见 [消息传送可靠性Message Delivery Reliability](08_message_delivery_reliability.md)
 
 
 ###非阻塞担保（进展条件）
