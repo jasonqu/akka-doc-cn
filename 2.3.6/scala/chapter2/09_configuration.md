@@ -82,10 +82,9 @@ Transformers）
      </executions>
     </plugin>
 
-Custom application.conf
------------------------
+###自定义application.conf
+一个自定义的``application.conf`可能看起来像这样：
 
-A custom ``application.conf`` might look like this::
 
   # In this file you can override any option defined in the reference files.
   # Copy in parts of the reference files and modify as you please.
@@ -121,14 +120,10 @@ A custom ``application.conf`` might look like this::
     }
   }
 
+###包含文件
+有时包含另一个配置文件内容的能力是非常有用，例如假设你有一个``application.conf``包含所有环境独立设置，然后使用特定环境的设置覆写。
 
-Including files
----------------
-
-Sometimes it can be useful to include another configuration file, for example if you have one ``application.conf`` with all
-environment independent settings and then override some settings for specific environments.
-
-Specifying system property with ``-Dconfig.resource=/dev.conf`` will load the ``dev.conf`` file, which includes the ``application.conf``
+用``-Dconfig.resource=/dev.conf``制定系统属性，将会加载``dev.conf``文件，并包含``application.conf``
 
 dev.conf:
 
@@ -140,21 +135,15 @@ dev.conf:
     loglevel = "DEBUG"
   }
 
-More advanced include and substitution mechanisms are explained in the `HOCON <https://github.com/typesafehub/config/blob/master/HOCON.md>`_
-specification.
+更高级的包括和替换机制的解释在`HOCON <https://github.com/typesafehub/config/blob/master/HOCON.md>`规范中。
 
 
 .. _-Dakka.log-config-on-start:
 
-Logging of Configuration
-------------------------
+###配置日志
+如果系统或配置属性``akka.log-config-on-start`` 被设置为 ``on``，则在actor系统启动的时候，就完成了INFO级别的日志设置。当你不能确定使用何种配置时，这很有用。
 
-If the system or config property ``akka.log-config-on-start`` is set to ``on``, then the
-complete configuration at INFO level when the actor system is started. This is useful
-when you are uncertain of what configuration is used.
-
-If in doubt, you can also easily and nicely inspect configuration objects
-before or after using them to construct an actor system:
+如果有疑问，您也可以在创建actor系统之前或之后，很容易很方便地检查配置对象：
 
 .. parsed-literal::
 
@@ -178,10 +167,7 @@ before or after using them to construct an actor system:
       }
   }
 
-The comments preceding every item give detailed information about the origin of
-the setting (file & line number) plus possible comments which were present,
-e.g. in the reference configuration. The settings as merged with the reference
-and parsed by the actor system can be displayed like this:
+展示结果中，每个项目前会有评论展示这个配置的起源（对应的文件和行数），并展示已存在的评论，如配置参考中的。actor系统合并参考并解析后形成的设置，可以这样显示：
 
 .. code-block:: java
 
@@ -189,41 +175,20 @@ and parsed by the actor system can be displayed like this:
   System.out.println(system.settings());
   // this is a shortcut for system.settings().config().root().render()
 
-A Word About ClassLoaders
--------------------------
+###谈一谈类加载器
 
-In several places of the configuration file it is possible to specify the
-fully-qualified class name of something to be instantiated by Akka. This is
-done using Java reflection, which in turn uses a :class:`ClassLoader`. Getting
-the right one in challenging environments like application containers or OSGi
-bundles is not always trivial, the current approach of Akka is that each
-:class:`ActorSystem` implementation stores the current thread’s context class
-loader (if available, otherwise just its own loader as in
-``this.getClass.getClassLoader``) and uses that for all reflective accesses.
-This implies that putting Akka on the boot class path will yield
-:class:`NullPointerException` from strange places: this is simply not
-supported.
+在配置文件的几个地方，可以通过制定类的全名来让Akka实例化该类。这是通过Java反射完成的，相应地用到了一个`ClassLoader`。在具有挑战性的环境中，如应用容器和OSGi绑定中，选择正确的类加载器并不总是一件简单的事情，Akka的现行做法是每个 `ActorSystem` 实现存储当前线程的上下文类加载器（如果可用，否则就使用他自己的加载器``this.getClass.getClassLoader``），并使用它为所有的反射访问服务。这意味着Akka放在引导类路径（boot class path）下，会从奇怪的地方产生`NullPointerException`： 这里就是不支持。
 
-Application specific settings
------------------------------
-
-The configuration can also be used for application specific settings.
-A good practice is to place those settings in an Extension, as described in:
+###应用特定设置
+配置也可用于应用程序特定的设置。一个好的实践是将这些设置放在一个扩展中，像下面的章节所描述的：
 
  * Scala API: :ref:`extending-akka-scala.settings`
  * Java API: :ref:`extending-akka-java.settings`
 
-Configuring multiple ActorSystem
---------------------------------
+###配置多个ActorSystem
+如果你有一个以上的``ActorSystem``（或你正在写一个库，有可能有一个独立于应用的 ``ActorSystem``） 你可能想要为每个系统进行单独配置。
 
-If you have more than one ``ActorSystem`` (or you're writing a
-library and have an ``ActorSystem`` that may be separate from the
-application's) you may want to separate the configuration for each
-system.
-
-Given that ``ConfigFactory.load()`` merges all resources with matching name
-from the whole class path, it is easiest to utilize that functionality and
-differentiate actor systems within the hierarchy of the configuration::
+由于 ConfigFactory.load() 会合并classpath中所有匹配名称的资源, 最简单的方式是利用这一功能并在配置树中区分actor系统:
 
   myapp1 {
     akka.loglevel = "WARNING"
@@ -243,9 +208,7 @@ differentiate actor systems within the hierarchy of the configuration::
   val app2 = ActorSystem("MyApp2",
     config.getConfig("myapp2").withOnlyPath("akka").withFallback(config))
 
-These two samples demonstrate different variations of the “lift-a-subtree”
-trick: in the first case, the configuration accessible from within the actor
-system is this
+这两个例子演示了“提升子树”技巧的不同变种: 第一种情况下，actor系统获得的配置是
 
 .. code-block:: ruby
 
@@ -254,8 +217,7 @@ system is this
   my.other.setting = "hello"
   // plus myapp1 and myapp2 subtrees
 
-while in the second one, only the “akka” subtree is lifted, with the following
-result
+而在第二种情况下，只有 “akka” 子树被提升了，结果如下:
 
 .. code-block:: ruby
 
@@ -266,113 +228,71 @@ result
 
 .. note::
 
-  The configuration library is really powerful, explaining all features exceeds
-  the scope affordable here. In particular not covered are how to include other
-  configuration files within other files (see a small example at `Including
-  files`_) and copying parts of the configuration tree by way of path
-  substitutions.
+这个配置文件库非常强大，这里不可能解释其所有的功能. 特别是如何在配置文件中包含其它的配置文件 (在[`包含文件Including
+  files`]()中有一个简单的例子) 以及通过路径替换来复制部分配置树。
 
-You may also specify and parse the configuration programmatically in other ways when instantiating
-the ``ActorSystem``.
+你也可以在初始化``ActorSystem``时，通过代码的形式，使用其它方法来指定和解析配置信息。
 
 .. includecode:: code/docs/config/ConfigDocSpec.scala
    :include: imports,custom-config
 
-Reading configuration from a custom location
---------------------------------------------
+###从自定义位置读取配置
+您可以使用代码或系统属性，来替换或补充``application.conf`` 。
 
-You can replace or supplement ``application.conf`` either in code
-or using system properties.
+如果您使用的``ConfigFactory.load()``（Akka默认方式），您可以通过定义``-Dconfig.resource=whatever``、``-Dconfig.file=whatever``或
+``-Dconfig.url=whatever``替换 ``application.conf``。
 
-If you're using ``ConfigFactory.load()`` (which Akka does by
-default) you can replace ``application.conf`` by defining
-``-Dconfig.resource=whatever``, ``-Dconfig.file=whatever``, or
-``-Dconfig.url=whatever``.
 
-From inside your replacement file specified with
-``-Dconfig.resource`` and friends, you can ``include
-"application"`` if you still want to use
-``application.{conf,json,properties}`` as well.  Settings
-specified before ``include "application"`` would be overridden by
-the included file, while those after would override the included
-file.
+在``-Dconfig.resource``和相关选项指定的替换配置文件中，如果你还想使用``application.{conf,json,properties}``，可以使用``include
+"application"``。在``include
+"application"``之前指定的设置会被包含进来的文件内容重写，同理包含的文件的内容也会被之后的内容重写。
 
-In code, there are many customization options.
+在代码中，有很多自定义选项。
 
-There are several overloads of ``ConfigFactory.load()``; these
-allow you to specify something to be sandwiched between system
-properties (which override) and the defaults (from
-``reference.conf``), replacing the usual
-``application.{conf,json,properties}`` and replacing
-``-Dconfig.file`` and friends.
+``ConfigFactory.load()``有几个重载；这些重载允许您指定夹在 系统属性（重写）和默认值（来自``reference.conf``）之间的配置，并替换通常的``application.{conf,json,properties}``和``-Dconfig.file``相关选项。
 
-The simplest variant of ``ConfigFactory.load()`` takes a resource
+The simplest variant of  takes a resource
 basename (instead of ``application``); ``myname.conf``,
 ``myname.json``, and ``myname.properties`` would then be used
 instead of ``application.{conf,json,properties}``.
 
-The most flexible variant takes a ``Config`` object, which
-you can load using any method in ``ConfigFactory``.  For example
-you could put a config string in code using
-``ConfigFactory.parseString()`` or you could make a map and
-``ConfigFactory.parseMap()``, or you could load a file.
+``ConfigFactory.load()`` 最简单的变体需要资源基本名称（``application``之外的）；如``myname.conf``、``myname.json``和``myname.properties``而不是``application.{conf,json,properties}``。
 
-You can also combine your custom config with the usual config,
-that might look like:
+最灵活的变体是以一个``Config``对象为参数，您可以使用``ConfigFactory``中的任何方法加载。例如，您可以在代码中使用``ConfigFactory.parseString()``处理一个配置字符串，或者你可以使用``ConfigFactory.parseMap()``创建一个映射，或者也可以加载一个文件。
+
+您也可以将自定义的配置与通常的配置组合起来，像这样：
 
 .. includecode:: code/docs/config/ConfigDoc.java
    :include: java-custom-config
 
-When working with ``Config`` objects, keep in mind that there are
-three "layers" in the cake:
+使用``Config``对象时，请牢记这个蛋糕有三"层"：
 
- - ``ConfigFactory.defaultOverrides()`` (system properties)
- - the app's settings
- - ``ConfigFactory.defaultReference()`` (reference.conf)
+- ``ConfigFactory.defaultOverrides()``（系统属性）
+- 应用设置
+- ``ConfigFactory.defaultReference()``（reference.conf）
 
-The normal goal is to customize the middle layer while leaving the
-other two alone.
+正常的目标是要自定义中间一层，不管其他两个。
 
- - ``ConfigFactory.load()`` loads the whole stack
- - the overloads of ``ConfigFactory.load()`` let you specify a
-   different middle layer
- - the ``ConfigFactory.parse()`` variations load single files or resources
+ - ``ConfigFactory.load()``加载整个堆栈
+ - ``ConfigFactory.load()``的重载允许您指定一个不同的中间层
+ - ``ConfigFactory.parse()`变体加载单个文件或资源
 
-To stack two layers, use ``override.withFallback(fallback)``; try
-to keep system props (``defaultOverrides()``) on top and
-``reference.conf`` (``defaultReference()``) on the bottom.
+要叠加两层，可使用``override.withFallback(fallback)``；请努力保持系统属性（``defaultOverrides()``）在顶部，``reference.conf`` （``defaultReference()``）在底部。
 
-Do keep in mind, you can often just add another ``include``
-statement in ``application.conf`` rather than writing code.
-Includes at the top of ``application.conf`` will be overridden by
-the rest of ``application.conf``, while those at the bottom will
-override the earlier stuff.
+要记住，通常你只需要在``application.conf``添加一个``include``语句，而不是编写代码。在``application.conf``顶部引入的将被``application.conf``其余部分覆盖，而那些在底部的设置将覆盖以前的内容。
 
-Actor Deployment Configuration
-------------------------------
-
-Deployment settings for specific actors can be defined in the ``akka.actor.deployment``
-section of the configuration. In the deployment section it is possible to define
-things like dispatcher, mailbox, router settings, and remote deployment.
-Configuration of these features are described in the chapters detailing corresponding
-topics. An example may look like this:
+###Actor部署配置
+可以在配置的``akka.actor.deployment``节中定义特定actor的部署设置。在部署部分有可能定义这些事物——调度器、邮箱、路由器设置和远程部署。在相应主题的章节中详细介绍了配置的这些特性。一个例子，可以如下所示：
 
 .. includecode:: code/docs/config/ConfigDocSpec.scala#deployment-section
 
-The deployment section for a specific actor is identified by the 
-path of the actor relative to ``/user``.
+一个指定actor部署部分的设置是通过其相对 ``/user``的路径来标识的。
 
-You can use asterisks as wildcard matches for the actor path sections, so you could specify:
-``/*/sampleActor`` and that would match all ``sampleActor`` on that level in the hierarchy.
-You can also use wildcard in the last position to match all actors at a certain level:
-``/someParent/*``. Non-wildcard matches always have higher priority to match than wildcards, so:
-``/foo/bar`` is considered **more specific** than ``/foo/*`` and only the highest priority match is used.
-Please note that it **cannot** be used to partially match section, like this: ``/foo*/bar``, ``/f*o/bar`` etc.
+您可以使用星号作为通配符匹配actor的路径部分，所以您可以指定：``/*/sampleActor``将匹配该树形结构中那个级别上的所有``sampleActor``。您也能把通配符放在最后来匹配某一级别的所有actor：``/someParent/*``。非通配符匹配总是有更高的优先级，所以：``/foo/bar``比``/foo/*`` **更具体**，并且只有最高优先的匹配才会。请注意它**不能**用于部分匹配，像这样：``/foo*/bar``、``/f*o/bar`` 等。
 
-Listing of the Reference Configuration
---------------------------------------
+###参考配置清单
 
-Each Akka module has a reference configuration file with the default values.
+每个Akka模块都有保存默认值的“reference”配置文件。
 
 .. _config-akka-actor:
 
@@ -445,13 +365,5 @@ akka-zeromq
 
 .. literalinclude:: ../../../akka-zeromq/src/main/resources/reference.conf
    :language: none
-
-
-
-
-
-
-
-
 
 
