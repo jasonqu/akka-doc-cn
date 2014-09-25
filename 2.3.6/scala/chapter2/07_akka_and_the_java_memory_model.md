@@ -26,15 +26,16 @@
 * **actor发送规则 : **一条消息的发送动作先于同一个actor对同一条消息的接收。
 * **actor后续处理规则: **一条消息的处理先于同一个actor的下一条消息处理
 
-note
-通俗地说，这意味着当这个actor处理下一个消息的时候，对actor的内部字段的改变是可见的。因此，在你的actor中的域不需要是volitale或是同等可见性的。
+> 注意
+
+> 通俗地说，这意味着当这个actor处理下一个消息的时候，对actor的内部字段的改变是可见的。因此，在你的actor中的域不需要是volitale或是同等可见性的。
 
 这两条规则都只应用于同一个actor实例，对不同的actor则无效。
 
 ###Future与Java内存模型
 一个Future的完成 “先于” 任何注册到它的回调函数(译者注：闭包)的执行。
 
-我们建议不要在回调中捕捉（close over）非final的值 (Java中称final，Scala中称val), 如果你*一定*要捕捉非final的域，则它们必须被标记为*volatile*来让它的当前值对回调代码可见。
+我们建议不要在回调中捕捉（close over）非final的值 (Java中称final，Scala中称val), 如果你**一定**要捕捉非final的域，则它们必须被标记为*volatile*来让它的当前值对回调代码可见。
 
 如果你捕捉一个引用，你还必须保证它所指代的实例是线程安全的。我们强烈建议远离使用锁的对象，因为它们会引入性能问题，甚至最坏可能造成死锁。
 
@@ -55,34 +56,35 @@ Akka中的软件事务性内存 (STM) 也提供了一条 “发生在先” 规�
 
 * 捕捉Actor内部状态并暴露给其它线程
 
-.. code-block:: scala
+```scala
 
 class MyActor extends Actor {
- var state = ...
- def receive = {
+  var state = ...
+  def receive = {
     case _ =>
-      //错误的做法
- 
-    // 非常错误，共享和可变状态，
-    // 会让应用莫名其妙地崩溃
+      // 错误的做法
+
+      // 非常错误，共享可变状态，
+      // 会让应用莫名其妙地崩溃
       Future { state = NewState }
       anotherActor ? message onSuccess { r => state = r }
- 
-    // 非常错误, "发送者" 随每个消息改变
-    // 共享可变状态 bug
+
+      // 非常错误, 共享可变状态 bug
+      // "发送者"是一个可变变量，随每个消息改变
       Future { expensiveCalculation(sender) }
- 
+
       //正确的做法
- 
-    // 非常安全， "self" 被捕捉是安全的
-    // 并且它是一个Actor引用, 是线程完全的
+
+      // 非常安全， "self" 被闭包捕捉是安全的
+      // 并且它是一个Actor引用, 是线程安全的
       Future { expensiveCalculation() } onComplete { f => self ! f.value.get }
- 
-    // 非常安全，我们捕捉了一个固定值
-    // 并且它是一个Actor引用，是线程安全的
+
+      // 非常安全，我们捕捉了一个固定值
+      // 并且它是一个Actor引用，是线程安全的
       val currentSender = sender
       Future { expensiveCalculation(currentSender) }
- }
+  }
 }
+```
 
 * 消息**应当**是不可变的, 这是为了避开共享可变状态的陷阱。

@@ -63,7 +63,7 @@
    * [周期信息调度](chapter7/10_scheduling_periodic_messages.md)
    * [模板模式](chapter7/11_template_pattern.md)
 * [实验模块](chapter8/experimental_modules.md)
-   * [持久化](chapter8/01_persistence.md)
+   * [持久化](chapter3/08_persistence.md)
    * [多节点测试](chapter8/02_multi_node_testing.md)
    * [Actors(使用Java的Lambda支持)](chapter8/03_actors.md)
    * [FSM(使用Java的Lambda支持)](chapter8/04_fsm.md)

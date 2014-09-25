@@ -39,16 +39,16 @@ actor系统是多个协作actor的组，它天生就是管理调度服务、配�
 
 对“阻塞问题”的充分解决方案的清单是不会穷尽的，但肯定会有下面的建议：
 
-* 在一个actor（或由一个路由器[[Java](#TODO), [Scala](http://doc.akka.io/docs/akka/2.3.6/scala/routing.html#routing-scala)]管理的一组actor内）内进行阻塞调用，并确保配置一个线程池，它要足够大或者专门用于这一目的。
-* 在一个 `Future` 内进行阻塞调用，确保任意时间点内这种调用的数量都在一个上限内（无限制提交这类任务会耗尽你的记忆或线程）。
+* 在一个actor（或由一个路由器[[Java](#TODO), [Scala](../chapter3/06_routing.md)]管理的一组actor内）内进行阻塞调用，并确保配置一个线程池，它要足够大或者专门用于这一目的。
+* 在一个 `Future` 内进行阻塞调用，确保任意时间点内这种调用的数量都在一个上限内（无限制提交这类任务会耗尽你的内存或线程）。
 * 在一个 `Future` 内进行阻塞调用，使用一个线程池，该线程池的线程数上限对应用程序运行的硬件是合适的。
 * 奉献一个单独的线程来管理一组阻塞资源（如一个NIO选择器驱动多个频道），并在事件发生时把它们作为actor消息发送。
 
-第一个建议对本质上是单线程的资源特别适合，如传统数据库句柄一次只能执行一个未完成的查询，并使用内部同步保证这一点。一个常见的​​模式是对N个actor创建一个router，每个actor包装一个数据库连接，并处理发送给这个router的查询。数目`N`必须被调整为最大吞吐量，这个数字取决于什么数据库管理系统部署在什么硬件上。
+第一个建议对本质上是单线程的资源特别适合，如传统数据库句柄一次只能执行一个未完成的查询，并使用内部同步保证这一点。一个常见的模式是对N个actor创建一个router，每个actor包装一个数据库连接，并处理发送给这个router的查询。数目`N`必须被调整为最大吞吐量，这个数字取决于什么数据库管理系统部署在什么硬件上。
 
 NOte
 注意
-配置线程池的任务最好代理给Akka来做，只要在` application.conf `中配置，并由`ActorSystem` [[Java](http://doc.akka.io/docs/akka/2.3.6/java/dispatchers.html#dispatcher-lookup-java), [Scala](http://doc.akka.io/docs/akka/2.3.6/scala/dispatchers.html#dispatcher-lookup-scala)] 实例化即可。
+配置线程池的任务最好代理给Akka来做，只要在` application.conf `中配置，并由`ActorSystem` [[Java](#TODO), [Scala](../chapter3/04_dispatchers.md#dispatcher-lookup-scala)] 实例化即可。
 
 
 ###你不应该担心的事

@@ -1,8 +1,8 @@
 # Actor引用, 路径与地址
 
-本章描述actor如何被确定，以及在一个可能是分布式的actor系统中如何定位。这与 [Actor系统]() 的核心概念有关：固有的树形监管结构和跨多个网络节点的actor之间进行透明通讯。
+本章描述actor如何被确定，以及在一个可能是分布式的actor系统中如何定位。这与 [Actor系统](02_actor_systems.md) 的核心概念有关：固有的树形监管结构和跨多个网络节点的actor之间进行透明通讯。
 
-.. image:: ActorPath.png
+![](ActorPath.png)
 
 上图展示了actor系统中最重要的实体关系，请继续阅读了解详情。
 
@@ -31,9 +31,9 @@ Actor引用是 `ActorRef` 的子类，其最重要的目的是支持向它所代
 #####Actor引用和路径之间有什么区别？
 Actor引用标明了一个actor，其生命周期和actor的生命周期保持匹配；actor路径表示一个名称，其背后可能有也可能没有真实的actor，而且路径本身不具有生命周期，它永远不会失效。你可以创建一个actor路径，而无需创建一个actor，但你不能在创建actor引用时不创建相应的actor。
 
-.. note::
-注意
-这个定义并不适用于`actorFor`，这是为什么废弃`actorFor`而选择`actorSelection`的原因之一。
+> 注意
+
+> 这个定义并不适用于`actorFor`，这是为什么废弃`actorFor`而选择`actorSelection`的原因之一。
 
 你可以创建一个actor，终止它，然后创建一个具有相同路径的新actor。新创建的实例是actor的一个新的化身。它并不是一样的actor。一个指向老的化身的actor引用不适用于新的化身。发送给老的actor引用的消息不会被传递到新的化身，即使它们拥有相同的路径。
 
@@ -41,8 +41,8 @@ Actor引用标明了一个actor，其生命周期和actor的生命周期保持�
 
 每一条actor路径都有一个地址组件，描述访问这个actor所需要的协议和位置，之后是从根到actor所经过的树节点上actor的名字。例如：
 
-  "akka://my-sys/user/service-a/worker1"                   // 纯本地
-  "akka.tcp://my-sys@host.example.com:5678/user/service-b" // 远程
+    "akka://my-sys/user/service-a/worker1"                   // 纯本地
+    "akka.tcp://my-sys@host.example.com:5678/user/service-b" // 远程
 
 在这里, `akka.tcp` 是Akka 2.2及以上版本默认的远程传输方式，其它的方式都是可以通过插件引入的。对使用UDP的远程主机可以使用`akka.udp`访问。对主机和端口部分的解析（即上例中的`host.example.com:5678`）决定于所使用的传输机制，但是必须遵循URI的结构标准。
 
@@ -67,9 +67,9 @@ actor引用的获取方法分为两类：通过创建actor，或者通过查找a
 
 为了获得一个绑定到指定actor生命周期的`ActorRef`，你需要发送一个消息，如内置的`Identify`信息，向指定的actor，所获得的`sender()`即为所求。
 
-.. note::
-注意
-`actorFor`因被`actorSelection`替代而废弃，因为`actorFor`对本地和远程的actor表现有所不同。对一个本地actor引用，被查找的actor需要在查找之前就存在，否而获得的引用是一个`EmptyLocalActorRef`。即使后来与实际路径相符的actor被创建，所获得引用仍然是这样。对于`actorFor`行为获得的远程actor
+> 注意
+
+> `actorFor`因被`actorSelection`替代而废弃，因为`actorFor`对本地和远程的actor表现有所不同。对一个本地actor引用，被查找的actor需要在查找之前就存在，否而获得的引用是一个`EmptyLocalActorRef`。即使后来与实际路径相符的actor被创建，所获得引用仍然是这样。对于`actorFor`行为获得的远程actor
 引用则不同，每封邮件的发送都会在远程系统中进行一次按路径的查找。
 
 ###绝对路径 vs 相对路径
@@ -93,9 +93,9 @@ actor引用的获取方法分为两类：通过创建actor，或者通过查找a
 
 #####总结: `actorOf` vs. `actorSelection`vs. `actorFor`
 
-Note
-以上部分所描述的细节可以简要地总结和记忆成：
+> Note
 
+> 以上部分所描述的细节可以简要地总结和记忆成：
 * `actorOf` 永远都只会创建一个新的actor，这个新的actor是actorOf所调用上下文（可以是任意一个actor或actor系统本身）的直接子actor
 * `actorSelection`只会在消息送达后查找已经存在的actor集合，即不会创建actor，也不会在创建选择集合时验证actor是否存在。
 * `actorFor`（废弃，已经被`actorSelection`取代） 永远都只是查找到一个已存在的actor，不会创建新的actor。
@@ -113,21 +113,20 @@ Note
 ###重用Actor路径
 当一个actor被终止，其引用将指向一个死信邮箱，DeathWatch将发布其最终的转变，并且一般地它也不会起死回生（因为actor的生命周期不允许这样）。虽然以后可能创建一个具有相同路径的actor——如果无法保留actor系统开始以来创建的所有可用actor，则无法保证其反向成立——因而这不是一个好的实践：通过`acterFor`获取的已经‘死亡’的远程actor引用突然再次开始工作，但没有这种过渡和任何其他事件之间顺序的任何保证，因此，该路径的新居民可能收到本意是送给其以前住户的消息。
 
-//TODO
-在某些非常特殊的情况下这可能是正确的事情，但一定要限制这种处理恰恰是演员的上司，因为那是它可以可靠地检测名称正确注销唯一的演员，之前的新创作孩子将失败。
+在某些非常特殊的情况下这可能是正确的事情，但一定要限制这种处理只能由其监管者操作，因为它是唯一可以可靠地检测名称正确注销的actor，在此之前的新创建的孩子将失败。
 
-它也可以在测试过程中所需的，当被检者取决于被实例化在特定的路径。在这种情况下，最好是嘲笑其主管，这样它会在终止消息转发到测试程序中的适当位置，从而使后者等待的名称的正确注销。
+它在测试中可能也是必要的，当测试对象取决于某个特定路径被实例化的时候。在这种情况下，最好mock其监管者，这样它会将终止消息转发至测试过程正确的点，使后者能够等待登记名字的正确注销。
 
 ###与远程部署之间的互操作
 当一个actor创建一个子actor，actor系统的部署者会决定新的actor是在同一个jvm中还是在其它节点上。如果是后者，actor的创建会通过网络连接引到另一个jvm中进行，因而在另一个actor系统中。远程系统会将新的actor放在一个专为这种场景所保留的特殊路径下，新的actor的监管者将会是一个远程actor引用（代表触发它创建动作的actor）。这时，`context.parent`（监管者引用）和`context.path.parent`（actor路径上的父actor）表示的actor是不同的。然而，在其监管者中查找这个actor的名称将会在远程节点上找到它，保持其逻辑结构，例如向另一个未确定(unresolved)的actor引用发送消息。
 
-.. image:: RemoteDeployment.png
+![](RemoteDeployment.png)
 
 ###路径中的地址部分用来做什么？
 在网络上传送actor引用时，是用它的路径来表示的。因此，它的路径必须包括能够用来向它所代表的actor发送消息的完整信息。这一点是通过将协议、主机名和端口编码在路径字符串的地址部分做到的。当actor系统从远程节点接收到一个actor路径，会检查它的地址部分是否与自己的地址相同，如果相同，那么会将这条路径解析为本地actor引用，否则解析为一个远程actor引用。
 
 
-###Actor路径的顶级作用域
+###<a name="toplevel-paths"></a>Actor路径的顶级作用域
 在路径树的根上是根监管者，所有其他actor都可以从通过它找到；它的名字是`"/"`。在第二个层次上是以下这些：
 
 * `"/user"` 是所有由用户创建的顶级actor的监管者；用 `ActorSystem.actorOf`创建的actor在其下。
@@ -138,5 +137,5 @@ Note
 
 需要为actor构建这样的名称空间源于一个核心的非常简单的设计目标：在层次结构中的一切都是一个actor，以及所有的actor都以相同方式工作。因此，你不仅可以查找你所创建的actor，你也可以查找系统守护者并发送消息（在这种情况下它会忠实地丢弃之）。这个强大的原则意味着不需要记住额外的怪异模式，它使整个系统更加统一和一致。
 
-如果您想了解更多关于actor系统的顶层结构，参考[顶级监管者]()。
+如果您想了解更多关于actor系统的顶层结构，参考[顶级监管者](04_supervision_and_monitoring.md#toplevel-supervisors)。
 

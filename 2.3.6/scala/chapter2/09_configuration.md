@@ -8,45 +8,40 @@
 * 路由器定义
 * 调度的调整
 
-Akka使用`Typesafe配置库
-<https://github.com/typesafehub/config>`，这可能也是你自己的应用或库的不错选择，不管用不用Akka。这个库由Java实现，没有外部的依赖；本文后面将只对这个库有一些归纳，你应该查看其文档参考具体的使用（尤其是`ConfigFactory
-<http://typesafehub.github.io/config/v1.2.0/com/typesafe/config/ConfigFactory.html>`）。
+Akka使用[Typesafe配置库](https://github.com/typesafehub/config)，这可能也是你自己的应用或库的不错选择，不管用不用Akka。这个库由Java实现，没有外部的依赖；本文后面将只对这个库有一些归纳，你应该查看其文档参考具体的使用（尤其是[ConfigFactory](http://typesafehub.github.io/config/v1.2.0/com/typesafe/config/ConfigFactory.html)）。
 
 
-.. warning::
+> 警告
 
-如果你在Scala REPL的2.9.x系列版本中使用Akka，并且你不提供自己的ClassLoader给ActorSystem，则需要以“-Yrepl-sync”选项启动REPL来解决上下文ClassLoader的缺陷。
+> 如果你在Scala REPL的2.9.x系列版本中使用Akka，并且你不提供自己的ClassLoader给ActorSystem，则需要以“-Yrepl-sync”选项启动REPL来解决上下文ClassLoader的缺陷。
 
 ###配置读取的地方
 
 Akka的所有配置都保存在`ActorSystem`的实例中，或者换一种说法，从外界来看，`ActorSystem`是配置信息的唯一消费者。在构造一个actor系统时，你可以选择传进一个`Config`对象，如果不传则等效于传入``ConfigFactory.load()``（通过正确的类加载器）。粗略的讲，这意味着默认会解析classpath根目录下所有的`application.conf`，`application.json`和`application.properties`文件——请参考前面提到的文档以获取细节。然后actor系统会合并classpath根目录下的所有 ``reference.conf``行成后备配置，也就是说，它在内部使用
 
-.. code-block:: scala
-
+```scala
   appConfig.withFallback(ConfigFactory.defaultReference(classLoader))
+```
 
 其哲学是代码永远不包含缺省值，相反是依赖于随库提供的 `reference.conf` 中的配置。
 
-系统属性中覆盖的配置具有最高优先级，参见 `HOCON 规范
-<https://github.com/typesafehub/config/blob/master/HOCON.md>`（靠近末尾的位置）。此外值得注意的是，应用程序配置——缺省为``application``——可以使用``config.resource``属性重写 （还有更多，请参阅`配置文档
-<https://github.com/typesafehub/config/blob/master/README.md>`）。
+系统属性中覆盖的配置具有最高优先级，参见[HOCON 规范](https://github.com/typesafehub/config/blob/master/HOCON.md)（靠近末尾的位置）。此外值得注意的是，应用程序配置——缺省为``application``——可以使用``config.resource``属性重写 （还有更多，请参阅[配置文档](https://github.com/typesafehub/config/blob/master/README.md)）。
 
-.. note::
+> 注意
 
-如果您正在编写一个Akka 应用，将你的配置保存类路径的根目录下的``application.conf``文件中。如果您正在编写一个基于Akka的库，将其配置保存在JAR包根目录下的``reference.conf``文件中。
+> 如果您正在编写一个Akka 应用，将你的配置保存类路径的根目录下的``application.conf``文件中。如果您正在编写一个基于Akka的库，将其配置保存在JAR包根目录下的``reference.conf``文件中。
 
 ###当使用JarJar,，OneJar，Assembly或任何jar打包命令（jar-bundler）
 .. warning::
 Akka的配置方法重度依赖于这个理念——每一模块/jar都有它自己的 `reference.conf`文件，所有这些都将会被配置发现并加载。不幸的是，这也意味着如果你放置/合并多个jar到相同的 jar中，您页需要合并所有的`reference.conf`文件。否则所有的默认设置将会丢失，Akka将无法工作。
 
-如果你使用 Maven 打包应用程序，你还可以使用`Apache Maven Shade Plugin
-<http://maven.apache.org/plugins/maven-shade-plugin>`中对`资源转换（Resource
-Transformers）
-<http://maven.apache.org/plugins/maven-shade-plugin/examples/resource-transformers.html#AppendingTransformer>`的支持，来将所有构建类路径中的`reference.conf`合并为一个文件。
+如果你使用 Maven 打包应用程序，你还可以使用[Apache Maven Shade Plugin](
+http://maven.apache.org/plugins/maven-shade-plugin)中对[资源转换（Resource
+Transformers）](http://maven.apache.org/plugins/maven-shade-plugin/examples/resource-transformers.html#AppendingTransformer)的支持，来将所有构建类路径中的`reference.conf`合并为一个文件。
 
 插件配置可能如下所示：
 
-
+```xml
     <plugin>
      <groupId>org.apache.maven.plugins</groupId>
      <artifactId>maven-shade-plugin</artifactId>
@@ -81,11 +76,13 @@ Transformers）
       </execution>
      </executions>
     </plugin>
+```
 
+.. _-Dakka.log-config-on-start:
 ###自定义application.conf
 一个自定义的``application.conf`可能看起来像这样：
 
-
+```
   # In this file you can override any option defined in the reference files.
   # Copy in parts of the reference files and modify as you please.
 
@@ -107,7 +104,7 @@ Transformers）
 
     actor {
       provider = "akka.cluster.ClusterActorRefProvider"
-      
+
       default-dispatcher {
         # Throughput for default Dispatcher, set to 1 for as fair as possible
         throughput = 10
@@ -119,6 +116,7 @@ Transformers）
       netty.tcp.port = 4711
     }
   }
+```
 
 ###包含文件
 有时包含另一个配置文件内容的能力是非常有用，例如假设你有一个``application.conf``包含所有环境独立设置，然后使用特定环境的设置覆写。
@@ -127,25 +125,23 @@ Transformers）
 
 dev.conf:
 
-::
-
+```
   include "application"
 
   akka {
     loglevel = "DEBUG"
   }
+```
 
-更高级的包括和替换机制的解释在`HOCON <https://github.com/typesafehub/config/blob/master/HOCON.md>`规范中。
+更高级的包括和替换机制的解释在[HOCON](https://github.com/typesafehub/config/blob/master/HOCON.md)规范中。
 
-
-.. _-Dakka.log-config-on-start:
 
 ###配置日志
 如果系统或配置属性``akka.log-config-on-start`` 被设置为 ``on``，则在actor系统启动的时候，就完成了INFO级别的日志设置。当你不能确定使用何种配置时，这很有用。
 
 如果有疑问，您也可以在创建actor系统之前或之后，很容易很方便地检查配置对象：
 
-.. parsed-literal::
+```
 
   Welcome to Scala version @scalaVersion@ (Java HotSpot(TM) 64-Bit Server VM, Java 1.6.0_27).
   Type in expressions to have them evaluated.
@@ -166,14 +162,15 @@ dev.conf:
           "b" : 12
       }
   }
+```
 
 展示结果中，每个项目前会有评论展示这个配置的起源（对应的文件和行数），并展示已存在的评论，如配置参考中的。actor系统合并参考并解析后形成的设置，可以这样显示：
 
-.. code-block:: java
-
+```java
   final ActorSystem system = ActorSystem.create();
   System.out.println(system.settings());
   // this is a shortcut for system.settings().config().root().render()
+```
 
 ###谈一谈类加载器
 
@@ -190,6 +187,7 @@ dev.conf:
 
 由于 ConfigFactory.load() 会合并classpath中所有匹配名称的资源, 最简单的方式是利用这一功能并在配置树中区分actor系统:
 
+```
   myapp1 {
     akka.loglevel = "WARNING"
     my.own.setting = 43
@@ -200,35 +198,36 @@ dev.conf:
   }
   my.own.setting = 42
   my.other.setting = "hello"
+```
 
-.. code-block:: scala
-
+```scala
   val config = ConfigFactory.load()
   val app1 = ActorSystem("MyApp1", config.getConfig("myapp1").withFallback(config))
   val app2 = ActorSystem("MyApp2",
     config.getConfig("myapp2").withOnlyPath("akka").withFallback(config))
+```
 
 这两个例子演示了“提升子树”技巧的不同变种: 第一种情况下，actor系统获得的配置是
 
-.. code-block:: ruby
-
+```ruby
   akka.loglevel = "WARNING"
   my.own.setting = 43
   my.other.setting = "hello"
   // plus myapp1 and myapp2 subtrees
+```
 
 而在第二种情况下，只有 “akka” 子树被提升了，结果如下:
 
-.. code-block:: ruby
-
+```ruby
   akka.loglevel = "ERROR"
   my.own.setting = 42
   my.other.setting = "hello"
   // plus myapp1 and myapp2 subtrees
+```
 
-.. note::
+> 注意
 
-这个配置文件库非常强大，这里不可能解释其所有的功能. 特别是如何在配置文件中包含其它的配置文件 (在[`包含文件Including
+> 这个配置文件库非常强大，这里不可能解释其所有的功能. 特别是如何在配置文件中包含其它的配置文件 (在[`包含文件Including
   files`]()中有一个简单的例子) 以及通过路径替换来复制部分配置树。
 
 你也可以在初始化``ActorSystem``时，通过代码的形式，使用其它方法来指定和解析配置信息。
