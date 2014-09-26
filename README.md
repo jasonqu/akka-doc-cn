@@ -8,13 +8,13 @@ akka文档中文翻译
 
 ###贡献力量
 
-欢迎大家对该文档贡献力量，提出[宝贵意见](issues)，修改并提交[Pull Requests](pulls)。
+欢迎大家对该文档贡献力量，提出[宝贵意见](../../issues)，修改并提交[Pull Requests](../../pulls)。
 
 如果对scala和akka感兴趣，欢迎加入“无水scala群”：231809997，有各路scala高手帮你释疑。
 
 对贡献的要求是保持术语和代码的一致
 
-* **术语的一致**：以[《Akka 2.0文档》](http://www.gtan.com/welfare04.html)的术语为准，如果有更好的选择，欢迎[提出issue](issues)
+* **术语的一致**：以[《Akka 2.0文档》](http://www.gtan.com/welfare04.html)的术语为准，如果有更好的选择，欢迎[提出issue](../../issues)
 * **代码的一致**：书的内容放在`版本号/语言/`目录下，如`2.3.6/scala/`，生成的html文件放在`版本号/语言/book/`目录下。如非必要，不要提交其他无关内容或生成的内容。
 
 ###翻译进度与状态
