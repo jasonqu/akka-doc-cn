@@ -38,7 +38,7 @@ Akka实现的是一种叫“父监管”的形式。Actor只能被其它的actor
 
 根守护者所谓“顶级”actor的祖父，它监督所有在[Actor路径的顶级作用域](05_actor_references_paths_and_addresses.md#toplevel-paths)中定义的特殊actor，使用发现任何`Exception`就终止子actor的`SupervisorStrategy.stoppingStrategy`策略。其他所有Throwable都会被上升……但是上升给谁？所有的真实actor都有一个监管者，但是根守护者没有父actor，因为它就是整个树结构的根。因此这里使用一个虚拟的`ActorRef`，在发现问题后立即停掉其子actor，并在根守护者完全终止之后（所有子actor递归停止），立即把actor系统的`isTerminated`置为`true`。
 
-###重启的含义
+###<a name="supervision-restart"></a>重启的含义
 当actor在处理某条消息时失败时，失败的原因可以分成以下三类:
 
 * 对收到的特定消息的系统错误（即程序错误）
