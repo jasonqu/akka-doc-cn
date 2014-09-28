@@ -221,6 +221,7 @@ def postRestart(reason: Throwable): Unit = {
 
 以上所示的实现是`Actor` trait的缺省实现。
 
+<span id="actor-lifecycle-scala"></span>
 ###Actor生命周期
 
 .. image:: ../images/actor_lifecycle.png
@@ -235,6 +236,7 @@ actor系统中的路径代表一个"地方"，这里可能会被活着的actor�
 
 相对地，`ActorSelection`指向路径（或多个路径，如果使用了通配符），且完全不关注有没有化身占据它。因此`ActorSelection` 不能被观察。获取某路径下的当前化身``ActorRef``是可能的，只要向该``ActorSelection``发送``Identify``，如果收到``ActorIdentity``回应，则正确的引用就包含其中（详见[通过Actor Selection确定Actor](#actorselection-scala)）。也可以使用`ActorSelection`的``resolveOne``方法，它会返回一个包含匹配`ActorRef`的``Future``。
 
+<span id="deathwatch-scala"></span>
 #####使用DeathWatch进行生命周期监控
 为了在其它actor终止时 (即永久停止, 而不是临时的失败和重启)收到通知, actor可以将自己注册为其它actor在终止时所发布的`Terminated`消息的接收者（见[停止 Actor](#stopping-actors)）。这个服务是由actor系统的`DeathWatch`组件提供的。
 
@@ -262,6 +264,7 @@ class WatchActor extends Actor {
 
 可以使用``context.unwatch(target)``来停止对另一个actor生存状态的监控。即使`Terminated`已经加入邮箱，该操作仍有效；一旦调用`unwatch`，则被观察的actor的`Terminated`消息都不会再被处理。
 
+<span id="start-hook-scala"></span>
 #####启动Hook
 actor启动后，它的`preStart`方法会被立即执行。
 
@@ -274,67 +277,460 @@ override def preStart() {
 
 这位actor第一次创建时，将调用此方法。在重新启动期间，它被`postRestart`的默认实现调用，这意味着通过重写该方法，你可以选择是仅仅在初始化该actor时调用一次，还是为每次重新启动都调用。actor构造函数中的初始化代码将在每个actor实例创建的时候被调用，这也发生在每次重启时。
 
-#####重启 Hook
+<span id="restart-hook-scala"></span>
+#####重启Hook
 所有的actor都是被监管的，即与另一个使用某种失败处理策略的actor链接在一起。如果在处理一个消息的时候抛出的异常，Actor将被重启（详见[监管与监控](../chapter2/04_supervision_and_monitoring.md)）。这个重启过程包括上面提到的Hook:
 
+1. 要被重启的actor被通知是通过调用`preRestart`，包含着导致重启的异常以及触发异常的消息; 如果重启并不是因为消息处理而发生的，则所携带的消息为`None`，例如，当一个监管者没有处理某个异常继而被其监管者重启时，或者因其兄弟节点的失败导致的重启。如果消息可用，则消息的发送者通常也可用（即通过调用``sender``）。
+
+  这个方法是用来完成清理、准备移交给新actor实例等操作的最佳位置。其缺省实现是终止所有子actor并调用`postStop`。
+2. 最初调用``actorOf``的工厂将被用来创建新的实例。
+3. 新的actor的`postRestart`方法被调用时，将携带着导致重启的异常信息。默认实现中，`preStart`被调用时，就像一个正常的启动一样。
+
+actor的重启只会替换掉原来的actor对象；重启不影响邮箱的内容, 所以对消息的处理将在`postRestart` hook返回后继续。触发异常的消息不会被重新接收。在actor重启过程中，所有发送到该actor的消息将象平常一样被放进邮箱队列中。
+
+> 警告
+
+> 要知道失败通知与用户消息的相关顺序不是决定性的。尤其是，在失败以前收到的最后一条消息被处理之前，父节点可能已经重启其子节点了。详细信息请参见[“讨论：消息顺序”](../chapter2/08_message_delivery_reliability.md#message-ordering)。
+
+<span id="stop-hook-scala"></span>
+#####终止 Hook
+一个Actor终止后，其`postStop` hook将被调用，它可以用来，例如取消该actor在其它服务中的注册。这个hook保证在该actor的消息队列被禁止后才运行，即之后发给该actor的消息将被重定向到`ActorSystem`的`deadLetters`中。
+
+<span id="actorSelection-scala"></span>
+###通过Actor Selection定位Actor
+如[Actor引用, 路径与地址](../chapter2/05_actor_references_paths_and_addresses.md)中所述，每个actor都拥有一个唯一的逻辑路径，此路径是由从actor系统的根开始的父子链构成；它还拥有一个物理路径，如果监管链包含有远程监管者，此路径可能会与逻辑路径不同。这些路径用来在系统中查找actor，例如，当收到一个远程消息时查找收件者，但是它们更直接的用处在于：actor可以通过指定绝对或相对路径（逻辑的或物理的）来查找其它的actor，并随结果获取一个`ActorSelection`：
+
+```scala
+// will look up this absolute path
+context.actorSelection("/user/serviceA/aggregator")
+// will look up sibling beneath same supervisor
+context.actorSelection("../joe")
+```
+
+其中指定的路径被解析为一个`java.net.URI`，它以``/``分隔成路径段。如果路径以``/``开始，表示一个绝对路径，且从根监管者（``"/user"``的父亲）开始查找；否则是从当前actor开始。如果某一个路径段为``..``，会找到当前所遍历到的actor的上一级，否则则会向下一级寻找具有该名字的子actor。 必须注意的是actor路径中的``..``总是表示逻辑结构，即其监管者。
+
+一个actor selection的路径元素中可能包含通配符，从而允许向匹配模式的集合广播该条消息：
+
+```scala
+// will look all children to serviceB with names starting with worker
+context.actorSelection("/user/serviceB/worker*")
+// will look up all siblings beneath same supervisor
+context.actorSelection("../*")
+```
+
+消息可以通过`ActorSelection`发送，并且在投递每条消息时 `ActorSelection`的路径都会被查找。如果selection不匹配任何actor，则消息将被丢弃。
+
+要获得`ActorSelection`的`ActorRef`，你需要发送一条消息到selection，然后使用答复消息的``sender()``引用即可。有一个内置的``Identify``消息，所有actor会理解它并自动返回一个包含`ActorRef`的`ActorIdentity`消息。此消息被遍历到的actor特殊处理为，如果一个具体的名称查找失败（即一个不含通配符的路径没有对应的活动actor），则会生成一个否定结果。请注意这并不意味着应答消息有到达保证，它仍然是一个普通的消息。
+
+```scala
+import akka.actor.{ Actor, Props, Identify, ActorIdentity, Terminated }
+ 
+class Follower extends Actor {
+  val identifyId = 1
+  context.actorSelection("/user/another") ! Identify(identifyId)
+ 
+  def receive = {
+    case ActorIdentity(`identifyId`, Some(ref)) =>
+      context.watch(ref)
+      context.become(active(ref))
+    case ActorIdentity(`identifyId`, None) => context.stop(self)
+ 
+  }
+ 
+  def active(another: ActorRef): Actor.Receive = {
+    case Terminated(`another`) => context.stop(self)
+  }
+}
+```
+
+你也可以通过`ActorSelection`的``resolveOne``方法获取`ActorSelection`的一个`ActorRef`。如果存在这样的actor，它将返回一个包含匹配的`ActorRef`的``Future``。如果没有这样的actor
+存在或识别没有在指定的时间内完成，它将以失败告终（akka.actor.ActorNotFound）。
+
+如果开启了远程调用，则远程actor地址也可以被查找。:
+
+	context.actorSelection("akka.tcp://app@otherhost:1234/user/serviceB")
 
 
-TODO
-1. 要被重启的actor的 preRestart 被调用，携带着导致重启的异常以及触发异常的消息; 如果重启并不是因为消息的处理而发生的，所携带的消息为 None , 例如，当一个监管者没有处理某个异常继而被它自己的监管者重启时。 这个方法是用来完成清理、准备移交给新的actor实例的最佳位置。 它的缺省实现是终止所有的子actor并调用 postStop.
-最初 actorOf 调用的工厂方法将被用来创建新的实例。
-新的actor的 postRestart 方法被调用，携带着导致重启的异常信息。 By default the preStart is called, just as in the normal start-up case.
-actor的重启会替换掉原来的actor对象; 重启不影响邮箱的内容, 所以对消息的处理将在 postRestart hook 返回后继续. 触发异常的消息不会被重新接收。在actor重启过程中所有发送到该actor的消息将象平常一样被放进邮箱队列中。
+一个关于actor查找的示例见[远程查找](../chapter5/03_remoting.md#remote-sample-scala)。
 
+> 注意
 
+> `actorFor`因被`actorSelection`替代而废弃，因为`actorFor`对本地和远程的actor表现有所不同。对一个本地actor引用，被查找的actor需要在查找之前就存在，否则获得的引用是一个`EmptyLocalActorRef`。即使后来与实际路径相符的actor被创建，所获得引用仍然是这样。对于`actorFor`行为获得的远程actor
+引用则不同，每条消息的发送都会在远程系统中进行一次按路径的查找。
 
+###消息与不可变性
+**重要**：消息可以是任何类型的对象，但必须是不可变的。（目前） Scala还无法强制不可变性，所以这一点必须作为约定。String、Int、Boolean这些原始类型总是不可变的。 除了它们以外，推荐的做法是使用Scala case class，它们是不可变的（如果你不专门暴露状态的话），并与接收侧的模式匹配配合得非常好。
 
+以下是一个例子:
 
+```scala
+// define the case class
+case class Register(user: User)
+ 
+// create a new case class message
+val message = Register(user)
+```
 
+###发送消息
+向actor发送消息需使用下列方法之一。
 
+* ``!``意思是“fire-and-forget”，即异步发送一个消息并立即返回。也称为``tell``。
+* ``?``异步发送一条消息并返回一个`Future`代表一个可能的回应。也称为``ask``。
 
+对每一个消息发送者，分别有消息顺序保证。
 
+> 注意
 
+> 使用``ask``有一些性能内涵，因为需要跟踪超时，需要有桥梁将``Promise``转为`ActorRef`，并且需要在远程情况下可访问。所以为了性能总是选择``tell``，除非只能选择``ask``。
 
+<span id="actors-tell-sender-scala"></span>
+#####Tell: Fire-forget
+这是发送消息的推荐方式。 不会阻塞地等待消息。它拥有最好的并发性和可扩展性。
 
+	actorRef ! message
 
+如果是在一个Actor中调用 ，那么发送方的actor引用会被隐式地作为消息的``sender(): ActorRef``成员一起发送。目的actor可以使用它来向源actor发送回应， 使用``sender() ! replyMsg``。
 
+如果**不**是从Actor实例发送的，sender成员缺省为 `deadLetters` actor引用。
 
+#####Ask: Send-And-Receive-Future
+``ask``模式既包含actor也包含future, 所以它是一种使用模式，而不是`ActorRef`的方法:
 
+```scala
+import akka.pattern.{ ask, pipe }
+import system.dispatcher // The ExecutionContext that will be used
+case class Result(x: Int, s: String, d: Double)
+case object Request
+ 
+implicit val timeout = Timeout(5 seconds) // needed for `?` below
+ 
+val f: Future[Result] =
+  for {
+    x <- ask(actorA, Request).mapTo[Int] // call pattern directly
+    s <- (actorB ask Request).mapTo[String] // call by implicit conversion
+    d <- (actorC ? Request).mapTo[Double] // call by symbolic name
+  } yield Result(x, s, d)
+ 
+f pipeTo actorD // .. or ..
+pipe(f) to actorD
+```
 
+上面的例子展示了将``ask``与future上的``pipeTo``模式一起使用，因为这是一种非常常用的组合。 请注意上面所有的调用都是完全非阻塞和异步的：``ask``产生 `Future`, 三个`Future`通过for-语法组合成一个新的future，然后用``pipeTo``在future上安装一个``onComplete``-处理器来完成将收集到的`Result`发送到另一个actor的动作。
 
+使用``ask``将会像``tell``一样发送消息给接收方, 接收方必须通过``sender() ! reply``发送回应来为返回的`Future`填充数据。``ask``操作包括创建一个内部actor来处理回应，必须为这个内部actor指定一个超时期限，并且过期销毁该内部actor以防止内存泄露。
 
+> 警告
 
+> 如果要以异常来完成future你需要发送一个`Failure`消息给发送方。这个操作*不会在actor处理消息发生异常时自动完成*。
 
+```scala
+try {
+  val result = operation()
+  sender() ! result
+} catch {
+  case e: Exception =>
+    sender() ! akka.actor.Status.Failure(e)
+    throw e
+}
+```
 
+如果actor没有完成future，它会在超时时限到来时过期，以`AskTimeoutException`结束。超时的时限是按下面的顺序和位置来获取的:
 
+1. 显式指定超时：
 
+```scala
+import akka.util.duration._
+import akka.pattern.ask
+val future = myActor.ask("hello")(5 seconds)
+```
 
+2. 提供类型为`akka.util.Timeout`的隐式参数, 例如，
 
+```scala
+import scala.concurrent.duration._
+import akka.util.Timeout
+import akka.pattern.ask
+implicit val timeout = Timeout(5 seconds)
+val future = myActor ? "hello"
+```
 
+参阅 [Futures (Scala)](../chapter4/01_futures.md#futures-scala) 了解更多关于等待和查询future的信息。
 
+``Future``的``onComplete``、``onSuccess``或``onFailure``方法可以用来注册一个回调，以便在Future完成时得到通知。从而提供一种避免阻塞的方法。
 
+> 警告
 
+> 在使用future回调如``onComplete``、``onSuccess``和``onFailure``时, 在actor内部你要小心避免捕捉该actor的引用，即不要在回调中调用该actor的方法或访问其可变状态。这会破坏actor的封装，会引用同步bug和竞态条件，因为回调会与此actor一同被并发调度。不幸的是目前还没有一种编译时的方法能够探测到这种非法访问。参阅: [Actor与共享可变状态](../chapter2/07_akka_and_the_java_memory_model.md#jmm-shared-state)
 
+#####转发消息
+你可以将消息从一个actor转发给另一个。虽然经过了一个“中间人”，但最初的发送者地址/引用将保持不变。当实现类似路由器、负载均衡器、复制器等功能的actor时会很有用。
 
+	myActor.forward(message)
 
+###接收消息
+Actor必须实现``receive``方法来接收消息：
 
+	protected def receive: PartialFunction[Any, Unit]
 
+这个方法应返回一个``PartialFunction``，例如一个“match/case”子句，消息可以与其中的不同分支进行scala模式匹配。如下例:
 
+```scala
+import akka.actor.Actor
+import akka.actor.Props
+import akka.event.Logging
+ 
+class MyActor extends Actor {
+  val log = Logging(context.system, this)
+  def receive = {
+    case "test" => log.info("received test")
+    case _      => log.info("received unknown message")
+  }
+}
+```
 
+<span id="actor-reply"></span>
+###回应消息
+如果你需要一个用来发送回应消息的目标，可以使用``sender()``，它返回一个Actor引用。你可以用``sender() ! replyMsg``向这个引用发送回应消息。你也可以将这个ActorRef保存起来，将来再作回应或传给其它actor。如果没有`sender`（不是从actor发送的消息或者没有future上下文）那么`sender`缺省为 “死信”actor引用.
 
+```scala
+  case request =>
+    val result = process(request)
+    sender() ! result       // will have dead-letter actor as default
+```
 
+###接收超时
 
+`ActorContext`的`setReceiveTimeout`定义一个不活动时间，在这个时间到达后后，叫出发一个`ReceiveTimeout`消息的发送。当指定时，接收函数应该能够处理`akka.actor.ReceiveTimeout`消息。最低支持的超时是 1 毫秒。
 
+请注意接收超时引发的`ReceiveTimeout`消息可能在另一条消息后加入队列；因此**不能保证**收到的接收超时必须与设置的空闲时间长度一致。
 
+一旦进行了设置，接收超时将一直有效（即继续在空闲期后重发）。通过传入`Duration.Undefined`关掉此功能。
 
+```scala
+import akka.actor.ReceiveTimeout
+import scala.concurrent.duration._
+class MyActor extends Actor {
+  // To set an initial delay
+  context.setReceiveTimeout(30 milliseconds)
+  def receive = {
+    case "Hello" =>
+      // To set in a response to a message
+      context.setReceiveTimeout(100 milliseconds)
+    case ReceiveTimeout =>
+      // To turn it off
+      context.setReceiveTimeout(Duration.Undefined)
+      throw new RuntimeException("Receive timed out")
+  }
+}
+```
+<span id="stopping-actors-scala"></span>
+###终止Actor
+通过调用``ActorRefFactory``（即``ActorContext``或``ActorSystem``）的`stop`方法来终止一个actor。通常context用来终止子actor，而 system用来终止顶级actor。实际的终止操作是异步执行的，即`stop`可能在actor被终止之前返回。
 
+如果当前有正在处理的消息，对该消息的处理将在actor被终止之前完成，但是邮箱中的后续消息将不会被处理。缺省情况下这些消息会被送到`ActorSystem`的`deadLetters`中，但是这取决于邮箱的实现。
 
+actor的终止分两步: 第一步actor将挂起对邮箱的处理，并向所有子actor发送终止命令，然后处理来自子actor的终止消息直到所有的子actor都完成终止，最后终止自己（调用`postStop`，清空邮箱, 向[DeathWatch](#deathwatch-scala)发布`Terminated`，通知其监管者）。这个过程保证actor系统中的子树以一种有序的方式终止，将终止命令传播到叶子结点并收集它们回送的确认消息给被终止的监管者。如果其中某个actor没有响应（即由于处理消息用了太长时间以至于没有收到终止命令），整个过程将会被阻塞。
 
+在`ActorSystem.shutdown()`被调用时, 系统根监管actor会被终止，以上的过程将保证整个系统的正确终止。
 
+`postStop()` hook 是在actor被完全终止以后调用的。这是为了清理资源:
 
+```scala
+override def postStop() {
+  // clean up some resources ...
+}
+```
 
+> 注意
 
+> 由于actor的终止是异步的，你不能马上使用你刚刚终止的子actor的名字；这会导致`InvalidActorNameException`。你应该 监视`watch()`正在终止的actor，并在`Terminated`最终到达后作为回应创建它的替代者。
 
+<span id="poison-pill-scala"></span>
+#####PoisonPill
+你也可以向actor发送``akka.actor.PoisonPill``消息，这个消息处理完成后actor会被终止。``PoisonPill``与普通消息一样被放进队列，因此会在已经入队列的其它消息之后被执行。
+
+#####优雅地终止
+如果你需要等待终止过程的结束，或者组合若干actor的终止次序，可以使用`gracefulStop`：
+
+```scala
+import akka.pattern.gracefulStop
+import scala.concurrent.Await
+ 
+try {
+  val stopped: Future[Boolean] = gracefulStop(actorRef, 5 seconds, Manager.Shutdown)
+  Await.result(stopped, 6 seconds)
+  // the actor has been stopped
+} catch {
+  // the actor wasn't stopped within 5 seconds
+  case e: akka.pattern.AskTimeoutException =>
+}
+```
+
+```scala
+object Manager {
+  case object Shutdown
+}
+ 
+class Manager extends Actor {
+  import Manager._
+  val worker = context.watch(context.actorOf(Props[Cruncher], "worker"))
+ 
+  def receive = {
+    case "job" => worker ! "crunch"
+    case Shutdown =>
+      worker ! PoisonPill
+      context become shuttingDown
+  }
+ 
+  def shuttingDown: Receive = {
+    case "job" => sender() ! "service unavailable, shutting down"
+    case Terminated(`worker`) =>
+      context stop self
+  }
+}
+```
+
+当``gracefulStop()``成功返回时，actor的``postStop()`` hook将会被执行：在``postStop()``结束和``gracefulStop()``返回之间存在happens-before边界。
+
+在上面的示例中自定义的``Manager.Shutdown``消息是发送到目标actor来启动actor的终止过程。你可以使用``PoisonPill``，但之后在停止目标actor之前，你与其他actor的互动的机会有限。在``postStop``中，可以处理简单的清理任务。
+
+> 警告
+
+> 请记住，actor停止和其名称被注销是彼此异步发生的独立事件。因此，在``gracefulStop()``返回后。你会发现其名称仍可能在使用中。为了保证正确注销，只在你控制的监管者内，并且只在响应`Terminated`消息时重用名称，即不是用于顶级actor。
+
+<span id="actor-hotswap"></span>
+###Become/Unbecome
+#####升级
+Akka支持在运行时对Actor消息循环（即其实现）进行实时替换：在actor中调用``context.become``方法。`become`要求一个``PartialFunction[Any, Unit]``参数作为新的消息处理实现。 被替换的代码被保存在一个栈中，可以被push和pop。
+
+> 警告
+
+> 请注意actor被其监管者重启后将恢复其最初的行为。
+
+使用``become``替换Actor的行为：
+
+```scala
+class HotSwapActor extends Actor {
+  import context._
+  def angry: Receive = {
+    case "foo" => sender() ! "I am already angry?"
+    case "bar" => become(happy)
+  }
+ 
+  def happy: Receive = {
+    case "bar" => sender() ! "I am already happy :-)"
+    case "foo" => become(angry)
+  }
+ 
+  def receive = {
+    case "foo" => become(angry)
+    case "bar" => become(happy)
+  }
+}
+```
+
+`become`方法的变种还有很多其它的用处，例如实现一个有限状态机（FSM，例子见[Dining Hakkers](http://www.typesafe.com/activator/template/akka-sample-fsm-scala)）。它将取代当前的行为 （即行为堆栈的顶部），这意味着，您不使用`unbecome`，相反下一个行为总是被显式安装。
+
+其他使用`become`的方式不是替换，而是添加到行为堆栈的顶部。在这种情况下必须小心，以确保长远而言，“pop”操作（即`unbecome`）与“push”操作相当，否则会导致内存泄漏 （这就是为什么这种行为不是默认的）。
+
+```scala
+case object Swap
+class Swapper extends Actor {
+  import context._
+  val log = Logging(system, this)
+ 
+  def receive = {
+    case Swap =>
+      log.info("Hi")
+      become({
+        case Swap =>
+          log.info("Ho")
+          unbecome() // resets the latest 'become' (just for fun)
+      }, discardOld = false) // push on top instead of replace
+  }
+}
+ 
+object SwapperApp extends App {
+  val system = ActorSystem("SwapperSystem")
+  val swap = system.actorOf(Props[Swapper], name = "swapper")
+  swap ! Swap // logs Hi
+  swap ! Swap // logs Ho
+  swap ! Swap // logs Hi
+  swap ! Swap // logs Ho
+  swap ! Swap // logs Hi
+  swap ! Swap // logs Ho
+}
+```
+
+#####对Scala Actors 嵌套接收消息进行编码而不会造成意外的内存泄露
+参阅[解嵌套接收消息示例](http://github.com/akka/akka/tree/v2.3.6/akka-docs/rst/scala/code/docs/actor/UnnestedReceives.scala)。
+
+###贮藏(Stash)
+`Stash`特质使actor可以暂时贮藏消息，来跳过当前行为不能或不应该处理的消息。在actor的消息处理程序改变时，即调用``context.become``或``context.unbecome``前，所有贮藏的消息可以是“unstashed”，从而前置到actor的邮箱中。这种方式下，贮藏消息可以按照其原始接收顺序被处理。
+
+> 注意
+
+> ``Stash``特质继承自标记特质``RequiresMessageQueue[DequeBasedMessageQueueSemantics]``，它要求系统自动为actor选择一个基于deque的邮箱实现。如果你想更好地控制该邮箱，参阅文档[邮箱](05_mailboxes.md)。
+
+这里是``Stash``的一个实际例子：
+
+```scala
+import akka.actor.Stash
+class ActorWithProtocol extends Actor with Stash {
+  def receive = {
+    case "open" =>
+      unstashAll()
+      context.become({
+        case "write" => // do writing...
+        case "close" =>
+          unstashAll()
+          context.unbecome()
+        case msg => stash()
+      }, discardOld = false) // stack on top instead of replacing
+    case msg => stash()
+  }
+}
+```
+
+调用``stash()``将当前消息（actor最后接收到的消息）添加到actor的贮藏处。通常在其它case语句不能处理该消息时，在默认处理中调用来把消息贮藏起来。两次贮藏同一个消息是非法的；这样做会抛出``IllegalStateException``。贮藏操作也可能是有界的，在这种情况下调用``stash()``可能会导致超出容量，结果抛出``StashOverflowException``。可以使用邮箱配置中的``stash-capacity``（一个``Int``）配置贮存能力。
+
+调用``unstashAll()``将把贮藏的消息转移到actor的邮箱中，直到邮箱满（请注意消息从贮藏处被前置到邮箱中的）。万一有界的邮箱溢出，则抛出``MessageQueueAppendFailedException``。贮藏出被保证在调用``unstashAll()``后被清空。
+
+贮藏箱由``scala.collection.immutable.Vector``支持。其结果是，即使有很大数目的消息被贮藏也不会对性能有大的影响。
+
+> 警告
+
+> ``Stash``特质必须在``preRestart``回调被任何一个特质/类重写之前，被混入到``Actor``（的一个子类）中。这意味着如果``MyActor``重写``preRestart``，则不可能写出``Actor with MyActor with Stash``。
+
+请注意暗箱是actor的瞬时状态，不同于邮箱。因此，它应该象actor中其他具有相同属性的状态一样被管理。`Stash`的`preRestart`实现将调用``unstashAll()``，这通常也是期望的行为。
+
+> 注意
+
+> 如果你想强制你的actor只能在无界暗箱下工作，则你应该换用 ``UnboundedStash``特质。
+
+<span id="killing-actors-scala"></span>
+###杀死actor
+你可以发送``Kill``消息来杀死actor。这将导致actor抛出`ActorKilledException`，触发失败。该actor将暂停操作，其主管也将会被问及如何处理这一失败，这可能意味着恢复actor、 重新启动或完全终止它。更多的信息，请参阅[监管的意思](../chapter2/04_supervision_and_monitoring.md#supervision-directives)。
+
+像这样使用``Kill``：
+
+```scala
+// kill the 'victim' actor
+victim ! Kill
+```
+
+###Actor与异常
+在消息被actor处理的过程中可能会抛出异常，例如数据库异常。
+
+#####消息会怎样
+如果消息处理过程中（即从邮箱中取出并交给当前行为后）发生了异常，这个消息将被丢失。必须明白它不会被放回到邮箱中。所以如果你希望重试对消息的处理，你需要自己抓住异常然后在异常处理流程中重试。请确保限制重试的次数，因为你不会希望系统产生活锁 (从而消耗大量CPU而于事无补)。另一种可能性请参见[PeekMailbox 模式](../chapter8/05_external_contributions.md#peek-mailbox#mailbox-acking)。
+
+#####邮箱会怎样
+如果消息处理过程中发生异常，邮箱没有任何变化。如果actor被重启，仍然是相同的邮箱在那里。邮箱中的所有消息不会丢失。
+
+#####actor会怎样
+如果actor代码抛出了异常，actor会被暂停并启动监管过程（参见[监管与监控](../chapter2/04_supervision_and_monitoring.md)）。根据监管者的策略，
 
 
 

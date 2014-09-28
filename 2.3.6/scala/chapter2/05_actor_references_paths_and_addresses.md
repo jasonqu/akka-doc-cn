@@ -69,8 +69,8 @@ actor引用的获取方法分为两类：通过创建actor，或者通过查找a
 
 > 注意
 
-> `actorFor`因被`actorSelection`替代而废弃，因为`actorFor`对本地和远程的actor表现有所不同。对一个本地actor引用，被查找的actor需要在查找之前就存在，否而获得的引用是一个`EmptyLocalActorRef`。即使后来与实际路径相符的actor被创建，所获得引用仍然是这样。对于`actorFor`行为获得的远程actor
-引用则不同，每封邮件的发送都会在远程系统中进行一次按路径的查找。
+> `actorFor`因被`actorSelection`替代而废弃，因为`actorFor`对本地和远程的actor表现有所不同。对一个本地actor引用，被查找的actor需要在查找之前就存在，否则获得的引用是一个`EmptyLocalActorRef`。即使后来与实际路径相符的actor被创建，所获得引用仍然是这样。对于`actorFor`行为获得的远程actor
+引用则不同，每条消息的发送都会在远程系统中进行一次按路径的查找。
 
 ###绝对路径 vs 相对路径
 除了`ActorSystem.actorSelection`还有一个`ActorContext.actorSelection`，这是可以在任何一个actor实例中通过`context.actorSelection`访问的。它的actor查找与`ActorSystem`的返回值非常类似，不同在于它的路径查找是从当前actor开始的，而不是从actor树的根开始。可以用 ".." 路径来访问父actor. 例如，你可以向一个指定兄弟发送消息：
