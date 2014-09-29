@@ -20,7 +20,7 @@
    * [配置](chapter2/09_configuration.md)
 * [Actors](chapter3/actors.md)
    * [Actors](chapter3/01_actors.md)
-   * [类型Actor](chapter3/02_typed_actors.md)
+   * [有类型Actor](chapter3/02_typed_actors.md)
    * [容错](chapter3/03_fault_tolerance.md)
    * [调度器](chapter3/04_dispatchers.md)
    * [邮箱](chapter3/05_mailboxes.md)
