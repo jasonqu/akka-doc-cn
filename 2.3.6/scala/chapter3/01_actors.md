@@ -224,9 +224,7 @@ def postRestart(reason: Throwable): Unit = {
 <span id="actor-lifecycle-scala"></span>
 ###Actor生命周期
 
-.. image:: ../images/actor_lifecycle.png
-   :align: center
-   :width: 680
+![](../images/actor_lifecycle.png)
 
 actor系统中的路径代表一个"地方"，这里可能会被活着的actor占据。最初（除了系统初始化actor）路径都是空的。在调用``actorOf()``时它将为指定路径分配actor根据传入``Props``创建的一个*化身*。actor化身是由路径*和一个UID*标识的。重新启动只会替换有``Props``定义的``Actor``实例，但不会替换化身，因此UID保持不变。
 
@@ -730,11 +728,111 @@ victim ! Kill
 如果消息处理过程中发生异常，邮箱没有任何变化。如果actor被重启，仍然是相同的邮箱在那里。邮箱中的所有消息不会丢失。
 
 #####actor会怎样
-如果actor代码抛出了异常，actor会被暂停并启动监管过程（参见[监管与监控](../chapter2/04_supervision_and_monitoring.md)）。根据监管者的策略，
+如果actor代码抛出了异常，actor会被暂停并启动监管过程（参见[监管与监控](../chapter2/04_supervision_and_monitoring.md)）。根据监管者的策略，actor可以被恢复（好像什么也没有发生过）、重启（消灭其内部状态并从零开始）或终止。
 
+###使用PartialFunction链来扩展actor
+有时在一些actor中分享共同的行为，或通过若干小的函数构成一个actor的行为是很有用的。这由于actor的`receive`方法返回一个``Actor.Receive``（``PartialFunction[Any,Unit]``的类型别名）而成使之为可能，多个偏函数可以使用``PartialFunction#orElse``链接在一起。你可以根据需要链接尽可能多的功能，但是你要牢记"第一个匹配"获胜——这在结合可以处理同一类型的消息的功能时会很重要。
 
+例如，假设您有一组actor是生产者``Producers``或消费者``Consumers``，然而有时候需要actor分享这两种行为。这可以很容易实现而无需重复代码，通过提取行为的特质和并将actor的`receive`实现为这些偏函数的组合。
 
+```scala
+trait ProducerBehavior {
+  this: Actor =>
+ 
+  val producerBehavior: Receive = {
+    case GiveMeThings =>
+      sender() ! Give("thing")
+  }
+}
+ 
+trait ConsumerBehavior {
+  this: Actor with ActorLogging =>
+ 
+  val consumerBehavior: Receive = {
+    case ref: ActorRef =>
+      ref ! GiveMeThings
+ 
+    case Give(thing) =>
+      log.info("Got a thing! It's {}", thing)
+  }
+}
+ 
+class Producer extends Actor with ProducerBehavior {
+  def receive = producerBehavior
+}
+ 
+class Consumer extends Actor with ActorLogging with ConsumerBehavior {
+  def receive = consumerBehavior
+}
+ 
+class ProducerConsumer extends Actor with ActorLogging
+  with ProducerBehavior with ConsumerBehavior {
+ 
+  def receive = producerBehavior orElse consumerBehavior
+}
+ 
+// protocol
+case object GiveMeThings
+case class Give(thing: Any)
+```
 
+不同于继承，相同的模式可以通过组合实现——可以简单的通过委托的偏函数组合成`receive`方法。
 
+###初始化模式
+actor丰富的生命周期钩子（hook）提供一个有用的工具包，可用于实现各种初始化模式。在``ActorRef``的生命中，actor可能会经历多次重启，老的实例被替换为新的实例，除观察者以外是觉察不到的，只能看到一个``ActorRef``。
 
+一个人可能把新实例看做是"化身"。初始化对actor每个化身都是必要的，但有时你需要初始化只在第一个实例创建时，即``ActorRef``创建时发生。以下各节提供了满足不同的初始化需求的模式。
 
+#####通过构造函数初始化
+使用构造函数初始化有各种好处。首先，使得用``val``字段来存储在actor实例的生命周期内不变的状态成为可能，使actor的实现更加健壮。对actor的每个化身都会调用一次构造函数，因此，actor内部总是可以假定正确地完成初始化。这也是这种方法的缺点，例如当想要避免在重启时重新初始化内部状态的情况下。例如，跨重启保留子actor经常很有用。下面提供了该情况的一种模式。
+
+#####通过preStart初始化
+actor的``preStart()``方法只在第一个实例的初始化时调用一次，即``ActorRef``创建时。在重新启动后，``preStart()``是由``postRestart()``调用，因此如果重写，``preStart()``对每个化身都会被调用。然而，重写``postRestart()``可以禁用此行为，并确保只有一个对``preStart()``的调用。
+
+这种模式的一个有用用法是禁止在重启期间为子actor创建新``ActorRefs``。这可以通过重写``preRestart()``实现：
+
+```scala
+override def preStart(): Unit = {
+  // Initialize children here
+}
+ 
+// Overriding postRestart to disable the call to preStart()
+// after restarts
+override def postRestart(reason: Throwable): Unit = ()
+ 
+// The default implementation of preRestart() stops all the children
+// of the actor. To opt-out from stopping the children, we
+// have to override preRestart()
+override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
+  // Keep the call to postStop(), but no stopping of children
+  postStop()
+}
+```
+
+请注意，子actor*仍会重新启动*，但不会创建新的``ActorRef``。可以以递归方式为子actor应用相同的原则，确保其``preStart()``方法只在创建引用时被调用一次。
+
+有关更多信息，请参见[重启的含义](../chapter2/04_supervision_and_monitoring.md#supervision-restart)。
+
+#####通过消息传递初始化
+有些情况下不可能在构造函数中传入actor初始化所需要的所有信息，例如存在循环依赖关系。在这种情况下actor应该监听初始化消息，并使用``become()``或一个有限状态机状态转换来编码actor的初始化和未初始化状态。
+
+```scala
+var initializeMe: Option[String] = None
+ 
+override def receive = {
+  case "init" =>
+    initializeMe = Some("Up and running")
+    context.become(initialized, discardOld = true)
+ 
+}
+ 
+def initialized: Receive = {
+  case "U OK?" => initializeMe foreach { sender() ! _ }
+}
+```
+
+如果actor在初始化之前可能收到消息，一个有用的``Stash``工具可以用来存储消息直到初始化完成，并在actor完成初始化后回放这些消息。
+
+> 警告
+
+> 此模式应小心使用，并且仅当上述模式都不适用时才应用。其潜在的问题之一是当发送到远程的actor时，消息可能会丢失。此外，发布一个处于未初始化状态的``ActorRef``可能会导致竞态条件，即在初始化完成前它接收到一个用户消息。

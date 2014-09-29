@@ -40,7 +40,7 @@ akka文档中文翻译
    * [x] 消息发送语义
    * [x] 配置
 * [ ] Actors
-   * [ ] Actors
+   * [x] Actors
    * [ ] 类型Actor
    * [ ] 容错
    * [ ] 调度器
