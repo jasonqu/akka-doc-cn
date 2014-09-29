@@ -111,8 +111,156 @@ val otherSquarer: Squarer =
 
 * ``Unit`` 会以 ``fire-and-forget``语义进行派发，与``ActorRef.tell``完全一致。
 * ``akka.dispatch.Future[_]`` 会以 ``send-request-reply``语义进行派发，与 ``ActorRef.ask``完全一致。
-* ``scala.Option[_] `` 会以 ``send-request-reply`` 语义派发，但是*会*阻塞等待应答, 如果在超时时限内没有应答则返回``scala.None``，否则返回包含结果的``scala.Some[_]``。在这个调用中发生的异常将被重新抛出。
+* ``scala.Option[_]``会以``send-request-reply``语义派发，但是*会*阻塞等待应答, 如果在超时时限内没有应答则返回``scala.None``，否则返回包含结果的``scala.Some[_]``。在这个调用中发生的异常将被重新抛出。
 * 任何其它类型的值将以``send-request-reply``语义进行派发，但*会*阻塞地等待应答, 如果超时会抛出``java.util.concurrent.TimeoutException``，如果发生异常则将异常重新抛出。
+
+###消息与不可变性
+虽然Akka不能强制要求你传给有类型Actor方法的参数类型是不可变的, 我们*强烈*建议只传递不可变参数。
+
+#####单向消息发送
+
+```scala
+mySquarer.squareDontCare(10)
+```
+
+就是这么简单！方法会在另一个线程中异步地调用。
+
+#####请求-响应消息发送
+
+```scala
+val oSquare = mySquarer.squareNowPlease(10) //Option[Int]
+```
+
+如果需要，这会阻塞到有类型actor的Props中设置的超时时限。如果超时，会返回``None`` 。
+
+```scala
+val iSquare = mySquarer.squareNow(10) //Int
+```
+
+如果需要，这会阻塞到有类型actor的Props中设置的超时时限。如果超时，会抛出``java.util.concurrent.TimeoutException``。
+
+#####请求-以future作为响应的消息发送
+
+```scala
+val fSquare = mySquarer.square(10) //A Future[Int]
+```
+
+这个调用是异步的，返回的Future可以用作异步组合。
+
+###终止有类型Actor
+由于有类型actor底层还是Akka actor，所以在不需要的时候要终止它。
+
+```scala
+TypedActor(system).stop(mySquarer)
+```
+
+这将会尽快地异步终止与指定的代理关联的有类型Actor。
+
+```scala
+TypedActor(system).poisonPill(otherSquarer)
+```
+
+这将会在有类型actor完成所有入队的调用后异步地终止它。
+
+###有类型Actor监管树
+你可以通过传入一个``ActorContext``来获得有类型Actor上下文，所以你可以对它调用``typedActorOf(..)``来创建有类型子actor。
+
+```scala
+//Inside your Typed Actor
+val childSquarer: Squarer =
+  TypedActor(TypedActor.context).typedActorOf(TypedProps[SquarerImpl]())
+//Use "childSquarer" as a Squarer
+```
+
+通过将``ActorContext``作为参数传给``TypedActor.get(…)``，也可以为普通的Akka actor创建有类型子actor。
+
+###监管策略
+通过让你的有类型Actor的具体实现类实现``TypedActor.Supervisor``方法，你可以定义用来监管子actor的策略，就像[监管与监控](../chapter2/04_supervision_and_monitoring.md) 和[容错(Scala)](03_fault_tolerance.md)所描述的。
+
+###生命周期回调
+通过使你的有类型actor实现类实现以下方法:
+
+* ``TypedActor.PreStart``
+* ``TypedActor.PostStop``
+* ``TypedActor.PreRestart``
+* ``TypedActor.PostRestart``
+
+你可以hook进有类型actor的整个生命周期。
+
+###接收任意消息
+如果你的有类型actor的实现类扩展了``akka.actor.TypedActor.Receiver``，所有非方法调用``MethodCall``的消息会被传给``onReceive``方法.
+
+这使你能够对DeathWatch的``Terminated``消息及其它类型的消息进行处理，例如，与无类型actor进行交互的场合。
+
+###代理
+你可以使用带TypedProps和ActorRef参数的``typedActorOf``来将指定的Actor引用代理成一个有类型Actor。这在你需要与远程主机上的有类型Actor通信时会有用, 只要将``ActorRef``传递给 ``typedActorOf``即可。
+
+> 注意
+
+> 目标Actor引用需要能处理``MethodCall``消息.
+
+###查找与远程处理
+因为``TypedActor``底层还是``Akka Actors``，你可以使用``typedActorOf``来代理可能在远程节点上的``ActorRefs``。
+
+```scala
+val typedActor: Foo with Bar =
+  TypedActor(system).
+    typedActorOf(
+      TypedProps[FooBar],
+      actorRefToRemoteActor)
+//Use "typedActor" as a FooBar
+```
+
+###功能扩充
+以下是使用traits来为你的有类型actor混入行为的示例：
+
+```scala
+trait Foo {
+  def doFoo(times: Int): Unit = println("doFoo(" + times + ")")
+}
+ 
+trait Bar {
+  def doBar(str: String): Future[String] =
+    Future.successful(str.toUpperCase)
+}
+
+class FooBar extends Foo with Bar
+```
+
+```scala
+val awesomeFooBar: Foo with Bar =
+  TypedActor(system).typedActorOf(TypedProps[FooBar]())
+ 
+awesomeFooBar.doFoo(10)
+val f = awesomeFooBar.doBar("yes")
+ 
+TypedActor(system).poisonPill(awesomeFooBar)
+```
+
+###有类型路由器模式
+有时你想要传播多个actor之间的消息。在Akka中实现这一目标的最简单方法是使用一个[路由器](06_routing.md)，可以实现特定的路由逻辑，例如最小邮箱``smallest-mailbox``或一致性哈希``consistent-hashing``等。
+
+路由器不能直接提供给有类型actor，但可以很容易的利用非类型化的路由器，并在其使用一个有类型代理即可。为了展示，让我们创建有类型actor并分配它们一些随机``id``，所以我们知道事实上，路由器已向消息发送给不同的actor：
+
+```scala
+trait HasName {
+  def name(): String
+}
+ 
+class Named extends HasName {
+  import scala.util.Random
+  private val id = Random.nextInt(1024)
+ 
+  def name(): String = "name-" + id
+}
+```
+
+为了在此类actor的几个实例中，您可以简单地创建一个平原非类型化的路由器，然后立面它与 TypedActor 像下面的示例所示。这是因为类型的演员当然沟通作为正常的演员，使用相同的机制和方法调用对他们获得变成 MethodCall 消息的消息发送。
+
+
+
+
+
 
 
 
