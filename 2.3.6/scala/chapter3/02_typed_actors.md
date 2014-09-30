@@ -255,12 +255,27 @@ class Named extends HasName {
 }
 ```
 
-为了在此类actor的几个实例中，您可以简单地创建一个平原非类型化的路由器，然后立面它与 TypedActor 像下面的示例所示。这是因为类型的演员当然沟通作为正常的演员，使用相同的机制和方法调用对他们获得变成 MethodCall 消息的消息发送。
+为了在此类actor的几个实例中轮询访问（round robin），你可以简单地创建一个普通的非类型化路由器，然后像下面的示例所示把它包装为一个``TypedActor``。这之所以能够正确工作，是因为有类型actor与普通actor使用相同的机制通讯，其方法调用最终都被转换为``MethodCall``消息的发送。
 
-
-
-
-
-
-
+```scala
+def namedActor(): HasName = TypedActor(system).typedActorOf(TypedProps[Named]())
+ 
+// prepare routees
+val routees: List[HasName] = List.fill(5) { namedActor() }
+val routeePaths = routees map { r =>
+  TypedActor(system).getActorRefFor(r).path.toStringWithoutAddress
+}
+ 
+// prepare untyped router
+val router: ActorRef = system.actorOf(RoundRobinGroup(routeePaths).props())
+ 
+// prepare typed proxy, forwarding MethodCall messages to `router`
+val typedRouter: HasName =
+  TypedActor(system).typedActorOf(TypedProps[Named](), actorRef = router)
+ 
+println("actor was: " + typedRouter.name()) // name-184
+println("actor was: " + typedRouter.name()) // name-753
+println("actor was: " + typedRouter.name()) // name-320
+println("actor was: " + typedRouter.name()) // name-164
+```
 

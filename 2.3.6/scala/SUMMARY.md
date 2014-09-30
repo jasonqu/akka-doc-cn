@@ -22,6 +22,7 @@
    * [Actors](chapter3/01_actors.md)
    * [有类型Actor](chapter3/02_typed_actors.md)
    * [容错](chapter3/03_fault_tolerance.md)
+       * [容错示例](chapter3/03-1_fault_tolerance_sample.md)
    * [调度器](chapter3/04_dispatchers.md)
    * [邮箱](chapter3/05_mailboxes.md)
    * [路由](chapter3/06_routing.md)
