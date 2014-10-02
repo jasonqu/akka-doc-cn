@@ -26,7 +26,7 @@ Akka实现的是一种叫“父监管”的形式。Actor只能被其它的actor
 
 一个actor系统在其创建过程中至少要启动三个actor，如上图所示。有关actor路径及相关信息请参见[Actor路径的顶级作用域](05_actor_references_paths_and_addresses.md#toplevel-paths)。
 
-#####`/user`: 守护Actor
+#####<a name="user-guardian"></a> `/user`: 守护Actor
 
 这个名为`"/user"`的守护者，作为所有用户创建actor的父actor，可能是需要打交道最多的。使用`system.actorOf()`创建的actor都是其子actor。这意味着，当该守护者终止时，系统中所有的普通actor都将被关闭。同时也意味着，该守护者的监管策略决定了普通顶级actor是如何被监督的。自Akka 2.1起就可以使用这个设定`akka.actor.guardian-supervisor-strategy`，以一个`SupervisorStrategyConfigurator`的完整类名进行配置。当这个守护者上升一个失败，根守护者的响应是终止该守护者，从而关闭整个actor系统。
 
