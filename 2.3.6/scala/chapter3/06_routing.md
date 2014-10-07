@@ -783,80 +783,160 @@ val router30: ActorRef =
 
 <span id="router-design-scala"></span>
 ###Akka中的路由是如何设计的
-
-
-TODO
-路由actor的行为象一个单独的actor，但它们又不应阻碍可扩展性. 解决这一明显的矛盾的方法是用特殊的 RoutedActorRef来表示路由actor, 它将收到的消息派发到目的routee上而实际不会调用路由的行为（这样就避免了邮箱的存在；单路由actor的任务是管理与routee的生命周期相关的所有方面）. 这意味着决定选择哪条路由的代码是与所有可能的发送方并发执行的，因此必须是线程安全的, 它不能简单快乐地生活在某个actor中。
-
-上面这一段有一部分要求我们给出更多的背景解释: 为什么路由actor需要一个 “head” 而它其实是所有 routee的父亲? 最初的设计试图绕过这个问题，但是位置透明性和强制性的父亲监管体系导致对它需要进行重新设计. 路由actor所派生的每一个actor都必须拥有自己的唯一标识, 这一唯一标识表示为唯一的actor路径。由于路由actor在其父亲的上下文中只有一个名字, 因此命名空间中需要另一个级别, 按照寻址语义，这个级别意味着需要有以路由actor之名为名的actor的存在。这不仅是在创建、重启和终止actor时的内部消息机制的需要, 也是actor池中的actor与其它actor对话并以确定的方式接收应答的需要. 由于每个actor知道自己及其父亲的外部表示, 所以routees在对消息进行响应时能够确定应答发送到哪里:
-
-现在大家就能明白为什么路由需要在代码最初就开启而不可能以后再“拧上”: 一个actor是否要进行路由会改变actor的层次，改变路由actor所有子actor 的路径。所有的routee特别需要知道是谁为它们做的寻路以便选择它们所派发的消息的发送引用，如上例。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+从表面看，路由器就像普通的actor，但是它们实际实现是不同的。路由器在收消息和快速发消息给routee被设计的极度优化。
+
+一个普通的actor可以用来路由消息，但是actor的单线程处理会成为一个瓶颈。路由器可以通过优化原有消息处理pipeline来支持多线程，从而达到更高的吞吐量。这里是通过直接嵌入路由逻辑到其``ActorRef``，而不是在路由actor本身。发送到路由器``ActorRef``的消息可以直接被路由到routee，从而完全跳过单线程的路由actor。
+
+当然，这个改进的成本是路由代码的内部构造相比于使用普通actor构造来说复杂许多。幸运的是所有这种复杂性对于路由API消费者来说是不可见的。然而，这却是你在实现自己的路由器时需要意识到的。
+
+<span id="custom-router-scala"></span>
+###自定义路由actor
+如果觉得Akka自带的路由actor都不合用，你也可以创建自己的路由actor。要创建自己的路由，你需要满足本节中所列出的条件。
+
+在创建您自己的路由器之前，您应该考虑一个拥有类似路由器行为的普通actor是否能完成一个成熟路由器的功能。正如[上文](#router-design-scala)解释，路由器相比于普通actor主要好处是他们拥有更高的性能。但相比普通actor他们的代码也更为复杂。因此，如果在你的应用程序中较低的最大吞吐量是可以接受的，则不妨继续使用传统的actor。不过这一节假定你想要获得最大性能，并因而演示如何创建你自己的路由器。
+
+在此示例中创建的路由器将把每个消息复制到几个目的地。
+
+首先从路由逻辑开始：
+
+```scala
+import scala.collection.immutable
+import scala.concurrent.forkjoin.ThreadLocalRandom
+import akka.routing.RoundRobinRoutingLogic
+import akka.routing.RoutingLogic
+import akka.routing.Routee
+import akka.routing.SeveralRoutees
+ 
+class RedundancyRoutingLogic(nbrCopies: Int) extends RoutingLogic {
+  val roundRobin = RoundRobinRoutingLogic()
+  def select(message: Any, routees: immutable.IndexedSeq[Routee]): Routee = {
+    val targets = (1 to nbrCopies).map(_ => roundRobin.select(message, routees))
+    SeveralRoutees(targets)
+  }
+}
+```
+
+在这个例子中``select``将被每个消息调用来使用轮询来挑选几个目的地，通过重用现有的``RoundRobinRoutingLogic``并将结果包装在一个``SeveralRoutees``实例中。``SeveralRoutees``将会把消息发送给所有提供的routee。
+
+路由逻辑的实现必须是线程安全的，因为它可能在actor外被使用。
+
+路由逻辑的一个单元测试：
+
+```scala
+case class TestRoutee(n: Int) extends Routee {
+  override def send(message: Any, sender: ActorRef): Unit = ()
+}
+ 
+  val logic = new RedundancyRoutingLogic(nbrCopies = 3)
+ 
+  val routees = for (n <- 1 to 7) yield TestRoutee(n)
+ 
+  val r1 = logic.select("msg", routees)
+  r1.asInstanceOf[SeveralRoutees].routees should be(
+    Vector(TestRoutee(1), TestRoutee(2), TestRoutee(3)))
+ 
+  val r2 = logic.select("msg", routees)
+  r2.asInstanceOf[SeveralRoutees].routees should be(
+    Vector(TestRoutee(4), TestRoutee(5), TestRoutee(6)))
+ 
+  val r3 = logic.select("msg", routees)
+  r3.asInstanceOf[SeveralRoutees].routees should be(
+    Vector(TestRoutee(7), TestRoutee(1), TestRoutee(2)))
+```
+
+你可以停在这儿，通过``akka.routing.Router``使用 ``RedundancyRoutingLogic``，如[一个简单路由器](#simple-router-scala)中所述。
+
+让我们继续，并使之成为一个自包含的、可配置的路由器actor。
+
+创建一个类来扩展``Pool``，``Group``或``CustomRouterConfig``。该类是一个路由逻辑的工厂，并持有路由器的配置。在这里，我们把它变成一个``Group``。
+
+```scala
+import akka.dispatch.Dispatchers
+import akka.routing.Group
+import akka.routing.Router
+import akka.japi.Util.immutableSeq
+import com.typesafe.config.Config
+ 
+case class RedundancyGroup(override val paths: immutable.Iterable[String], nbrCopies: Int) extends Group {
+ 
+  def this(config: Config) = this(
+    paths = immutableSeq(config.getStringList("routees.paths")),
+    nbrCopies = config.getInt("nbr-copies"))
+ 
+  override def createRouter(system: ActorSystem): Router =
+    new Router(new RedundancyRoutingLogic(nbrCopies))
+ 
+  override val routerDispatcher: String = Dispatchers.DefaultDispatcherId
+}
+```
+
+这可以像Akka提供的路由actor完全一样使用。
+
+```scala
+for (n <- 1 to 10) system.actorOf(Props[Storage], "s" + n)
+ 
+val paths = for (n <- 1 to 10) yield ("/user/s" + n)
+val redundancy1: ActorRef =
+  system.actorOf(RedundancyGroup(paths, nbrCopies = 3).props(),
+    name = "redundancy1")
+redundancy1 ! "important"
+```
+
+请注意我们在``RedundancyGroup``添加一个以``Config``为参数的构造函数。这样一来，我们就可能在配置中定义。
+
+```
+akka.actor.deployment {
+  /redundancy2 {
+    router = "docs.routing.RedundancyGroup"
+    routees.paths = ["/user/s1", "/user/s2", "/user/s3"]
+    nbr-copies = 5
+  }
+}
+```
+
+请注意``router``属性中的类的全名。路由器类必须继承``akka.routing.RouterConfig``（``Pool``，``Group``或``CustomRouterConfig``），并且有一个以``com.typesafe.config.Config``为参数的构造函数。配置的部署部分将被传递给构造函数。
+
+```scala
+val redundancy2: ActorRef = system.actorOf(FromConfig.props(),
+  name = "redundancy2")
+redundancy2 ! "very important"
+```
+
+###配置调度器
+为池的创建孩子的调度器将取自``Props``，如[调度器](04_dispatchers.md)中所述。
+
+为了可以很容易地定义池routee的调度器，你可以在配置的部署一节中定义内联调度器。
+
+```
+akka.actor.deployment {
+  /poolWithDispatcher {
+    router = random-pool
+    nr-of-instances = 5
+    pool-dispatcher {
+      fork-join-executor.parallelism-min = 5
+      fork-join-executor.parallelism-max = 5
+    }
+  }
+}
+```
+
+这是启用一个池专用调度器，你唯一需要做的。
+
+> 注意
+
+> 如果你使用actor群，并路由到它们的路径，然后他们将仍然使用配置在其``Props``的相同的调度器，不可能在actor创建后改变actor的调度器。
+
+“头”路由器不能总是在相同的调度器上运行，因为它不处理同一类型的消息，因此这个特殊的actor没有使用配置的调度器，但相反，使用`RouterConfig`的``routerDispatcher``，它是actor系统默认调度器默认的。所有标准路由器允许它们在构造函数或工厂方法中设置此属性，自定义路由器必须以适当的方式实现该方法。
+
+```scala
+val router: ActorRef = system.actorOf(
+  // “head” router actor will run on "router-dispatcher" dispatcher
+  // Worker routees will run on "pool-dispatcher" dispatcher  
+  RandomPool(5, routerDispatcher = "router-dispatcher").props(Props[Worker]),
+  name = "poolWithDispatcher")
+```
+
+> 注意
+
+> 不允许配置``routerDispatcher``为`akka.dispatch.BalancingDispatcherConfigurator`，因为用于特殊路由actor的消息不能被其他任意actor处理。
 
