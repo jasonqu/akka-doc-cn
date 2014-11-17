@@ -349,6 +349,25 @@ probe2.expectMsg(500 millis, "hello")
 这里我们用 `MyDoubleEcho`来模拟一个待测系统, 它会将输入镜像为两个输出. 关联两个测试探针来进行（最简单）行为的确认. 还有一个例子是两个相互协作的 actor A，B， A 发送消息给 B. 为了确认这个消息流，可以插入一个 `TestProbe` 作为A的目标, 使用转发功能或下文中的自动导向功能在测试上下文中包含一个真实的B.
 
 还可以为探针配备自定义的断言来使测试代码更简洁清晰:
+<<<<<<< HEAD
+=======
+
+```scala
+ase class Update(id: Int, value: String)
+ 
+val probe = new TestProbe(system) {
+  def expectUpdate(x: Int) = {
+    expectMsgPF() {
+      case Update(id, _) if id == x => true
+    }
+    sender() ! "ACK"
+  }
+}
+
+```
+
+这里你拥有完全的灵活性，可以将`TestKit` 提供的工具与你自己的检测代码混合和匹配，并为它取一个有意义的名字。在实际开发中你的代码很可能比上面的示例要复杂；要充分利用工具的力量！
+>>>>>>> refs/remotes/origin/gh-pages
 
 ```scala
 ase class Update(id: Int, value: String)
