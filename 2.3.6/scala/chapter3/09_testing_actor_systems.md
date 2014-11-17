@@ -273,39 +273,179 @@ akka.loggers = [akka.testkit.TestEventListener]
    }
 ```
 
+传给`within`的代码块必须在一个介于 `min` 和 `max`之间的`Duration`之前完成, 其中`min`缺省值为0. 将`max` 参数与块的启动时间相加得到的时间期限在所有检查方法块内部都可以隐式获得， 如果你没有指定`max`值，它会从最深层的 `within` 块继承这个值.
 
+应注意如果代码块的最后一条接收消息断言是 `expectNoMsg` 或 `receiveWhile`, 对 `within` 的最终检查将被跳过，以避免由于唤醒延迟导致的错误的true值. 这意味着虽然其中每一个独立的断言仍然使用时间上限，整个代码块在这种情况下会有长度随机的延迟。
 
+```scala
+import akka.actor.Props
+import scala.concurrent.duration._
+ 
+val worker = system.actorOf(Props[Worker])
+within(200 millis) {
+  worker ! "some work"
+  expectMsg("some result")
+  expectNoMsg // will block for the rest of the 200ms
+  Thread.sleep(300) // will NOT make this block fail
+}
+```
 
+> 注意
 
+> 所有的时间都以 ``System.nanoTime``为单位, 即它们描述的是墙上时间，而非CPU时间.
 
+Ray Roestenburg 写了一篇关于使用 TestKit 的好文: [http://roestenburg.agilesquad.com/2011/02/unit-testing-akka-actors-with-testkit_12.html]. 完整的示例也可以在[这里](09_1_testkit-example.md)找到.
 
+#######考虑很慢的测试系统
+你在跑得飞快的笔记本上使用的超时设置在高负载的Jenkins（或类似的）服务器上通常都会导致虚假的测试失败。 为了考虑这种情况，所有的时间上限都在内部乘以一个系数，这个系数来自 [配置文件](../chapter2/09_configuration.md)中的 ``akka.test.timefactor``, 缺省值为 1.
 
+你也可以用``akka.testkit``包对象中的隐式转换来将同样的系数来作用于其它的时限，为 `Duration `添加扩展函数.
 
+```scala
+import scala.concurrent.duration._
+import akka.testkit._
+10.milliseconds.dilated
+```
 
+#####用隐式的ActorRef解决冲突
 
+如果你希望在基于TestKit的测试中，消息发送者为 ``testActor`` 只需要在你的测试代码混入 ``ÌmplicitSender`` .
 
+```scala
+class MySpec(_system: ActorSystem) extends TestKit(_system) with ImplicitSender
+  with WordSpecLike with Matchers with BeforeAndAfterAll {
+```
 
+#####使用多个探针 Actor
+如果待测的actor会发送多个消息到不同的目标，在使用`TestKit`时可能会难以分辨到达 `testActor`的消息流. 另一种方法是用它来创建简单的探针actor，将它们插入到消息流中. 为了让这种方法更加强大和方便，我们提供了一个具体实现，称为 `TestProbe`. 它的功能可以用下面的小例子说明:
 
+```scala
+import scala.concurrent.duration._
+import akka.actor._
+import scala.concurrent.Future
 
+class MyDoubleEcho extends Actor {
+  var dest1: ActorRef = _
+  var dest2: ActorRef = _
+  def receive = {
+    case (d1: ActorRef, d2: ActorRef) =>
+      dest1 = d1
+      dest2 = d2
+    case x =>
+      dest1 ! x
+      dest2 ! x
+  }
+}
 
+val probe1 = TestProbe()
+val probe2 = TestProbe()
+val actor = system.actorOf(Props[MyDoubleEcho])
+actor ! ((probe1.ref, probe2.ref))
+actor ! "hello"
+probe1.expectMsg(500 millis, "hello")
+probe2.expectMsg(500 millis, "hello")
+```
 
+这里我们用 `MyDoubleEcho`来模拟一个待测系统, 它会将输入镜像为两个输出. 关联两个测试探针来进行（最简单）行为的确认. 还有一个例子是两个相互协作的 actor A，B， A 发送消息给 B. 为了确认这个消息流，可以插入一个 `TestProbe` 作为A的目标, 使用转发功能或下文中的自动导向功能在测试上下文中包含一个真实的B.
 
+还可以为探针配备自定义的断言来使测试代码更简洁清晰:
 
+```scala
+ase class Update(id: Int, value: String)
+ 
+val probe = new TestProbe(system) {
+  def expectUpdate(x: Int) = {
+    expectMsgPF() {
+      case Update(id, _) if id == x => true
+    }
+    sender() ! "ACK"
+  }
+}
 
+```
 
+这里你拥有完全的灵活性，可以将`TestKit` 提供的工具与你自己的检测代码混合和匹配，并为它取一个有意义的名字。在实际开发中你的代码很可能比上面的示例要复杂；要充分利用工具的力量！
 
+> 警告
 
+> 任何从 ``TestProbe``发送到  另一个运行在 `CallingThreadDispatcher`上 的actor的消息，存在死锁的可能性，如果另一个actor也可能会向此探测器发送消息。`TestProbe.watch` 和 `TestProbe.unwatch `的实现也将向将空着发送消息，这意味着尝试监视它是危险的，例如从 `TestProbe`到`TestActorRef`  发送消息。
 
+###从探针观察其它actor
 
+`TestProbe `可以将自己注册为任意其他actor的DeathWatch：
 
+```scala
+val probe = TestProbe()
+probe watch target
+target ! PoisonPill
+probe.expectTerminated(target)
+```
 
+#####对探针收到的消息进行应答
+探针在可能的条件下，会记录通讯通道以便进行应答:
 
+```scala
+val probe = TestProbe()
+val future = probe.ref ? "hello"
+probe.expectMsg(0 millis, "hello") // TestActor runs on CallingThreadDispatcher
+probe.reply("world")
+assert(future.isCompleted && future.value == Some(Success("world")))
+```
 
+#####对探针收到的消息进行转发
+假定一个象征性的actor网络中某目标 actor ``dest`` 从 actor ``source``收到一条消息. 如果你安排消息使其先发往 `TestProbe` ``probe`` , 你可以在保持网络功能的同时对消息流的容量和时限进行断言:
 
+```scala
+class Source(target: ActorRef) extends Actor {
+  def receive = {
+    case "start" => target ! "work"
+  }
+}
+ 
+class Destination extends Actor {
+  def receive = {
+    case x => // Do something..
+  }
+}
+val probe = TestProbe()
+val source = system.actorOf(Props(classOf[Source], probe.ref))
+val dest = system.actorOf(Props[Destination])
+source ! "start"
+probe.expectMsg("work")
+probe.forward(dest)
+```
 
+目标`` dest`` actor 将先收到同样的消息，就象没有插入探针一样.
 
+#####自动导向
+将收到的消息放进队列以便以后处理，这种方法不错，但要保持测试运行并对其运行过程进行跟踪，你也可以为参与测试的探针(事实上是任何 `TestKit`)安装一个 `AutoPilot`（自动导向）。 自动导向在消息进入检查队列之前启动. 以下代码可以用来转发消息, 例如 ``A --> Probe --> B``, 只要满足一定的协约.
 
+```scala
+val probe = TestProbe()
+probe.setAutoPilot(new TestActor.AutoPilot {
+  def run(sender: ActorRef, msg: Any): Option[TestActor.AutoPilot] =
+    msg match {
+      case "stop" ⇒ None
+      case x      ⇒ testActor.tell(x, sender); Some(this)
+    }
+})
+```
 
+###TODO
+`run` 方法必须返回包含在Option 中的auto-pilot供下一条消息使用, 设置成 None 表示终止自动导向.
+
+小心定时器断言
+在使用测试探针时，within 块的行为可能会不那么直观：你需要记住 上文 所描述的期限仅对每一个探针的局部作用域有效。因此，探针 不会响应别的探针的期限，也不响应包含它的TestKit 实例的期限:
+
+class SomeTest extends TestKit(_system: ActorSystem) with ImplicitSender {
+ 
+  val probe = TestProbe()
+ 
+  within(100 millis) {
+    probe.expectMsg("hallo")  // 将永远挂起!
+  }
+}
+这个测试将无限挂起，因为 expectMsg 调用看不到任何期限. 目前，使它正常工作的唯一方法是在代码中使用 probe.within ; 以后的版本可能会提供通过词法作用域内的隐式参数设置期限的方法.
 
 
 
