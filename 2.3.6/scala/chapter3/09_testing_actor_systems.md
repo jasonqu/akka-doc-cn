@@ -437,7 +437,7 @@ probe.forward(dest)
 目标`` dest`` actor 将先收到同样的消息，就象没有插入探针一样.
 
 #####自动导向
-将收到的消息放进队列以便以后处理，这种方法不错，但要保持测试运行并对其运行过程进行跟踪，你也可以为参与测试的探针(事实上是任何 `TestKit`)安装一个 `AutoPilot`（自动导向）。 自动导向在消息进入检查队列之前启动. 以下代码可以用来转发消息, 例如 ``A --> Probe --> B``, 只要满足一定的协约.
+将收到的消息放进队列以便以后处理，这种方法不错，但要保持测试运行并对其运行过程进行跟踪，你也可以为参与测试的探针(事实上是任何 `TestKit`)安装一个 `AutoPilot`（自动导向）。 自动导向在消息进入检查队列之前启动. 以下代码可以用来转发消息, 例如 ``A --> Probe --> B``, 只要满足一定的协议.
 
 ```scala
 val probe = TestProbe()
@@ -450,25 +450,129 @@ probe.setAutoPilot(new TestActor.AutoPilot {
 })
 ```
 
-###TODO
-`run` 方法必须返回包含在Option 中的auto-pilot供下一条消息使用, 设置成 None 表示终止自动导向.
+`run` 方法必须返回`auto-pilot`供下一条消息使用, 它可以是`KeepRunning`来保存当前值，或者是`NoAutoPilot`来终止自动导向.
 
-小心定时器断言
-在使用测试探针时，within 块的行为可能会不那么直观：你需要记住 上文 所描述的期限仅对每一个探针的局部作用域有效。因此，探针 不会响应别的探针的期限，也不响应包含它的TestKit 实例的期限:
+#####小心定时器断言
+在使用测试探针时，`within `块的行为可能会不那么直观：你需要记住 [上文](#TestKit.within) 所描述的nicely scoped期限仅对每一个探针的局部作用域有效。因此，探针 不会响应别的探针的期限，也不响应包含它的`TestKit `实例的期限:
 
-class SomeTest extends TestKit(_system: ActorSystem) with ImplicitSender {
- 
-  val probe = TestProbe()
- 
-  within(100 millis) {
-    probe.expectMsg("hallo")  // 将永远挂起!
+```scala
+val probe = TestProbe()
+within(1 second) {
+  probe.expectMsg("hello")
+}
+```
+
+这里``expectMsg``调用将使用默认超时.
+
+###CallingThreadDispatcher
+如上文所述， `CallingThreadDispatcher `在单元测试中非常重要, 但最初它出现是为了在出错的时候能够生成连续的stacktrace. 由于这个特殊的派发器一般地将任何消息直接运行在当前线程中，所以只要所有的actor都是在这个派发器上运行，消息处理的完整历史信息在调用堆栈上就 有记录。
+
+#####如何使用它
+只要象平常一样设置派发器:
+
+```scala
+import akka.testkit.CallingThreadDispatcher
+val ref = system.actorOf(Props[MyActor].withDispatcher(CallingThreadDispatcher.Id))
+```
+
+#####它是如何运作的
+在被调用时, `CallingThreadDispatcher` 会检查接收消息的actor是否已经在当前线程中了. 这种情况的最简单的例子是actor向自己发送消息. 这时，不能马上对它进行处理，因为这违背了actor模型, 于是这个消息被放进队列，直到actor的当前消息被处理完毕；因此，新消息会在调用的线程上被处理，只是在actor完成其先前的工作之后. 在别的情况下，消息会在当前线程中立即得到处理. 通过这个派发器规划的Future也会立即执行.
+
+这种工作方式使 `CallingThreadDispatcher` 象一个为永远不会因为外部事件而阻塞的actor所设计的通用派发器.
+
+在有多个线程的情况下，有可能同时存在两个使用这个派发器的actor在不同线程中收到消息。此时，它们会立即在自己的线程中被执行，并竞争actor锁，竞争失败的那个必须等待。 这样我们保持了actor模型，但由于使用了受限的调度我们损失了一些并发性。从这个意义上说，它等同于使用传统的基于互斥的并发.
+
+另一个困难是正确地处理挂起和继续: 当actor被挂起时，后续的消息将被放进一个thread-local的队列中（和正常情况下使用的队列是同一个). 但是对 `resume`的调用, 是由一个特定的线程执行的，系统中所有其它的线程 很可能不会运行这个特定的actor，这会导致thread-local队列无法被它们的本地线程清空。于是，调用 `resume` 的线程会从所有线程收集所有当前在队列中的消息到自己的队列中，然后处理它们.
+
+#####局限性
+
+> 警告
+
+> 在`CallingThreadDispatcher `被用作顶级actor，但没有通过` TestActorRef`的情况下，则存在一个时间窗，在此期间actor会等待user 守护者actor的构造。在此期间发送到这个actor的消息会被加入队列，然后在守护者的线程，而不是调用者的线程上执行。要避免此问题，请使用 `TestActorRef`。
+
+如果一个actor发送完消息后由于某种原因（通常是被发完消息后的调用actor所影响）阻塞了, 此时若使用这个派发器，显然将导致死锁。 这在使用 基于 `CountDownLatch` 同步actor测试中是很常见的情景:
+
+```scala
+   val latch = new CountDownLatch(1)
+   actor ! startWorkAfter(latch)   // actor will call latch.await() before proceeding
+   doSomeSetupStuff()
+   latch.countDown()
+```
+
+这个例子将无限挂起，消息处理到达第二行而永远到不了第四行，而只有在第四行才能在一个普通的派发器上取消它的阻塞.
+
+所以要记住 `CallingThreadDispatcher `并不是普通派发器的 通用替代品. 而另一方面在它上面运行你的actor网络测试会非常有用, 因为如果它在机率特别高的条件下都能不死锁，那么在生产环境中也不会.
+
+> 警告
+
+> 上面这句话很遗憾并不是一个有力的保证，因为你的代码运行在不同的派发器上时可能直接或间接地改变它的行为。 如果你想要寻找帮助你debug死锁的工具, `CallingThreadDispatcher` 在有些错误场合下 可能会有用，但要记住它既可能给出错误的正面结果也可能给出错误的负面结果.
+
+#####线程中断
+如果 `CallingThreadDispatcher `看到当前线程在消息处理返回时已设置其 ``isInterrupted()`` 标志，它将在完成所有其处理 （即，如上文所述的需要处理的所有消息，都会在这种情况发生之前处理） 后抛出`InterruptedException`异常。正如`tell`由于其契约不能抛出异常，该异常将然后被捕获并记录日志，并且在该线程中断状态将再次设置。
+
+如果在消息处理过程中抛出`InterruptedException`异常，则它将被` CallingThreadDispatcher` 的消息处理循环捕获，然后将设置该线程`interrupted`标志,并且处理将继续正常进行。
+
+> 注意
+
+这两个段落的总结是，如果当前线程在`CallingThreadDispatcher`下工作时中断，则将导致当消息发送返回时 `isInterrupted `标志被置为``true``,，并不抛出`InterruptedException`异常。
+
+
+
+
+#####好处
+综上所述，以下是 `CallingThreadDispatcher`能够提供的特性:
+
+* 确定地执行单线程测试，同时保持几乎所有的actor语义
+* 在异常stacktrace中记录从失败点开始的完整的消息处理历史
+* 排除某些类型的死锁场景
+
+###跟踪Actor调用
+到目前为止所有的测试工具都针对系统的行为构造断言. 如果测试失败，通常是由你来查找原因，进行修改并进行下一轮验证测试。这个过程既有debugger支持，又有日志支持，这里Akka工具箱提供以下选项:
+
+* *对Actor实例中抛出的异常记录日志*
+
+  相比其它的日志机制，这一条是永远打开的；它的日志级别是 ``ERROR``.
+
+* *对某些actor的消息调用记录日志*
+
+  这是通过在[配置文件](../configuration.md)里添加设置项来打开 — 即 ``akka.actor.debug.receive`` — 它使得 `loggable`语句被应用在actor的 `receive` 函数上:
+
+```scala
+import akka.event.LoggingReceive
+def receive = LoggingReceive {
+  case msg => // Do something ...
+}
+def otherState: Receive = LoggingReceive.withLabel("other") {
+  case msg => // Do something else ...
+}
+```
+。
+如果在[配置文件](../configuration.md)中没有上面给出的配置, 这个方法将直接移交给给定的未被修改的 `Receive` 函数, 也就是说如果不打开，就没有运行时开销.
+
+这个日志功能是与指定的局部标记绑定的，因为将其一致地应用于所有的actor一般不是你所需要的， 如果被用于事件主线日志监听器，它还可能导致无限循环.
+
+* *对特殊的消息记录日志*
+
+Actor会自动处理某些特殊消息,例如` Kill`, `PoisonPill` 等等. 打开对这些消息的跟踪只需要设置 ``akka.actor.debug.autoreceive``, 这对所有actor都有效.
+
+* *对actor生命周期记录日志*
+
+Actor的创建、启动、重启、开始监控、停止监控和终止可以通过打开 ``akka.actor.debug.lifecycle`` 来跟踪; 这也是对所有 actor都有效的.
+
+所有这些日志消息都记录在 ``DEBUG`` 级别. 总结一下, 你可以用以下配置片段打开actor活动的完整日志:
+
+```
+akka {
+  loglevel = DEBUG
+  actor {
+    debug {
+      receive = on
+      autoreceive = on
+      lifecycle = on
+    }
   }
 }
-这个测试将无限挂起，因为 expectMsg 调用看不到任何期限. 目前，使它正常工作的唯一方法是在代码中使用 probe.within ; 以后的版本可能会提供通过词法作用域内的隐式参数设置期限的方法.
-
-
-
-
+```
 
 
 
