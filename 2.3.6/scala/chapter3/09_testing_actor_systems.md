@@ -574,44 +574,42 @@ akka {
 }
 ```
 
+###不同的测试框架
+Akka的测试套件是使用[`ScalaTest`](http://scalatest.org)，并参照文档中的示例编写的。然而，TestKit和其工具包并不依赖于这一框架，实际上你可以使用最适合你开发风格的测试框架。
 
+本节包含使用其他框架时的已知陷阱，这不是详尽的，并不意味着需要认证或或使用特殊支持。
 
+#####当你需要它是一个特质
+如果由于某种原因是，`TestKit`是一个具体的类，而不是特质，因此测试工具无法继承它，还有` TestKitBase`：
 
+```scala
+import akka.testkit.TestKitBase
+ 
+class MyTest extends TestKitBase {
+  implicit lazy val system = ActorSystem()
+ 
+  // put your test code here ...
+ 
+  shutdown(system)
+}
+```
 
+``implicit lazy val system``必须这样声明 （你当然可以根据需要将参数传递到actor系统工厂中） 因为特质 `TestKitBase` 在其构造过程中需要system。
 
+> 警告
 
+> 不提倡使用这个特质，由于在未来二进制向后兼容性可能会成为问题，所以使用它须自行承担风险。
 
+#####Specs2
+一些 [`Specs2` ](http://specs2.org)用户贡献了如何变通解决可能出现的一些冲突的示例：
 
+* 在TestKit中混入 `org.specs2.mutable.Specification` 将导致涉及 ``end`` 方法的名称冲突 （它在TestKit中是私有变量，而在Specification中是抽象方法） ；如果第一次混入测试工具包，代码可以编译，但可能在运行时失败。变通方法——实际上也有利于第三点—— 是将`org.specs2.specification.Scope`和TestKit一起应用 。
 
+* Specification特质提供了一个`Duration` DSL 的部分使用与`scala.concurrent.duration.Duration`具有相同名称的方法，如果引入``scala.concurrent.duration._``会 导致含糊不清的隐式值。有两个变通：
+  * 要么使用Specification的Duration变体，供应到Akka Duration的隐式转换。这种转换不有Akka提供，因为这将意味着我们的 JAR 文件将依赖于 Specs2，为实现这养一个小特性不合理。
+  * 或混入`org.specs2.time.NoTimeConversions`到Specification中。
 
+*Specifications默认是并发执行的，因此执行写入测试或者``sequential``关键字时需要谨慎一些。
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+###配置
+TestKit模块的几个配置属性，请参阅[配置参考](../chap2/.md)。
