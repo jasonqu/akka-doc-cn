@@ -49,7 +49,7 @@ akka文档中文翻译
    * [ ] 有限状态机(FSM) (已完成，待校验)
    * [ ] 持久化  (已完成，待校验)
    * [ ] 测试Actor系统 (已完成，待校验)
-   * [ ] Actor DSL  (翻译中)
+   * [ ] Actor DSL (已完成，待校验)
 * [ ] Futures与Agents
    * [ ] Futures
    * [ ] Agents
