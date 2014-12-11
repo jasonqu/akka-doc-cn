@@ -2,7 +2,7 @@
 
 上一节 [Actor系统](02_actor_systems.md) 解释了actor是应用创建中最小的单元，以及它们如何组成一个树形结构。本节单独来看看一个actor，解释在实现它时你会遇到的概念。更多细节请参阅 [Actors (Scala)](../chapter3/01_actors.md)和 [Actors (Java)](#TODO).
 
-一个Actor是一个容器，它包含了[状态](#state)，[行为](#behavior)，一个[邮箱](#mailbox)，[子Actor](#children)和一个[监管策略](#supervisor-strategy)。所有这些封装在一个[Actor引用](#actor-reference)里。最终Actor终止时，会有[这些](#when-an-actor-terminates)发生。
+一个Actor是一个容器，它包含了[状态](#state)，[行为](#behavior)，一个[邮箱](#mailbox)，[子Actor](#children)和一个[监管策略](#supervisor-strategy)。所有这些封装在一个[Actor引用](#actor-reference)里。最终在Actor终止时，会有[这些](#when-an-actor-terminates)发生。
 
 ###<a name="actor-reference"></a>Actor引用
 
@@ -34,10 +34,10 @@ Akka与其它actor模型实现的一个重要区别在于当前的行为必须�
 ###<a name="supervisor-strategy"></a>监管策略
 Actor的最后一部分是它用来处理其子actor错误状况的机制。错误处理是由Akka透明完成的，针对每个出现的失败，将应用[监管与监控](04_supervision_and_monitoring.md)中所描述的一个策略。由于策略是actor系统组织结构的基础，所以一旦actor被创建了它就不能被修改。
 
-考虑到对每个actor只有唯一的策略，这意味着如果一个actor的子actor们应用了不同的策略，这些子actor应该按照相同的策略来进行分组，并放在中间的监管者下，又一次倾向于根据任务到子任务的划分来组织actor系统的结构。
+考虑到对每个actor只有唯一的策略，这意味着：如果一个actor的子actor们应用了不同的策略，则这些子actor应该按照相同的策略来进行分组，并放在一个中间的监管者下，又一次转向了根据任务到子任务的划分来组织actor系统的结构的设计方法。
 
 ###<a name="when-an-actor-terminates"></a>当Actor终止时
-当一个actor终止，即失败了且不能用重启来解决，停止它自己或者被它的监管者停止，它会释放其资源，将它邮箱中所有未处理的消息放进系统的“死信邮箱(dead letter mailbox)”，即将所有消息作为死信重定向到事件流中。而actor引用中的邮箱将会被一个系统邮箱所替代，将所有的新消息作为死信重定向到事件流中。 但是这些操作只是尽力而为，所以不能依赖它来实现“投递保证”。
+当一个actor终止——即失败了且不能用重启来解决、停止它自己或者被它的监管者停止——它会释放其资源，将其邮箱中所有未处理的消息放进系统的“死信邮箱(dead letter mailbox)”，即将所有消息作为死信重定向到事件流中。而actor引用中的邮箱将会被一个系统邮箱所替代，将所有的新消息作为死信重定向到事件流中。 但是这些操作只是尽力而为，所以不能依赖它来实现“投递保证”。
 
 不是简单地把消息扔掉的想法来源于我们的测试：我们在事件总线上注册了`TestEventListener`来接收死信，然后将每个收到的死信在日志中生成一条警告——这对于更快地解析测试失败非常有帮助。可以想象这个特性也可以用于其它的目的。
 

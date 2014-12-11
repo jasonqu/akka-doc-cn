@@ -1,6 +1,6 @@
 # 配置
 
-你可以开始使用Akka为不需要定义任何配置，因为Akka提供了合理的默认值。不过你可能需要修改设置来更改默认行为或适应特定的运行环境。可以修改的典型设置的例子：
+你开始使用Akka时可以不需要定义任何配置，因为Akka提供了合理的默认值。不过为了适应特定的运行环境，你可能需要修改设置来更改默认行为。可以修改的典型设置的例子：
 
 * 日志级别和后端记录器
 * 启用远程
@@ -8,7 +8,7 @@
 * 路由器定义
 * 调度的调整
 
-Akka使用[Typesafe配置库](https://github.com/typesafehub/config)，这可能也是你自己的应用或库的不错选择，不管用不用Akka。这个库由Java实现，没有外部的依赖；本文后面将只对这个库有一些归纳，你应该查看其文档参考具体的使用（尤其是[ConfigFactory](http://typesafehub.github.io/config/v1.2.0/com/typesafe/config/ConfigFactory.html)）。
+Akka使用[Typesafe配置库](https://github.com/typesafehub/config)，它同样也是你自己的应用或库的不错选择，不管用不用Akka。这个库由Java实现，没有外部的依赖；本文后面将只对这个库有一些归纳，你应该查看其文档参考具体的使用（尤其是[ConfigFactory](http://typesafehub.github.io/config/v1.2.0/com/typesafe/config/ConfigFactory.html)）。
 
 
 > 警告
@@ -29,11 +29,13 @@ Akka的所有配置都保存在`ActorSystem`的实例中，或者换一种说法
 
 > 注意
 
-> 如果您正在编写一个Akka 应用，将你的配置保存类路径的根目录下的``application.conf``文件中。如果您正在编写一个基于Akka的库，将其配置保存在JAR包根目录下的``reference.conf``文件中。
+> 如果你正在编写一个Akka 应用，将你的配置保存类路径的根目录下的``application.conf``文件中。如果你正在编写一个基于Akka的库，将其配置保存在JAR包根目录下的``reference.conf``文件中。
 
 ###当使用JarJar,，OneJar，Assembly或任何jar打包命令（jar-bundler）
-.. warning::
-Akka的配置方法重度依赖于这个理念——每一模块/jar都有它自己的 `reference.conf`文件，所有这些都将会被配置发现并加载。不幸的是，这也意味着如果你放置/合并多个jar到相同的 jar中，您页需要合并所有的`reference.conf`文件。否则所有的默认设置将会丢失，Akka将无法工作。
+
+> 警告
+
+> Akka的配置方法重度依赖于这个理念——每一模块/jar都有它自己的 `reference.conf`文件，所有这些都将会被配置发现并加载。不幸的是，这也意味着如果你放置/合并多个jar到相同的 jar中，你也需要合并所有的`reference.conf`文件。否则所有的默认设置将会丢失，Akka将无法工作。
 
 如果你使用 Maven 打包应用程序，你还可以使用[Apache Maven Shade Plugin](
 http://maven.apache.org/plugins/maven-shade-plugin)中对[资源转换（Resource
@@ -118,8 +120,8 @@ Transformers）](http://maven.apache.org/plugins/maven-shade-plugin/examples/res
   }
 ```
 
-###包含文件
-有时包含另一个配置文件内容的能力是非常有用，例如假设你有一个``application.conf``包含所有环境独立设置，然后使用特定环境的设置覆写。
+###<a name="including-files"></a>包含文件
+有时包含另一个配置文件内容的能力是非常有用的，例如假设你有一个``application.conf``包含所有环境独立设置，然后使用特定环境的设置覆写。
 
 用``-Dconfig.resource=/dev.conf``制定系统属性，将会加载``dev.conf``文件，并包含``application.conf``
 
@@ -139,7 +141,7 @@ dev.conf:
 ###配置日志
 如果系统或配置属性``akka.log-config-on-start`` 被设置为 ``on``，则在actor系统启动的时候，就完成了INFO级别的日志设置。当你不能确定使用何种配置时，这很有用。
 
-如果有疑问，您也可以在创建actor系统之前或之后，很容易很方便地检查配置对象：
+如果有疑问，你也可以在创建actor系统之前或之后，很容易很方便地检查配置对象：
 
 ```
   Welcome to Scala version @scalaVersion@ (Java HotSpot(TM) 64-Bit Server VM, Java 1.6.0_27).
@@ -226,8 +228,8 @@ dev.conf:
 
 > 注意
 
-> 这个配置文件库非常强大，这里不可能解释其所有的功能. 特别是如何在配置文件中包含其它的配置文件 (在[`包含文件Including
-  files`]()中有一个简单的例子) 以及通过路径替换来复制部分配置树。
+> 这个配置文件库非常强大，这里不可能解释其所有的功能。特别是如何在配置文件中包含其它的配置文件 (在[`包含文件Including
+  files`](#including-files)中有一个简单的例子) 以及通过路径替换来复制部分配置树。
 
 你也可以在初始化``ActorSystem``时，通过代码的形式，使用其它方法来指定和解析配置信息。
 
@@ -248,24 +250,24 @@ import com.typesafe.config.ConfigFactory
 ```
 
 ###从自定义位置读取配置
-您可以使用代码或系统属性，来替换或补充``application.conf`` 。
+你可以使用代码或系统属性，来替换或补充``application.conf`` 。
 
-如果您使用的``ConfigFactory.load()``（Akka默认方式），您可以通过定义``-Dconfig.resource=whatever``、``-Dconfig.file=whatever``或
+如果你使用的方法是``ConfigFactory.load()``（Akka默认方式），你可以通过定义``-Dconfig.resource=whatever``、``-Dconfig.file=whatever``或
 ``-Dconfig.url=whatever``替换 ``application.conf``。
 
 在``-Dconfig.resource``和相关选项指定的替换配置文件中，如果你还想使用``application.{conf,json,properties}``，可以使用``include
 "application"``。在``include
-"application"``之前指定的设置会被包含进来的文件内容重写，同理包含的文件的内容也会被之后的内容重写。
+"application"``之前指定的设置会被包含进来的文件内容重写，同理所包含文件的内容也会被之后的内容重写。
 
 在代码中，有很多自定义选项。
 
-``ConfigFactory.load()``有几个重载；这些重载允许您指定夹在 系统属性（重写）和默认值（来自``reference.conf``）之间的配置，并替换通常的``application.{conf,json,properties}``和``-Dconfig.file``相关选项。
+``ConfigFactory.load()``有几个重载；这些重载允许你指定夹在 系统属性（重写）和默认值（来自``reference.conf``）之间的配置，并替换通常的``application.{conf,json,properties}``和``-Dconfig.file``相关选项。
 
 ``ConfigFactory.load()`` 最简单的变体需要资源基本名称（``application``之外的）；如``myname.conf``、``myname.json``和``myname.properties``而不是``application.{conf,json,properties}``。
 
-最灵活的变体是以一个``Config``对象为参数，您可以使用``ConfigFactory``中的任何方法加载。例如，您可以在代码中使用``ConfigFactory.parseString()``处理一个配置字符串，或者你可以使用``ConfigFactory.parseMap()``创建一个映射，或者也可以加载一个文件。
+最灵活的变体是以一个``Config``对象为参数，你可以使用``ConfigFactory``中的任何方法加载。例如，你可以在代码中使用``ConfigFactory.parseString()``处理一个配置字符串，或者你可以使用``ConfigFactory.parseMap()``创建一个映射，或者也可以加载一个文件。
 
-您也可以将自定义的配置与通常的配置组合起来，像这样：
+你也可以将自定义的配置与通常的配置组合起来，像这样：
 
 ```java
 // make a Config with just your special setting
@@ -296,8 +298,8 @@ ActorSystem system =
 正常的目标是要自定义中间一层，不管其他两个。
 
  - ``ConfigFactory.load()``加载整个堆栈
- - ``ConfigFactory.load()``的重载允许您指定一个不同的中间层
- - ``ConfigFactory.parse()`变体加载单个文件或资源
+ - ``ConfigFactory.load()``的重载允许你指定一个不同的中间层
+ - ``ConfigFactory.parse()``变体加载单个文件或资源
 
 要叠加两层，可使用``override.withFallback(fallback)``；请努力保持系统属性（``defaultOverrides()``）在顶部，``reference.conf`` （``defaultReference()``）在底部。
 
@@ -306,11 +308,43 @@ ActorSystem system =
 ###Actor部署配置
 可以在配置的``akka.actor.deployment``节中定义特定actor的部署设置。在部署部分有可能定义这些事物——调度器、邮箱、路由器设置和远程部署。在相应主题的章节中详细介绍了配置的这些特性。一个例子，可以如下所示：
 
-.. includecode:: code/docs/config/ConfigDocSpec.scala#deployment-section
+```
+akka.actor.deployment {
+
+  # '/user/actorA/actorB' is a remote deployed actor
+  /actorA/actorB {
+    remote = "akka.tcp://sampleActorSystem@127.0.0.1:2553"
+  }
+
+  # all direct children of '/user/actorC' have a dedicated dispatcher
+  "/actorC/*" {
+    dispatcher = my-dispatcher
+  }
+
+  # '/user/actorD/actorE' has a special priority mailbox
+  /actorD/actorE {
+    mailbox = prio-mailbox
+  }
+
+  # '/user/actorF/actorG/actorH' is a random pool
+  /actorF/actorG/actorH {
+    router = random-pool
+    nr-of-instances = 5
+  }
+}
+
+my-dispatcher {
+  fork-join-executor.parallelism-min = 10
+  fork-join-executor.parallelism-max = 10
+}
+prio-mailbox {
+  mailbox-type = "a.b.MyPrioMailbox"
+}
+```
 
 一个指定actor部署部分的设置是通过其相对 ``/user``的路径来标识的。
 
-您可以使用星号作为通配符匹配actor的路径部分，所以您可以指定：``/*/sampleActor``将匹配该树形结构中那个级别上的所有``sampleActor``。您也能把通配符放在最后来匹配某一级别的所有actor：``/someParent/*``。非通配符匹配总是有更高的优先级，所以：``/foo/bar``比``/foo/*`` **更具体**，并且只有最高优先的匹配才会。请注意它**不能**用于部分匹配，像这样：``/foo*/bar``、``/f*o/bar`` 等。
+你可以使用星号作为通配符匹配actor的路径部分，所以你可以指定：``/*/sampleActor``将匹配该树形结构中那个级别上的所有``sampleActor``。你也能把通配符放在最后来匹配某一级别的所有actor：``/someParent/*``。非通配符匹配总是有更高的优先级，所以：``/foo/bar``比``/foo/*`` **更具体**，并且只有最高优先的匹配才会被使用。请注意它**不能**用于部分匹配，像这样：``/foo*/bar``、``/f*o/bar`` 等。
 
 ###参考配置清单
 
@@ -1047,8 +1081,8 @@ akka {
 
 <span id="config-akka-agent"></span>
 
-akka-agent
-~~~~~~~~~~
+##### akka-agent
+
 
 ```
 ####################################

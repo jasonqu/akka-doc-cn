@@ -52,7 +52,7 @@ Actor引用标明了一个actor，其生命周期和actor的生命周期保持�
 #####Actor物理路径
 Actor逻辑路径描述它在一个actor系统内部的功能位置，而基于配置的远程部署意味着一个actor可能在另外一台网络主机上被创建，即另一个actor系统中。在这种情况下，从根守护者穿过actor路径来找到该actor肯定需要访问网络，这是一个很昂贵的操作。因此，每一个actor同时还有一条物理路径，从actor对象实际所在的actor系统的根开始。与其它actor通信时使用物理路径作为发送方引用，能够让接收方直接回复到这个actor上，将路由延迟降到最小。
 
-物理路径的一个重要方面是它决不会跨多个actor系统或跨JVM虚拟机。这意味着如果一个actor有祖先被远程监管，则其逻辑路径（监管树）和物理路径（actor部署）可能会分叉。
+物理路径的一个重要性质是它决不会跨多个actor系统或跨JVM虚拟机。这意味着如果一个actor有祖先被远程监管，则其逻辑路径（监管树）和物理路径（actor部署）可能会分叉。
 
 
 ###如何获得Actor引用？
@@ -63,7 +63,7 @@ actor引用的获取方法分为两类：通过创建actor，或者通过查找a
 
 #####通过具体的路径来查找actor
 
-另外，可以使用`ActorSystem.actorSelection`来查找actor引用。选择可被用在已有actor与被选择的actor进行通讯的时候用到，在投递每条消息的时候都会用到查找。
+另外，可以使用`ActorSystem.actorSelection`来查找actor引用。“选择”可在已有actor与被选择的actor进行通讯的时候用到，在投递每条消息的时候都会用到查找。
 
 为了获得一个绑定到指定actor生命周期的`ActorRef`，你需要发送一个消息，如内置的`Identify`信息，向指定的actor，所获得的`sender()`即为所求。
 
@@ -75,11 +75,11 @@ actor引用的获取方法分为两类：通过创建actor，或者通过查找a
 ###绝对路径 vs 相对路径
 除了`ActorSystem.actorSelection`还有一个`ActorContext.actorSelection`，这是可以在任何一个actor实例中通过`context.actorSelection`访问的。它的actor查找与`ActorSystem`的返回值非常类似，不同在于它的路径查找是从当前actor开始的，而不是从actor树的根开始。可以用 ".." 路径来访问父actor. 例如，你可以向一个指定兄弟发送消息：
 
-	context.actorFor("../brother") ! msg
+	context.actorSelection("../brother") ! msg
 
 当然绝对路径也可以在 context 中使用，即
 
-	context.actorFor("/user/serviceA") ! msg
+	context.actorSelection("/user/serviceA") ! msg
 
 也能正确运行。
 
@@ -103,7 +103,7 @@ actor引用的获取方法分为两类：通过创建actor，或者通过查找a
 
 ###Actor引用和路径相等性
 
-`ActorRef`的相等性与`ActorRef`的目的匹配，即它对应的目标actor化身。两个actor引用进行比较时，如果它们有相同的路径且指向同一个actor化身，则两者相等。指向一个已终止的actor的引用，与指向具有相同路径但却是另一个（重新创建）actor的引用是不相等的。需要注意的是，由于失败造导致的actor重启，仍意味着它是同一个actor化身，即重新启动对`ActorRef`消费者是不可见的。
+`ActorRef`的相等性与`ActorRef`的目的匹配，即一个`ActorRef`对应一个目标actor化身。两个actor引用进行比较时，如果它们有相同的路径且指向同一个actor化身，则两者相等。指向一个已终止的actor的引用，与指向具有相同路径但却是另一个（重新创建）actor的引用是不相等的。需要注意的是，由于失败造导致的actor重启，仍意味着它是同一个actor化身，即重新启动对`ActorRef`消费者是不可见的。
 
 由`actorFor`获得的远程actor引用不包括其身份的所有信息，因此，这种引用不能等于`actorOf`，`sender`或`context.self`的引用。正因如此`actorFor`被`actorSelection`替换废弃。
 
@@ -111,7 +111,7 @@ actor引用的获取方法分为两类：通过创建actor，或者通过查找a
 
 
 ###重用Actor路径
-当一个actor被终止，其引用将指向一个死信邮箱，DeathWatch将发布其最终的转变，并且一般地它也不会起死回生（因为actor的生命周期不允许这样）。虽然以后可能创建一个具有相同路径的actor——如果无法保留actor系统开始以来创建的所有可用actor，则无法保证其反向成立——因而这不是一个好的实践：通过`acterFor`获取的已经‘死亡’的远程actor引用突然再次开始工作，但没有这种过渡和任何其他事件之间顺序的任何保证，因此，该路径的新居民可能收到本意是送给其以前住户的消息。
+当一个actor被终止，其引用将指向一个死信邮箱，DeathWatch将发布其最终的转变，并且一般地它也不会起死回生（因为actor的生命周期不允许这样）。虽然以后可能创建一个具有相同路径的actor——如果无法保留actor系统开始以来创建的所有可用actor，则无法保证其反向成立——但是这不是一个好的实践：通过`acterFor`获取的已经‘死亡’的远程actor引用突然再次开始工作，但没有这种过渡和任何其他事件之间顺序的任何保证，因此，该路径的新居民可能收到本意是送给其以前住户的消息。
 
 在某些非常特殊的情况下这可能是正确的事情，但一定要限制这种处理只能由其监管者操作，因为它是唯一可以可靠地检测名称正确注销的actor，在此之前的新创建的孩子将失败。
 
@@ -133,7 +133,7 @@ actor引用的获取方法分为两类：通过创建actor，或者通过查找a
 * `"/system"` 是所有由系统创建的顶级actor的监管者，如日志监听器，或由配置指定在actor系统启动时自动部署的actor。
 * `"/deadLetters"` 是死信actor，所有发往已经终止或不存在的actor的消息会被重定向到这里（以尽最大努力为基础：即使在本地JVM，消息也可能丢失）
 * `"/temp"`是所有系统创建的短时actor的监管者，例如那些在`ActorRef.ask`的实现中用到的actor。
-* `"/remote"` 是一个人造路径，用来存放所有其监管者是远程actor引用的actor。
+* `"/remote"` 是一个人造虚拟路径，用来存放所有其监管者是远程actor引用的actor。
 
 需要为actor构建这样的名称空间源于一个核心的非常简单的设计目标：在层次结构中的一切都是一个actor，以及所有的actor都以相同方式工作。因此，你不仅可以查找你所创建的actor，你也可以查找系统守护者并发送消息（在这种情况下它会忠实地丢弃之）。这个强大的原则意味着不需要记住额外的怪异模式，它使整个系统更加统一和一致。
 
