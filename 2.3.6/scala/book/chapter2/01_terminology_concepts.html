@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.1" data-basepath=".." data-revision="1411643601835">
+    <div class="book"  data-level="2.1" data-basepath=".." data-revision="1418396877209">
     
 
 <div class="book-summary">
@@ -349,10 +349,10 @@
         </li>
     
         
-        <li class="chapter " data-level="3" data-path="chapter3/Actors.html">
+        <li class="chapter " data-level="3" data-path="chapter3/actors.html">
             
                 
-                    <a href="../chapter3/Actors.html">
+                    <a href="../chapter3/actors.html">
                         <i class="fa fa-check"></i>
                         
                             <b>3.</b>
@@ -390,7 +390,7 @@
                         
                             <b>3.2.</b>
                         
-                         类型Actor
+                         有类型Actor
                     </a>
                 
             
@@ -410,6 +410,28 @@
                     </a>
                 
             
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="3.3.1" data-path="chapter3/03-1_fault_tolerance_sample.html">
+            
+                
+                    <a href="../chapter3/03-1_fault_tolerance_sample.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.3.1.</b>
+                        
+                         容错示例
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
             
         </li>
     
@@ -462,10 +484,10 @@
         </li>
     
         
-        <li class="chapter " data-level="3.7" data-path="chapter3/07_FSM.html">
+        <li class="chapter " data-level="3.7" data-path="chapter3/07_fsm.html">
             
                 
-                    <a href="../chapter3/07_FSM.html">
+                    <a href="../chapter3/07_fsm.html">
                         <i class="fa fa-check"></i>
                         
                             <b>3.7.</b>
@@ -1595,7 +1617,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_393">
+                    <section class="normal" id="section-gitbook_11">
                     
                         <h1 id="">术语，概念</h1>
 <p>这一章我们将尝试建立通用的术语，对Akka面向的并发、分布式系统等提供一个坚实的讨论基础。请注意，这里的很多术语都没有统一的定义。我们只是希望在Akka文档的范围内给出可用的定义。</p>
@@ -1611,7 +1633,7 @@
 <p>当多个参与者互相等待别人达到某个特殊的状态才能继续处理的时候，<em>死锁</em> 出现了。因为如果一些参与者不达到特定状态，所有的参与者都不能执行（就像<a href="http://en.wikipedia.org/wiki/Catch-22" target="_blank">《第二十二条军规》</a>描述的<a href="http://en.wikipedia.org/wiki/Catch-22_(logic)">那样</a>，所有相关子系统都停顿了。死锁和阻塞息息相关，因为阻塞使得一个参与者线程可以无限期地推迟其他线程的处理。</p>
 <p>在死锁中，没有参与者可以处理，然而相对的 <em>饥饿</em> 可能发生，当有些参与者可以不断地处理，而另一些可能不行。一个典型的场景是一个幼稚的调度算法——总是选择高优先级的任务。如果高优先级的任务数量一直足够多，则低优先级的任务永远不会被完成。</p>
 <p><em>活锁</em> 和死锁类似，没有参与者可以处理。区别在于与进程进入等待其他进程处理的“冻结”状态不同，参与者不断地变换他们的状态。一个示例场景是两个参与者和两个特殊的资源。他们分别试图获取资源，并且检查是不是另一个参与者也需要这个资源。如果该资源被另一个参与者请求，则它们试图获取另一个资源。在一个很不幸的情况下，也许两个参与者会不停的在两个资源上“跳跃”，永远在谦让而不使用资源。</p>
-<h3 id="">竟态条件</h3>
+<h3 id="">竞态条件</h3>
 <p>当一组事件的顺序假设可能被外部不确定因素影响，我们称之为 <em>竞态条件</em>。竞态条件经常在多个线程共享一个可变状态时出现，一个线程对这个状态的操作可能被交织从而导致意外的行为。尽管这是常见的情况，但是共享状态并不一定会导致竞态条件。例如一个客户端向服务器发送无序的包（例如UDP数据包）<code>P1</code>，<code>P2</code>。由于包可能经过不同的网络路由器传送，所以服务器可能先收到<code>P2</code>，后收到<code>P1</code>。如果消息中没有包含发送顺序的相关信息的话，服务器是不可能确定包是否是按照发送顺序接收的。根据包的内容这可能会导致竞态条件。</p>
 <blockquote>
 <p>注意</p>

@@ -18,7 +18,7 @@
     
     
     
-    <link rel="next" href="../chapter3/Actors.html" />
+    <link rel="next" href="../chapter3/actors.html" />
     
     
     <link rel="prev" href="../chapter2/08_message_delivery_reliability.html" />
@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.9" data-basepath=".." data-revision="1411643601835">
+    <div class="book"  data-level="2.9" data-basepath=".." data-revision="1418396877209">
     
 
 <div class="book-summary">
@@ -349,10 +349,10 @@
         </li>
     
         
-        <li class="chapter " data-level="3" data-path="chapter3/Actors.html">
+        <li class="chapter " data-level="3" data-path="chapter3/actors.html">
             
                 
-                    <a href="../chapter3/Actors.html">
+                    <a href="../chapter3/actors.html">
                         <i class="fa fa-check"></i>
                         
                             <b>3.</b>
@@ -390,7 +390,7 @@
                         
                             <b>3.2.</b>
                         
-                         类型Actor
+                         有类型Actor
                     </a>
                 
             
@@ -410,6 +410,28 @@
                     </a>
                 
             
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="3.3.1" data-path="chapter3/03-1_fault_tolerance_sample.html">
+            
+                
+                    <a href="../chapter3/03-1_fault_tolerance_sample.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.3.1.</b>
+                        
+                         容错示例
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
             
         </li>
     
@@ -462,10 +484,10 @@
         </li>
     
         
-        <li class="chapter " data-level="3.7" data-path="chapter3/07_FSM.html">
+        <li class="chapter " data-level="3.7" data-path="chapter3/07_fsm.html">
             
                 
-                    <a href="../chapter3/07_FSM.html">
+                    <a href="../chapter3/07_fsm.html">
                         <i class="fa fa-check"></i>
                         
                             <b>3.7.</b>
@@ -1595,10 +1617,10 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_404">
+                    <section class="normal" id="section-gitbook_18">
                     
                         <h1 id="">配置</h1>
-<p>你可以开始使用Akka为不需要定义任何配置，因为Akka提供了合理的默认值。不过你可能需要修改设置来更改默认行为或适应特定的运行环境。可以修改的典型设置的例子：</p>
+<p>你开始使用Akka时可以不需要定义任何配置，因为Akka提供了合理的默认值。不过为了适应特定的运行环境，你可能需要修改设置来更改默认行为。可以修改的典型设置的例子：</p>
 <ul>
 <li>日志级别和后端记录器</li>
 <li>启用远程</li>
@@ -1606,7 +1628,7 @@
 <li>路由器定义</li>
 <li>调度的调整</li>
 </ul>
-<p>Akka使用<a href="https://github.com/typesafehub/config" target="_blank">Typesafe配置库</a>，这可能也是你自己的应用或库的不错选择，不管用不用Akka。这个库由Java实现，没有外部的依赖；本文后面将只对这个库有一些归纳，你应该查看其文档参考具体的使用（尤其是<a href="http://typesafehub.github.io/config/v1.2.0/com/typesafe/config/ConfigFactory.html" target="_blank">ConfigFactory</a>）。</p>
+<p>Akka使用<a href="https://github.com/typesafehub/config" target="_blank">Typesafe配置库</a>，它同样也是你自己的应用或库的不错选择，不管用不用Akka。这个库由Java实现，没有外部的依赖；本文后面将只对这个库有一些归纳，你应该查看其文档参考具体的使用（尤其是<a href="http://typesafehub.github.io/config/v1.2.0/com/typesafe/config/ConfigFactory.html" target="_blank">ConfigFactory</a>）。</p>
 <blockquote>
 <p>警告</p>
 <p>如果你在Scala REPL的2.9.x系列版本中使用Akka，并且你不提供自己的ClassLoader给ActorSystem，则需要以“-Yrepl-sync”选项启动REPL来解决上下文ClassLoader的缺陷。</p>
@@ -1619,11 +1641,13 @@
 <p>系统属性中覆盖的配置具有最高优先级，参见<a href="https://github.com/typesafehub/config/blob/master/HOCON.md" target="_blank">HOCON 规范</a>（靠近末尾的位置）。此外值得注意的是，应用程序配置——缺省为<code>application</code>——可以使用<code>config.resource</code>属性重写 （还有更多，请参阅<a href="https://github.com/typesafehub/config/blob/master/README.md" target="_blank">配置文档</a>）。</p>
 <blockquote>
 <p>注意</p>
-<p>如果您正在编写一个Akka 应用，将你的配置保存类路径的根目录下的<code>application.conf</code>文件中。如果您正在编写一个基于Akka的库，将其配置保存在JAR包根目录下的<code>reference.conf</code>文件中。</p>
+<p>如果你正在编写一个Akka 应用，将你的配置保存类路径的根目录下的<code>application.conf</code>文件中。如果你正在编写一个基于Akka的库，将其配置保存在JAR包根目录下的<code>reference.conf</code>文件中。</p>
 </blockquote>
 <h3 id="jarjaronejarassemblyjarjar-bundler">当使用JarJar,，OneJar，Assembly或任何jar打包命令（jar-bundler）</h3>
-<p>.. warning::
-Akka的配置方法重度依赖于这个理念——每一模块/jar都有它自己的 <code>reference.conf</code>文件，所有这些都将会被配置发现并加载。不幸的是，这也意味着如果你放置/合并多个jar到相同的 jar中，您页需要合并所有的<code>reference.conf</code>文件。否则所有的默认设置将会丢失，Akka将无法工作。</p>
+<blockquote>
+<p>警告</p>
+<p>Akka的配置方法重度依赖于这个理念——每一模块/jar都有它自己的 <code>reference.conf</code>文件，所有这些都将会被配置发现并加载。不幸的是，这也意味着如果你放置/合并多个jar到相同的 jar中，你也需要合并所有的<code>reference.conf</code>文件。否则所有的默认设置将会丢失，Akka将无法工作。</p>
+</blockquote>
 <p>如果你使用 Maven 打包应用程序，你还可以使用<a href="http://maven.apache.org/plugins/maven-shade-plugin" target="_blank">Apache Maven Shade Plugin</a>中对<a href="http://maven.apache.org/plugins/maven-shade-plugin/examples/resource-transformers.html#AppendingTransformer" target="_blank">资源转换（Resource
 Transformers）</a>的支持，来将所有构建类路径中的<code>reference.conf</code>合并为一个文件。</p>
 <p>插件配置可能如下所示：</p>
@@ -1698,8 +1722,8 @@ Transformers）</a>的支持，来将所有构建类路径中的<code>reference.
       netty.tcp.port = 4711
     }
   }
-</code></pre><h3 id="">包含文件</h3>
-<p>有时包含另一个配置文件内容的能力是非常有用，例如假设你有一个<code>application.conf</code>包含所有环境独立设置，然后使用特定环境的设置覆写。</p>
+</code></pre><h3 id="a-nameincluding-filesa"><a name="including-files"></a>包含文件</h3>
+<p>有时包含另一个配置文件内容的能力是非常有用的，例如假设你有一个<code>application.conf</code>包含所有环境独立设置，然后使用特定环境的设置覆写。</p>
 <p>用<code>-Dconfig.resource=/dev.conf</code>制定系统属性，将会加载<code>dev.conf</code>文件，并包含<code>application.conf</code></p>
 <p>dev.conf:</p>
 <pre><code>  include &quot;application&quot;
@@ -1710,7 +1734,7 @@ Transformers）</a>的支持，来将所有构建类路径中的<code>reference.
 </code></pre><p>更高级的包括和替换机制的解释在<a href="https://github.com/typesafehub/config/blob/master/HOCON.md" target="_blank">HOCON</a>规范中。</p>
 <h3 id="">配置日志</h3>
 <p>如果系统或配置属性<code>akka.log-config-on-start</code> 被设置为 <code>on</code>，则在actor系统启动的时候，就完成了INFO级别的日志设置。当你不能确定使用何种配置时，这很有用。</p>
-<p>如果有疑问，您也可以在创建actor系统之前或之后，很容易很方便地检查配置对象：</p>
+<p>如果有疑问，你也可以在创建actor系统之前或之后，很容易很方便地检查配置对象：</p>
 <pre><code>  Welcome to Scala version @scalaVersion@ (Java HotSpot(TM) 64-Bit Server VM, Java 1.6.0_27).
   Type in expressions to have them evaluated.
   Type :help for more information.
@@ -1775,7 +1799,7 @@ Transformers）</a>的支持，来将所有构建类路径中的<code>reference.
 </code></pre>
 <blockquote>
 <p>注意</p>
-<p>这个配置文件库非常强大，这里不可能解释其所有的功能. 特别是如何在配置文件中包含其它的配置文件 (在<a href=""><code>包含文件Including
+<p>这个配置文件库非常强大，这里不可能解释其所有的功能。特别是如何在配置文件中包含其它的配置文件 (在<a href="#including-files"><code>包含文件Including
   files</code></a>中有一个简单的例子) 以及通过路径替换来复制部分配置树。</p>
 </blockquote>
 <p>你也可以在初始化<code>ActorSystem</code>时，通过代码的形式，使用其它方法来指定和解析配置信息。</p>
@@ -1794,17 +1818,17 @@ Transformers）</a>的支持，来将所有构建类路径中的<code>reference.
     <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">system</span> =</span> <span class="hljs-type">ActorSystem</span>(<span class="hljs-string">"MySystem"</span>, <span class="hljs-type">ConfigFactory</span>.load(customConf))
 </code></pre>
 <h3 id="">从自定义位置读取配置</h3>
-<p>您可以使用代码或系统属性，来替换或补充<code>application.conf</code> 。</p>
-<p>如果您使用的<code>ConfigFactory.load()</code>（Akka默认方式），您可以通过定义<code>-Dconfig.resource=whatever</code>、<code>-Dconfig.file=whatever</code>或
+<p>你可以使用代码或系统属性，来替换或补充<code>application.conf</code> 。</p>
+<p>如果你使用的方法是<code>ConfigFactory.load()</code>（Akka默认方式），你可以通过定义<code>-Dconfig.resource=whatever</code>、<code>-Dconfig.file=whatever</code>或
 <code>-Dconfig.url=whatever</code>替换 <code>application.conf</code>。</p>
 <p>在<code>-Dconfig.resource</code>和相关选项指定的替换配置文件中，如果你还想使用<code>application.{conf,json,properties}</code>，可以使用<code>include
 &quot;application&quot;</code>。在<code>include
-&quot;application&quot;</code>之前指定的设置会被包含进来的文件内容重写，同理包含的文件的内容也会被之后的内容重写。</p>
+&quot;application&quot;</code>之前指定的设置会被包含进来的文件内容重写，同理所包含文件的内容也会被之后的内容重写。</p>
 <p>在代码中，有很多自定义选项。</p>
-<p><code>ConfigFactory.load()</code>有几个重载；这些重载允许您指定夹在 系统属性（重写）和默认值（来自<code>reference.conf</code>）之间的配置，并替换通常的<code>application.{conf,json,properties}</code>和<code>-Dconfig.file</code>相关选项。</p>
+<p><code>ConfigFactory.load()</code>有几个重载；这些重载允许你指定夹在 系统属性（重写）和默认值（来自<code>reference.conf</code>）之间的配置，并替换通常的<code>application.{conf,json,properties}</code>和<code>-Dconfig.file</code>相关选项。</p>
 <p><code>ConfigFactory.load()</code> 最简单的变体需要资源基本名称（<code>application</code>之外的）；如<code>myname.conf</code>、<code>myname.json</code>和<code>myname.properties</code>而不是<code>application.{conf,json,properties}</code>。</p>
-<p>最灵活的变体是以一个<code>Config</code>对象为参数，您可以使用<code>ConfigFactory</code>中的任何方法加载。例如，您可以在代码中使用<code>ConfigFactory.parseString()</code>处理一个配置字符串，或者你可以使用<code>ConfigFactory.parseMap()</code>创建一个映射，或者也可以加载一个文件。</p>
-<p>您也可以将自定义的配置与通常的配置组合起来，像这样：</p>
+<p>最灵活的变体是以一个<code>Config</code>对象为参数，你可以使用<code>ConfigFactory</code>中的任何方法加载。例如，你可以在代码中使用<code>ConfigFactory.parseString()</code>处理一个配置字符串，或者你可以使用<code>ConfigFactory.parseMap()</code>创建一个映射，或者也可以加载一个文件。</p>
+<p>你也可以将自定义的配置与通常的配置组合起来，像这样：</p>
 <pre><code class="lang-java"><span class="hljs-comment">// make a Config with just your special setting</span>
 Config myConfig =
   ConfigFactory.parseString(<span class="hljs-string">"something=somethingElse"</span>);
@@ -1832,23 +1856,51 @@ ActorSystem system =
 <p>正常的目标是要自定义中间一层，不管其他两个。</p>
 <ul>
 <li><code>ConfigFactory.load()</code>加载整个堆栈</li>
-<li><code>ConfigFactory.load()</code>的重载允许您指定一个不同的中间层</li>
-<li><code>`ConfigFactory.parse()</code>变体加载单个文件或资源</li>
+<li><code>ConfigFactory.load()</code>的重载允许你指定一个不同的中间层</li>
+<li><code>ConfigFactory.parse()</code>变体加载单个文件或资源</li>
 </ul>
 <p>要叠加两层，可使用<code>override.withFallback(fallback)</code>；请努力保持系统属性（<code>defaultOverrides()</code>）在顶部，<code>reference.conf</code> （<code>defaultReference()</code>）在底部。</p>
 <p>要记住，通常你只需要在<code>application.conf</code>添加一个<code>include</code>语句，而不是编写代码。在<code>application.conf</code>顶部引入的将被<code>application.conf</code>其余部分覆盖，而那些在底部的设置将覆盖以前的内容。</p>
 <h3 id="actor">Actor部署配置</h3>
 <p>可以在配置的<code>akka.actor.deployment</code>节中定义特定actor的部署设置。在部署部分有可能定义这些事物——调度器、邮箱、路由器设置和远程部署。在相应主题的章节中详细介绍了配置的这些特性。一个例子，可以如下所示：</p>
-<p>.. includecode:: code/docs/config/ConfigDocSpec.scala#deployment-section</p>
-<p>一个指定actor部署部分的设置是通过其相对 <code>/user</code>的路径来标识的。</p>
-<p>您可以使用星号作为通配符匹配actor的路径部分，所以您可以指定：<code>/*/sampleActor</code>将匹配该树形结构中那个级别上的所有<code>sampleActor</code>。您也能把通配符放在最后来匹配某一级别的所有actor：<code>/someParent/*</code>。非通配符匹配总是有更高的优先级，所以：<code>/foo/bar</code>比<code>/foo/*</code> <strong>更具体</strong>，并且只有最高优先的匹配才会。请注意它<strong>不能</strong>用于部分匹配，像这样：<code>/foo*/bar</code>、<code>/f*o/bar</code> 等。</p>
+<pre><code>akka.actor.deployment {
+
+  # &#39;/user/actorA/actorB&#39; is a remote deployed actor
+  /actorA/actorB {
+    remote = &quot;akka.tcp://sampleActorSystem@127.0.0.1:2553&quot;
+  }
+
+  # all direct children of &#39;/user/actorC&#39; have a dedicated dispatcher
+  &quot;/actorC/*&quot; {
+    dispatcher = my-dispatcher
+  }
+
+  # &#39;/user/actorD/actorE&#39; has a special priority mailbox
+  /actorD/actorE {
+    mailbox = prio-mailbox
+  }
+
+  # &#39;/user/actorF/actorG/actorH&#39; is a random pool
+  /actorF/actorG/actorH {
+    router = random-pool
+    nr-of-instances = 5
+  }
+}
+
+my-dispatcher {
+  fork-join-executor.parallelism-min = 10
+  fork-join-executor.parallelism-max = 10
+}
+prio-mailbox {
+  mailbox-type = &quot;a.b.MyPrioMailbox&quot;
+}
+</code></pre><p>一个指定actor部署部分的设置是通过其相对 <code>/user</code>的路径来标识的。</p>
+<p>你可以使用星号作为通配符匹配actor的路径部分，所以你可以指定：<code>/*/sampleActor</code>将匹配该树形结构中那个级别上的所有<code>sampleActor</code>。你也能把通配符放在最后来匹配某一级别的所有actor：<code>/someParent/*</code>。非通配符匹配总是有更高的优先级，所以：<code>/foo/bar</code>比<code>/foo/*</code> <strong>更具体</strong>，并且只有最高优先的匹配才会被使用。请注意它<strong>不能</strong>用于部分匹配，像这样：<code>/foo*/bar</code>、<code>/f*o/bar</code> 等。</p>
 <h3 id="">参考配置清单</h3>
 <p>每个Akka模块都有保存默认值的“reference”配置文件。</p>
 <p><span id="config-akka-actor"></span></p>
 <h5 id="akka-actor">akka-actor</h5>
-<pre><code>
-```
-####################################
+<pre><code>####################################
 # Akka Actor Reference Config File #
 ####################################
 
@@ -2570,12 +2622,9 @@ akka {
 
 
 }
-```
-
-&lt;span id=&quot;config-akka-agent&quot;&gt;&lt;/span&gt;
-
-akka-agent
-</code></pre><pre><code>####################################
+</code></pre><p><span id="config-akka-agent"></span></p>
+<h5 id="akka-agent">akka-agent</h5>
+<pre><code>####################################
 # Akka Agent Reference Config File #
 ####################################
 
@@ -3707,7 +3756,7 @@ akka {
         <a href="../chapter2/08_message_delivery_reliability.html" class="navigation navigation-prev " aria-label="Previous page: 消息发送语义"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../chapter3/Actors.html" class="navigation navigation-next " aria-label="Next page: Actors"><i class="fa fa-angle-right"></i></a>
+        <a href="../chapter3/actors.html" class="navigation navigation-next " aria-label="Next page: Actors"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

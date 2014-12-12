@@ -1,0 +1,2319 @@
+<!DOCTYPE HTML>
+<html lang="en-US" >
+    
+    <head>
+        
+        <meta charset="UTF-8">
+        <title>Actors | AKKA 2.3.6 Scala 文档</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 1.0.3">
+        <meta name="HandheldFriendly" content="true"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+        <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+        
+    
+    
+    
+    <link rel="next" href="../chapter3/02_typed_actors.html" />
+    
+    
+    <link rel="prev" href="../chapter3/actors.html" />
+    
+
+        
+    </head>
+    <body>
+        
+        
+<link rel="stylesheet" href="../gitbook/style.css">
+
+
+        
+    <div class="book"  data-level="3.1" data-basepath=".." data-revision="1418396877209">
+    
+
+<div class="book-summary">
+    <div class="book-search">
+        <input type="text" placeholder="Type to search" class="form-control" />
+    </div>
+    <ul class="summary">
+        
+    	
+    	
+    	
+
+        
+
+        
+    
+        
+        <li class="chapter " data-level="0" data-path="index.html">
+            
+                
+                    <a href="../index.html">
+                        <i class="fa fa-check"></i>
+                        
+                         Introduction
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="1" data-path="chapter1/introduction.html">
+            
+                
+                    <a href="../chapter1/introduction.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.</b>
+                        
+                         引言
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="1.1" data-path="chapter1/01_what_is_akka.html">
+            
+                
+                    <a href="../chapter1/01_what_is_akka.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.1.</b>
+                        
+                         Akka是什么?
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="1.2" data-path="chapter1/02_why_akka.html">
+            
+                
+                    <a href="../chapter1/02_why_akka.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.2.</b>
+                        
+                         为什么使用Akka?
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="1.3" data-path="chapter1/03_getting_started.html">
+            
+                
+                    <a href="../chapter1/03_getting_started.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.3.</b>
+                        
+                         入门
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="1.4" data-path="chapter1/04_the_obligatory_hello_world.html">
+            
+                
+                    <a href="../chapter1/04_the_obligatory_hello_world.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.4.</b>
+                        
+                         必修的“Hello World”
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="1.5" data-path="chapter1/05_usecase_and_deployment_scenarios.html">
+            
+                
+                    <a href="../chapter1/05_usecase_and_deployment_scenarios.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.5.</b>
+                        
+                         用例和部署场景
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="1.6" data-path="chapter1/06_examples_of_usecases_for_akka.html">
+            
+                
+                    <a href="../chapter1/06_examples_of_usecases_for_akka.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.6.</b>
+                        
+                         Akka使用实例
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2" data-path="chapter2/general.html">
+            
+                
+                    <a href="../chapter2/general.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.</b>
+                        
+                         概述
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="2.1" data-path="chapter2/01_terminology_concepts.html">
+            
+                
+                    <a href="../chapter2/01_terminology_concepts.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.1.</b>
+                        
+                         术语，概念
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2.2" data-path="chapter2/02_actor_systems.html">
+            
+                
+                    <a href="../chapter2/02_actor_systems.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.2.</b>
+                        
+                         Actor系统
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2.3" data-path="chapter2/03_what_is_an_actor.html">
+            
+                
+                    <a href="../chapter2/03_what_is_an_actor.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.3.</b>
+                        
+                         什么是Actor?
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2.4" data-path="chapter2/04_supervision_and_monitoring.html">
+            
+                
+                    <a href="../chapter2/04_supervision_and_monitoring.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.4.</b>
+                        
+                         监管与监控
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2.5" data-path="chapter2/05_actor_references_paths_and_addresses.html">
+            
+                
+                    <a href="../chapter2/05_actor_references_paths_and_addresses.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.5.</b>
+                        
+                         Actor引用, 路径与地址
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2.6" data-path="chapter2/06_location_transparency.html">
+            
+                
+                    <a href="../chapter2/06_location_transparency.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.6.</b>
+                        
+                         位置透明性
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2.7" data-path="chapter2/07_akka_and_the_java_memory_model.html">
+            
+                
+                    <a href="../chapter2/07_akka_and_the_java_memory_model.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.7.</b>
+                        
+                         Akka与Java内存模型
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2.8" data-path="chapter2/08_message_delivery_reliability.html">
+            
+                
+                    <a href="../chapter2/08_message_delivery_reliability.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.8.</b>
+                        
+                         消息发送语义
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2.9" data-path="chapter2/09_configuration.html">
+            
+                
+                    <a href="../chapter2/09_configuration.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.9.</b>
+                        
+                         配置
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3" data-path="chapter3/actors.html">
+            
+                
+                    <a href="../chapter3/actors.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.</b>
+                        
+                         Actors
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter active" data-level="3.1" data-path="chapter3/01_actors.html">
+            
+                
+                    <a href="../chapter3/01_actors.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.1.</b>
+                        
+                         Actors
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.2" data-path="chapter3/02_typed_actors.html">
+            
+                
+                    <a href="../chapter3/02_typed_actors.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.2.</b>
+                        
+                         有类型Actor
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.3" data-path="chapter3/03_fault_tolerance.html">
+            
+                
+                    <a href="../chapter3/03_fault_tolerance.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.3.</b>
+                        
+                         容错
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="3.3.1" data-path="chapter3/03-1_fault_tolerance_sample.html">
+            
+                
+                    <a href="../chapter3/03-1_fault_tolerance_sample.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.3.1.</b>
+                        
+                         容错示例
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.4" data-path="chapter3/04_dispatchers.html">
+            
+                
+                    <a href="../chapter3/04_dispatchers.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.4.</b>
+                        
+                         调度器
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.5" data-path="chapter3/05_mailboxes.html">
+            
+                
+                    <a href="../chapter3/05_mailboxes.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.5.</b>
+                        
+                         邮箱
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.6" data-path="chapter3/06_routing.html">
+            
+                
+                    <a href="../chapter3/06_routing.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.6.</b>
+                        
+                         路由
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.7" data-path="chapter3/07_fsm.html">
+            
+                
+                    <a href="../chapter3/07_fsm.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.7.</b>
+                        
+                         有限状态机(FSM)
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.8" data-path="chapter3/08_persistence.html">
+            
+                
+                    <a href="../chapter3/08_persistence.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.8.</b>
+                        
+                         持久化
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.9" data-path="chapter3/09_testing_actor_systems.html">
+            
+                
+                    <a href="../chapter3/09_testing_actor_systems.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.9.</b>
+                        
+                         测试Actor系统
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.10" data-path="chapter3/10_actor_dsl.html">
+            
+                
+                    <a href="../chapter3/10_actor_dsl.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.10.</b>
+                        
+                         Actor DSL
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="4" data-path="chapter4/futures_and_agents.html">
+            
+                
+                    <a href="../chapter4/futures_and_agents.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>4.</b>
+                        
+                         Futures与Agents
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="4.1" data-path="chapter4/01_futures.html">
+            
+                
+                    <a href="../chapter4/01_futures.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>4.1.</b>
+                        
+                         Futures
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="4.2" data-path="chapter4/02_agents.html">
+            
+                
+                    <a href="../chapter4/02_agents.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>4.2.</b>
+                        
+                         Agents
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5" data-path="chapter5/networking.html">
+            
+                
+                    <a href="../chapter5/networking.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.</b>
+                        
+                         网络
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="5.1" data-path="chapter5/01_cluster_cpecification.html">
+            
+                
+                    <a href="../chapter5/01_cluster_cpecification.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.1.</b>
+                        
+                         集群规格
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5.2" data-path="chapter5/02_cluster_usage.html">
+            
+                
+                    <a href="../chapter5/02_cluster_usage.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.2.</b>
+                        
+                         集群用法
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5.3" data-path="chapter5/03_remoting.html">
+            
+                
+                    <a href="../chapter5/03_remoting.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.3.</b>
+                        
+                         远程
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5.4" data-path="chapter5/04_serialization.html">
+            
+                
+                    <a href="../chapter5/04_serialization.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.4.</b>
+                        
+                         序列化
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5.5" data-path="chapter5/05_io.html">
+            
+                
+                    <a href="../chapter5/05_io.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.5.</b>
+                        
+                         I/O
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5.6" data-path="chapter5/06_using_tcp.html">
+            
+                
+                    <a href="../chapter5/06_using_tcp.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.6.</b>
+                        
+                         使用TCP
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5.7" data-path="chapter5/07_using_udp.html">
+            
+                
+                    <a href="../chapter5/07_using_udp.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.7.</b>
+                        
+                         使用UDP
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5.8" data-path="chapter5/08_zeromq.html">
+            
+                
+                    <a href="../chapter5/08_zeromq.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.8.</b>
+                        
+                         ZeroMQ
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5.9" data-path="chapter5/09_camel.html">
+            
+                
+                    <a href="../chapter5/09_camel.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.9.</b>
+                        
+                         Camel
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="6" data-path="chapter6/utilities.html">
+            
+                
+                    <a href="../chapter6/utilities.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.</b>
+                        
+                         实用工具
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="6.1" data-path="chapter6/01_event_bus.html">
+            
+                
+                    <a href="../chapter6/01_event_bus.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.1.</b>
+                        
+                         事件总线
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="6.2" data-path="chapter6/02_logging.html">
+            
+                
+                    <a href="../chapter6/02_logging.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.2.</b>
+                        
+                         日志
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="6.3" data-path="chapter6/03_scheduler.html">
+            
+                
+                    <a href="../chapter6/03_scheduler.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.3.</b>
+                        
+                         调度器
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="6.4" data-path="chapter6/04_duration.html">
+            
+                
+                    <a href="../chapter6/04_duration.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.4.</b>
+                        
+                         Duration
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="6.5" data-path="chapter6/05_circuit_breaker.html">
+            
+                
+                    <a href="../chapter6/05_circuit_breaker.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.5.</b>
+                        
+                         线路断路器
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="6.6" data-path="chapter6/06_akka_extensions.html">
+            
+                
+                    <a href="../chapter6/06_akka_extensions.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.6.</b>
+                        
+                         Akka扩展
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="6.7" data-path="chapter6/07_microkernel.html">
+            
+                
+                    <a href="../chapter6/07_microkernel.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.7.</b>
+                        
+                         微内核
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7" data-path="chapter7/howto_common_patterns.html">
+            
+                
+                    <a href="../chapter7/howto_common_patterns.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.</b>
+                        
+                         如何使用：常用模式
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="7.1" data-path="chapter7/01_throttling_messages.html">
+            
+                
+                    <a href="../chapter7/01_throttling_messages.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.1.</b>
+                        
+                         消息限流
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.2" data-path="chapter7/02_balancing_workload_across_nodes.html">
+            
+                
+                    <a href="../chapter7/02_balancing_workload_across_nodes.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.2.</b>
+                        
+                         跨节点平衡工作负载
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.3" data-path="chapter7/03_work_pulling_pattern.html">
+            
+                
+                    <a href="../chapter7/03_work_pulling_pattern.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.3.</b>
+                        
+                         工作拉取模式，来限流和分发工作，防止邮箱溢出
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.4" data-path="chapter7/04_ordered_termination.html">
+            
+                
+                    <a href="../chapter7/04_ordered_termination.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.4.</b>
+                        
+                         顺序终止
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.5" data-path="chapter7/05_akka_amqp_proxies.html">
+            
+                
+                    <a href="../chapter7/05_akka_amqp_proxies.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.5.</b>
+                        
+                         Akka AMQP代理
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.6" data-path="chapter7/06_shutdown_patterns.html">
+            
+                
+                    <a href="../chapter7/06_shutdown_patterns.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.6.</b>
+                        
+                         Akka 2中的关闭模式
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.7" data-path="chapter7/07_distributed_graph_processing.html">
+            
+                
+                    <a href="../chapter7/07_distributed_graph_processing.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.7.</b>
+                        
+                         使用Akka做分布式（内存）图像处理
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.8" data-path="chapter7/08_an_autoupdating_cache_using_actors.html">
+            
+                
+                    <a href="../chapter7/08_an_autoupdating_cache_using_actors.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.8.</b>
+                        
+                         案例分析：一个使用Actor的自动更新缓存
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.9" data-path="chapter7/09_spider_pattern.html">
+            
+                
+                    <a href="../chapter7/09_spider_pattern.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.9.</b>
+                        
+                         使用蜘蛛模式发现actor系统的消息流向
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.10" data-path="chapter7/10_scheduling_periodic_messages.html">
+            
+                
+                    <a href="../chapter7/10_scheduling_periodic_messages.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.10.</b>
+                        
+                         周期信息调度
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.11" data-path="chapter7/11_template_pattern.html">
+            
+                
+                    <a href="../chapter7/11_template_pattern.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.11.</b>
+                        
+                         模板模式
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="8" data-path="chapter8/experimental_modules.html">
+            
+                
+                    <a href="../chapter8/experimental_modules.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.</b>
+                        
+                         实验模块
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="8.1" data-path="chapter3/08_persistence.html">
+            
+                
+                    <a href="../chapter3/08_persistence.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.1.</b>
+                        
+                         持久化
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="8.2" data-path="chapter8/02_multi_node_testing.html">
+            
+                
+                    <a href="../chapter8/02_multi_node_testing.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.2.</b>
+                        
+                         多节点测试
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="8.3" data-path="chapter8/03_actors.html">
+            
+                
+                    <a href="../chapter8/03_actors.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.3.</b>
+                        
+                         Actors(使用Java的Lambda支持)
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="8.4" data-path="chapter8/04_fsm.html">
+            
+                
+                    <a href="../chapter8/04_fsm.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.4.</b>
+                        
+                         FSM(使用Java的Lambda支持)
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="8.5" data-path="chapter8/05_external_contributions.html">
+            
+                
+                    <a href="../chapter8/05_external_contributions.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.5.</b>
+                        
+                         外部贡献
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="9" data-path="chapter9/information_for_akka_developers.html">
+            
+                
+                    <a href="../chapter9/information_for_akka_developers.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.</b>
+                        
+                         Akka开发者信息
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="9.1" data-path="chapter9/01_building_akka.html">
+            
+                
+                    <a href="../chapter9/01_building_akka.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.1.</b>
+                        
+                         构建Akka
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="9.2" data-path="chapter9/02_multi_jvm_testing.html">
+            
+                
+                    <a href="../chapter9/02_multi_jvm_testing.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.2.</b>
+                        
+                         多JVM测试
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="9.3" data-path="chapter9/03_io_layer_design.html">
+            
+                
+                    <a href="../chapter9/03_io_layer_design.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.3.</b>
+                        
+                         I/O层设计
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="9.4" data-path="chapter9/04_developer_guidelines.html">
+            
+                
+                    <a href="../chapter9/04_developer_guidelines.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.4.</b>
+                        
+                         开发指南
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="9.5" data-path="chapter9/05_documentation_guidelines.html">
+            
+                
+                    <a href="../chapter9/05_documentation_guidelines.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.5.</b>
+                        
+                         文档指南
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="9.6" data-path="chapter9/06_team.html">
+            
+                
+                    <a href="../chapter9/06_team.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.6.</b>
+                        
+                         团队
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="10" data-path="chapter10/project_information.html">
+            
+                
+                    <a href="../chapter10/project_information.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>10.</b>
+                        
+                         工程信息
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="10.1" data-path="chapter10/01_migration_guides.html">
+            
+                
+                    <a href="../chapter10/01_migration_guides.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>10.1.</b>
+                        
+                         迁移指南
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="10.2" data-path="chapter10/02_issue_tracking.html">
+            
+                
+                    <a href="../chapter10/02_issue_tracking.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>10.2.</b>
+                        
+                         问题追踪
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="10.3" data-path="chapter10/03_licenses.html">
+            
+                
+                    <a href="../chapter10/03_licenses.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>10.3.</b>
+                        
+                         许可证
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="10.4" data-path="chapter10/04_sponsors.html">
+            
+                
+                    <a href="../chapter10/04_sponsors.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>10.4.</b>
+                        
+                         赞助商
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="10.5" data-path="chapter10/05_project.html">
+            
+                
+                    <a href="../chapter10/05_project.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>10.5.</b>
+                        
+                         项目
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="11" data-path="chapter11/additional_information.html">
+            
+                
+                    <a href="../chapter11/additional_information.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>11.</b>
+                        
+                         附加信息
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="11.1" data-path="chapter11/01_faq.html">
+            
+                
+                    <a href="../chapter11/01_faq.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>11.1.</b>
+                        
+                         常见问题
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="11.2" data-path="chapter11/02_books.html">
+            
+                
+                    <a href="../chapter11/02_books.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>11.2.</b>
+                        
+                         图书
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="11.3" data-path="chapter11/03_other_language_bindings.html">
+            
+                
+                    <a href="../chapter11/03_other_language_bindings.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>11.3.</b>
+                        
+                         其他语言绑定
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="11.4" data-path="chapter11/04_akka_in_osgi.html">
+            
+                
+                    <a href="../chapter11/04_akka_in_osgi.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>11.4.</b>
+                        
+                         Akka与OSGi
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="11.5" data-path="chapter11/05_incomplete_list_of_http_frameworks.html">
+            
+                
+                    <a href="../chapter11/05_incomplete_list_of_http_frameworks.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>11.5.</b>
+                        
+                         部分HTTP框架名单
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+
+        
+        <li class="divider"></li>
+        <li>
+            <a href="http://www.gitbook.io/" target="blank" class="gitbook-link">Published using GitBook</a>
+        </li>
+        
+    </ul>
+</div>
+
+    <div class="book-body">
+        <div class="body-inner">
+            <div class="book-header">
+    <!-- Actions Left -->
+    <a href="#" class="btn pull-left toggle-summary" aria-label="Toggle summary"><i class="fa fa-align-justify"></i></a>
+    <a href="#" class="btn pull-left toggle-search" aria-label="Toggle search"><i class="fa fa-search"></i></a>
+    
+    <div id="font-settings-wrapper" class="dropdown pull-left">
+        <a href="#" class="btn toggle-dropdown" aria-label="Toggle font settings"><i class="fa fa-font"></i>
+        </a>
+        <div class="dropdown-menu font-settings">
+    <div class="dropdown-caret">
+        <span class="caret-outer"></span>
+        <span class="caret-inner"></span>
+    </div>
+
+    <div class="buttons">
+        <button type="button" id="reduce-font-size" class="button size-2">A</button>
+        <button type="button" id="enlarge-font-size" class="button size-2">A</button>
+    </div>
+
+    <div class="buttons font-family-list">
+        <button type="button" data-font="0" class="button">Serif</button>
+        <button type="button" data-font="1" class="button">Sans</button>
+    </div>
+
+    <div class="buttons color-theme-list">
+        <button type="button" id="color-theme-preview-0" class="button size-3" data-theme="0">White</button>
+        <button type="button" id="color-theme-preview-1" class="button size-3" data-theme="1">Sepia</button>
+        <button type="button" id="color-theme-preview-2" class="button size-3" data-theme="2">Night</button>
+    </div>
+</div>
+
+    </div>
+
+    <!-- Actions Right -->
+    
+    <div class="dropdown pull-right">
+        <a href="#" class="btn toggle-dropdown" aria-label="Toggle share dropdown"><i class="fa fa-share-alt"></i>
+        </a>
+        <div class="dropdown-menu font-settings dropdown-left">
+            <div class="dropdown-caret">
+                <span class="caret-outer"></span>
+                <span class="caret-inner"></span>
+            </div>
+            <div class="buttons">
+                <button type="button" data-sharing="twitter" class="button">Twitter</button>
+                <button type="button" data-sharing="google-plus" class="button">Google</button>
+                <button type="button" data-sharing="facebook" class="button">Facebook</button>
+                <button type="button" data-sharing="weibo" class="button">Weibo</button>
+                <button type="button" data-sharing="instapaper" class="button">Instapaper</button>
+            </div>
+        </div>
+    </div>
+    
+
+    
+    <a href="#" target="_blank" class="btn pull-right google-plus-sharing-link sharing-link" data-sharing="google-plus" aria-label="Share on Google Plus"><i class="fa fa-google-plus"></i></a>
+    
+    
+    <a href="#" target="_blank" class="btn pull-right facebook-sharing-link sharing-link" data-sharing="facebook" aria-label="Share on Facebook"><i class="fa fa-facebook"></i></a>
+    
+    
+    <a href="#" target="_blank" class="btn pull-right twitter-sharing-link sharing-link" data-sharing="twitter" aria-label="Share on Twitter"><i class="fa fa-twitter"></i></a>
+    
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="../" >AKKA 2.3.6 Scala 文档</a>
+    </h1>
+</div>
+
+            <div class="page-wrapper" tabindex="-1">
+                <div class="page-inner">
+                
+                
+                    <section class="normal" id="section-gitbook_21">
+                    
+                        <h1 id="actors">Actors</h1>
+<p><a href="http://en.wikipedia.org/wiki/Actor_model" target="_blank">Actor模型</a>为编写并发和分布式系统提供了一种更高的抽象级别。它将开发人员从显式地处理锁和线程管理的工作中解脱出来，使编写并发和并行系统更加容易。Actor模型是在1973年Carl Hewitt的论文中定义的，不过直到被Erlang语言采用后才变得流行起来，一个成功案例是爱立信使用Erlang非常成功地创建了高并发的可靠的电信系统。</p>
+<p>Akka Actor的API与Scala Actor类似，它们都借鉴了Erlang的一些语法。</p>
+<h3 id="actor">创建Actor</h3>
+<blockquote>
+<p>注意</p>
+<p>由于Akka采用强制性的父子监管，每一个actor都被监管着，并且（可能）是别的actor的监管者；我们建议你熟悉一下<a href="../chapter2/02_actor_systems.html">Actor系统</a> 和 <a href="../chapter2/04_supervision_and_monitoring.html">监管与监控</a>，阅读 <a href="../chapter2/05_actor_references_paths_and_addresses.html">Actor引用，路径与地址</a>也有帮助。</p>
+</blockquote>
+<h5 id="actor">定义一个Actor类</h5>
+<p>要定义自己的Actor类，需要继承<code>Actor</code>并实现<code>receive</code>方法。<code>receive</code>方法需要定义一系列case语句（类型为<code>PartialFunction[Any, Unit]</code>）来描述你的Actor能够处理哪些消息（使用标准的Scala模式匹配），以及消息如何被处理。</p>
+<p>如下例：</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Actor</span>
+<span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Props</span>
+<span class="hljs-keyword">import</span> akka.event.<span class="hljs-type">Logging</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyActor</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">log</span> =</span> <span class="hljs-type">Logging</span>(context.system, <span class="hljs-keyword">this</span>)
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"test"</span> =&gt; log.info(<span class="hljs-string">"received test"</span>)
+    <span class="hljs-keyword">case</span> _      =&gt; log.info(<span class="hljs-string">"received unknown message"</span>)
+  }
+}
+</code></pre>
+<p>请注意Akka Actor的<code>receive</code>消息循环是完全的，这与Erlang和Scala的Actor行为不同。这意味着你需要提供一个模式匹配，来处理这个actor所能够接受的所有消息的规则，如果你希望处理未知的消息，你需要象上例一样提供一个缺省的case分支。否则会有一个<code>akka.actor.UnhandledMessage(message,
+sender, recipient)</code>被发布到Actor系统（<code>ActorSystem</code>）的事件流（<code>EventStream</code>）中。</p>
+<p>进一步注意到上面定义行为的返回类型是<code>Unit</code>；如果该actor应该回应收到的消息，则必须明确写出，如下文所述。</p>
+<p><code>receive</code>方法的结果是一个偏函数对象，它存储在actor中作为其&quot;最初的行为&quot;，对actor构造完成后改变行为的进一步信息，请参阅<a href="#actor-hotswap">Become/Unbecome</a>。</p>
+<h5 id="a-namepropsaprops"><a name="props"></a>Props</h5>
+<p><code>Props</code>是一个用来在创建actor时指定选项的配置类，可以把它看作是不可变的，因此在创建包含相关部署信息的actor时（例如使用哪一个调度器(dispatcher)，详见下文），是可以自由共享的。以下是如何创建<code>Props</code>实例的示例.</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Props</span>
+
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">props1</span> =</span> <span class="hljs-type">Props</span>[<span class="hljs-type">MyActor</span>]
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">props2</span> =</span> <span class="hljs-type">Props</span>(<span class="hljs-keyword">new</span> <span class="hljs-type">ActorWithArgs</span>(<span class="hljs-string">"arg"</span>)) <span class="hljs-comment">// careful, see below</span>
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">props3</span> =</span> <span class="hljs-type">Props</span>(classOf[<span class="hljs-type">ActorWithArgs</span>], <span class="hljs-string">"arg"</span>)
+</code></pre>
+<p>第二个变量<code>props2</code>演示了创建actor时，怎样将构造函数参数传进去，但它只应在actor之外使用，详见下文。</p>
+<p>最后一行展示了一种可能性，它在不关注上下文的情况下传递构造函数参数。在构造<code>Props</code>对象的时候，会检查是否存在匹配的构造函数，如果没有或存在多个匹配的构造函数，则会导致<code>IllegalArgumentEception</code>。</p>
+<h5 id="">危险的变量</h5>
+<pre><code class="lang-scala"><span class="hljs-comment">// 不建议在另一个actor内使用:</span>
+<span class="hljs-comment">// 因为它鼓励封闭作用域</span>
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">props7</span> =</span> <span class="hljs-type">Props</span>(<span class="hljs-keyword">new</span> <span class="hljs-type">MyActor</span>)
+</code></pre>
+<p>该方法不建议在另一个actor内使用，因为它鼓励封闭作用域，从而导致不可序列化的<code>Props</code>和可能的竞态条件（破坏了actor封装）。我们将提供一个基于宏的解决方案，在将来的版本中没有头痛地支持类似的语法，届时该变量将被恰当的废弃。另一方面在actor的伴生对象下，在一个<code>Props</code>工厂中使用该变量是完全没问题的，如下面&quot;推荐做法&quot;所述。</p>
+<p>这些方法有两个用例：将构造函数的参数传递给该actor——由新推出的<code>Props.apply(clazz, args)</code>方法解决了，如上面或下面的推荐做法所示——和作为匿名类创建&quot;临时性&quot;的actor。后者应通过命名这些actor，而非匿名来解决（如果他们未在顶级<code>object</code>中声明，则封闭的实例的<code>this</code>引用需要作为第一个参数传入）。</p>
+<blockquote>
+<p>警告</p>
+<p>在另一个actor中声明一个actor是非常危险的，会打破actor的封装。永远不要将一个actor的<code>this</code>引用传进<code>Props</code>！</p>
+</blockquote>
+<h5 id="">推荐做法</h5>
+<p>在每一个<code>Actor</code>的伴生对象中提供工厂方法是一个好主意，这有助于保持创建合适的<code>Props</code>，尽可能接近actor的定义。这也避免了使用<code>Props.apply(...)</code>方法将采用一个“按名”（by-name）参数的缺陷，因为伴生对象的给定代码块中将不会保留包含作用域的引用：</p>
+<pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">DemoActor</span> {</span>
+  <span class="hljs-comment">/**
+   * Create Props for an actor of this type.
+   * @param magciNumber The magic number to be passed to this actor’s constructor.
+   * @return a Props for creating this actor, which can then be further configured
+   *         (e.g. calling `.withDispatcher()` on it)
+   */</span>
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">props</span>(</span>magicNumber: <span class="hljs-type">Int</span>): <span class="hljs-type">Props</span> = <span class="hljs-type">Props</span>(<span class="hljs-keyword">new</span> <span class="hljs-type">DemoActor</span>(magicNumber))
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DemoActor</span>(</span>magicNumber: <span class="hljs-type">Int</span>) <span class="hljs-keyword">extends</span> <span class="hljs-type">Actor</span> {
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
+    <span class="hljs-keyword">case</span> x: <span class="hljs-type">Int</span> =&gt; sender() ! (x + magicNumber)
+  }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SomeOtherActor</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
+  <span class="hljs-comment">// Props(new DemoActor(42)) would not be safe</span>
+  context.actorOf(<span class="hljs-type">DemoActor</span>.props(<span class="hljs-number">42</span>), <span class="hljs-string">"demo"</span>)
+  <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<h5 id="propsactor">使用Props创建Actor</h5>
+<p>Actor可以通过将<code>Props</code>实例传入<code>actorOf</code>工厂方法来创建，<code>ActorSystem</code>和<code>ActorContext</code>中都有该方法。</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">ActorSystem</span>
+
+<span class="hljs-comment">// ActorSystem is a heavy object: create only one per application</span>
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">system</span> =</span> <span class="hljs-type">ActorSystem</span>(<span class="hljs-string">"mySystem"</span>)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">myActor</span> =</span> system.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">MyActor</span>], <span class="hljs-string">"myactor2"</span>)
+</code></pre>
+<p>使用<code>ActorSystem</code>将创建顶级actor，由actor系统提供的守护actor监管；如果使用的是actor的上下文，则创建一个该actor的子actor。</p>
+<pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FirstActor</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">child</span> =</span> context.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">MyActor</span>], name = <span class="hljs-string">"myChild"</span>)
+  <span class="hljs-comment">// plus some behavior ...</span>
+}
+</code></pre>
+<p>推荐创建一个树形结构，包含子actor、孙子等等，使之符合应用的逻辑错误处理结构，见<a href="../chapter2/02_actor_systems.html">Actor系统</a>。</p>
+<p>对<code>actorOf</code>的调用返回一个<code>ActorRef</code>实例。它是actor实例的句柄，并且是与之进行交互的唯一方法。<code>ActorRef</code>是不可变的，与其代表的actor有一一对应关系。<code>ActorRef</code>也是可序列化，并能通过网络传输。这意味着你可以将其序列化，通过网线发送，并在远程主机上使用它，而且虽然跨网络，它将仍然代表在原始节点上相同的actor。</p>
+<p>名称参数是可选的，不过你应该良好命名你的actor，因为名称将被用于日志打印和标识actor。名称不能为空，且不能以<code>$</code>开头，不过它可以包含URL编码字符（如空格用<code>%20</code>表示）。如果给定的名称已经被同一个父亲下的另一个子actor使用，则会抛出一个<code>InvalidActorNameException</code>。</p>
+<p>actor在创建时，会自动异步启动。</p>
+<h5 id="">依赖注入</h5>
+<p>如果你的actor有带参数的构造函数，则这些参数也需要成为<code>Props</code>的一部分，如<a href="#props">上文</a>所述。但有些情况下必须使用工厂方法，例如，当实际构造函数的参数由依赖注入框架决定。</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">IndirectActorProducer</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DependencyInjector</span>(</span>applicationContext: <span class="hljs-type">AnyRef</span>, beanName: <span class="hljs-type">String</span>)
+  <span class="hljs-keyword">extends</span> <span class="hljs-type">IndirectActorProducer</span> {
+
+  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">actorClass</span> =</span> classOf[<span class="hljs-type">Actor</span>]
+  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">produce</span> =</span>
+    <span class="hljs-comment">// obtain fresh Actor instance from DI framework ...</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">actorRef</span> =</span> system.actorOf(
+  <span class="hljs-type">Props</span>(classOf[<span class="hljs-type">DependencyInjector</span>], applicationContext, <span class="hljs-string">"hello"</span>),
+  <span class="hljs-string">"helloBean"</span>)
+</code></pre>
+<blockquote>
+<p>警告</p>
+<p>你有时可能倾向于提供一个<code>IndirectActorProducer</code>始终返回相同的实例，例如通过使用<code>lazy val</code>。这是不受支持的，因为它违背了<a href="../chapter2/04_supervision_and_monitoring.html#supervision-restart">actor重启的意义</a>。</p>
+<p>当使用依赖注入框架时，actor bean<em>必须不是</em>单例作用域。</p>
+</blockquote>
+<p>关于依赖注入极其Akka集成的更多内容情参见<a href="http://letitcrash.com/post/55958814293/akka-dependency-injection" target="_blank">“在Akka中使用依赖注入”</a>指南和Typesafe Activator的<a href="http://www.typesafe.com/activator/template/akka-java-spring" target="_blank">“Akka Java Spring”</a>教程。</p>
+<h5 id="">收件箱</h5>
+<p>当在actor外编写与actor交互的代码时，<code>ask</code>模式可以作为一个解决方案（见下文），但有两件事它不能做：接收多个答复（例如将<code>ActorRef</code>订阅到一个通知服务）和查看其他actor的生命周期。为达到这些目的可以使用<code>Inbox</code>类：</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">implicit</span> <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">i</span> =</span> inbox()
+echo ! <span class="hljs-string">"hello"</span>
+i.receive() should be(<span class="hljs-string">"hello"</span>)
+</code></pre>
+<p>有一个从收件箱到actor引用的一个隐式转换，意味着在这个例子中，发送者引用将成为收件箱隐藏的actor。这就允许了收件箱收到回应，如最后一行所示。监控一个actor也相当简单：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">target</span> =</span> <span class="hljs-comment">// some actor</span>
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">i</span> =</span> inbox()
+i watch target
+</code></pre>
+<h3 id="actor-api">Actor API</h3>
+<p><code>Actor</code> trait只定义了一个抽象方法，就是上面提到的<code>receive</code>，用来实现actor的行为。</p>
+<p>如果当前actor的行为与收到的消息不匹配，则会调用 <code>unhandled</code>，其缺省实现是向actor系统的事件流中发布一条<code>akka.actor.UnhandledMessage(message, sender, recipient)</code>（将配置项<code>akka.actor.debug.unhandled</code>设置为<code>on</code>来将它们转换为实际的调试消息）。</p>
+<p>另外，它还包括:</p>
+<ul>
+<li><code>self</code>引用代表本actor的<code>ActorRef</code></li>
+<li><code>sender</code>引用代表最近收到消息的发送actor，通常用于下面将讲到的<a href="#actor-reply">消息回应</a>中</li>
+<li><p><code>supervisorStrategy</code> 用户可重写它来定义对子actor的监管策略</p>
+<p>该策略通常在actor内声明，这样决定函数就可以访问actor的内部状态：因为失败通知作为消息发送给监管者，并像普通消息一样被处理（尽管不是正常行为），所有的值和actor变量都是可用的，以及<code>sender</code>引用 （报告失败的将是直接子actor；如果原始失败发生在遥远的后裔，它仍然是一次向上报告一层）。</p>
+</li>
+<li><p><code>context</code>暴露actor和当前消息的上下文信息，如：</p>
+<ul>
+<li>用于创建子actor的工厂方法（<code>actorOf</code>）</li>
+<li>actor所属的系统</li>
+<li>父监管者</li>
+<li>所监管的子actor</li>
+<li>生命周期监控</li>
+<li>hotswap行为栈，见<a href="#actor-hotswap">Become/Unbecome</a></li>
+</ul>
+</li>
+</ul>
+<p>你可以import <code>context</code>的成员来避免总加上<code>context.</code>前缀</p>
+<pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FirstActor</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
+  <span class="hljs-keyword">import</span> context._
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">myActor</span> =</span> actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">MyActor</span>], name = <span class="hljs-string">"myactor"</span>)
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
+    <span class="hljs-keyword">case</span> x =&gt; myActor ! x
+  }
+}
+</code></pre>
+<p>其余的可见方法是可以被用户重写的生命周期hook，描述如下:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">preStart</span>(</span>): <span class="hljs-type">Unit</span> = ()
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">postStop</span>(</span>): <span class="hljs-type">Unit</span> = ()
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">preRestart</span>(</span>reason: <span class="hljs-type">Throwable</span>, message: <span class="hljs-type">Option</span>[<span class="hljs-type">Any</span>]): <span class="hljs-type">Unit</span> = {
+  context.children foreach { child ⇒
+    context.unwatch(child)
+    context.stop(child)
+  }
+  postStop()
+}
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">postRestart</span>(</span>reason: <span class="hljs-type">Throwable</span>): <span class="hljs-type">Unit</span> = {
+  preStart()
+}
+</code></pre>
+<p>以上代码所示的是<code>Actor</code> trait的缺省实现。</p>
+<p><span id="actor-lifecycle-scala"></span></p>
+<h3 id="actor">Actor生命周期</h3>
+<p><img src="../images/actor_lifecycle.png" alt=""></p>
+<p>actor系统中的路径代表一个&quot;地方&quot;，这里可能会被活着的actor占据。最初（除了系统初始化actor）路径都是空的。在调用<code>actorOf()</code>时它将为指定路径分配根据传入<code>Props</code>创建的一个actor<em>化身</em>。actor化身是由路径<em>和一个UID</em>标识的。重新启动只会替换有<code>Props</code>定义的<code>Actor</code>实例，但不会替换化身，因此UID保持不变。</p>
+<p>当actor停止时，其化身的生命周期结束。在这一时间点上相关的生命周期事件被调用，监视该actor的actor都会获得终止通知。当化身停止后，路径可以重复使用，通过<code>actorOf()</code>创建一个actor。在这种情况下，除了UID不同外，新化身与老化身是相同的。</p>
+<p><code>ActorRef</code>始终表示化身（路径和UID）而不只是一个给定的路径。因此如果actor停止，并且创建一个新的具有相同名称的actor，则指向老化身的<code>ActorRef</code>将不会指向新的化身。</p>
+<p>相对地，<code>ActorSelection</code>指向路径（或多个路径，如果使用了通配符），且完全不关注有没有化身占据它。因此<code>ActorSelection</code> 不能被监视。获取某路径下的当前化身<code>ActorRef</code>是可能的，只要向该<code>ActorSelection</code>发送<code>Identify</code>，如果收到<code>ActorIdentity</code>回应，则正确的引用就包含其中（详见<a href="#actorSelection-scala">通过Actor Selection确定Actor</a>）。也可以使用<code>ActorSelection</code>的<code>resolveOne</code>方法，它会返回一个包含匹配<code>ActorRef</code>的<code>Future</code>。</p>
+<p><span id="deathwatch-scala"></span></p>
+<h5 id="deathwatch">使用DeathWatch进行生命周期监控</h5>
+<p>为了在其它actor终止时 (即永久停止，而不是临时的失败和重启)收到通知，actor可以将自己注册为其它actor在终止时所发布的<code>Terminated</code>消息的接收者（见<a href="#stopping-actors-scala">停止 Actor</a>）。这个服务是由actor系统的<code>DeathWatch</code>组件提供的。</p>
+<p>注册一个监视器很简单：</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.{ <span class="hljs-type">Actor</span>, <span class="hljs-type">Props</span>, <span class="hljs-type">Terminated</span> }
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">WatchActor</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">child</span> =</span> context.actorOf(<span class="hljs-type">Props</span>.empty, <span class="hljs-string">"child"</span>)
+  context.watch(child) <span class="hljs-comment">// &lt;-- this is the only call needed for registration</span>
+  <span class="hljs-keyword">var</span> lastSender = system.deadLetters
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"kill"</span> =&gt;
+      context.stop(child); lastSender = sender()
+    <span class="hljs-keyword">case</span> <span class="hljs-type">Terminated</span>(`child`) =&gt; lastSender ! <span class="hljs-string">"finished"</span>
+  }
+}
+</code></pre>
+<p>要注意<code>Terminated</code>消息的产生与注册和终止行为所发生的顺序无关。特别地，即使在注册时，被观察的actor已经终止了，监视actor仍然会受到一个<code>Terminated</code>消息。</p>
+<p>多次注册并不表示会有多个消息产生，也不保证有且只有一个这样的消息被接收到：如果被监控的actor已经生成了消息并且已经进入了队列，在这个消息被处理之前又发生了另一次注册，则会有第二个消息进入队列，因为对一个已经终止的actor的监控注册操作会立刻导致<code>Terminated</code>消息的产生。</p>
+<p>可以使用<code>context.unwatch(target)</code>来停止对另一个actor生存状态的监控。即使<code>Terminated</code>已经加入邮箱，该操作仍有效；一旦调用<code>unwatch</code>，则被观察的actor的<code>Terminated</code>消息就都不会再被处理。</p>
+<p><span id="start-hook-scala"></span></p>
+<h5 id="hook">启动Hook</h5>
+<p>actor启动后，它的<code>preStart</code>方法会被立即执行。</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">preStart</span>(</span>) {
+  <span class="hljs-comment">// registering with other actors</span>
+  someService ! <span class="hljs-type">Register</span>(self)
+}
+</code></pre>
+<p>在actor第一次创建时，将调用此方法。在重新启动期间，它被<code>postRestart</code>的默认实现调用，这意味着通过重写该方法，你可以选择是仅仅在初始化该actor时调用一次，还是为每次重新启动都调用。actor构造函数中的初始化代码将在每个actor实例创建的时候被调用，这也发生在每次重启时。</p>
+<p><span id="restart-hook-scala"></span></p>
+<h5 id="hook">重启Hook</h5>
+<p>所有的actor都是被监管的，即与另一个使用某种失败处理策略的actor绑定在一起。如果在处理一个消息的时候抛出了异常，Actor将被重启（详见<a href="../chapter2/04_supervision_and_monitoring.html">监管与监控</a>）。这个重启过程包括上面提到的Hook：</p>
+<ol>
+<li><p>要被重启的actor被通知是通过调用<code>preRestart</code>，包含着导致重启的异常以及触发异常的消息；如果重启并不是因为消息处理而发生的，则所携带的消息为<code>None</code>，例如，当一个监管者没有处理某个异常继而被其监管者重启时，或者因其兄弟节点的失败导致的重启。如果消息可用，则消息的发送者通常也可用（即通过调用<code>sender</code>）。</p>
+<p>这个方法是用来完成清理、准备移交给新actor实例等操作的最佳位置。其缺省实现是终止所有子actor并调用<code>postStop</code>。</p>
+</li>
+<li>最初调用<code>actorOf</code>的工厂将被用来创建新的实例。</li>
+<li>新的actor的<code>postRestart</code>方法被调用时，将携带着导致重启的异常信息。默认实现中，<code>preStart</code>被调用时，就像一个正常的启动一样。</li>
+</ol>
+<p>actor的重启只会替换掉原来的actor对象；重启不影响邮箱的内容，所以对消息的处理将在<code>postRestart</code> hook返回后继续。触发异常的消息不会被重新接收。在actor重启过程中，所有发送到该actor的消息将象平常一样被放进邮箱队列中。</p>
+<blockquote>
+<p>警告</p>
+<p>要知道失败通知与用户消息的相关顺序不是决定性的。尤其是，在失败以前收到的最后一条消息被处理之前，父节点可能已经重启其子节点了。详细信息请参见<a href="../chapter2/08_message_delivery_reliability.html#message-ordering">“讨论：消息顺序”</a>。</p>
+</blockquote>
+<p><span id="stop-hook-scala"></span></p>
+<h5 id="-hook">终止 Hook</h5>
+<p>一个Actor终止后，其<code>postStop</code> hook将被调用，它可以用来，例如取消该actor在其它服务中的注册。这个hook保证在该actor的消息队列被禁止后才运行，即之后发给该actor的消息将被重定向到<code>ActorSystem</code>的<code>deadLetters</code>中。</p>
+<p><span id="actorSelection-scala"></span></p>
+<h3 id="actor-selectionactor">通过Actor Selection定位Actor</h3>
+<p>如<a href="../chapter2/05_actor_references_paths_and_addresses.html">Actor引用, 路径与地址</a>中所述，每个actor都拥有一个唯一的逻辑路径，此路径是由从actor系统的根开始的父子链构成；它还拥有一个物理路径，如果监管链包含有远程监管者，此路径可能会与逻辑路径不同。这些路径用来在系统中查找actor，例如，当收到一个远程消息时查找收件者，但是它们更直接的用处在于：actor可以通过指定绝对或相对路径（逻辑的或物理的）来查找其它的actor，并随结果获取一个<code>ActorSelection</code>：</p>
+<pre><code class="lang-scala"><span class="hljs-comment">// will look up this absolute path</span>
+context.actorSelection(<span class="hljs-string">"/user/serviceA/aggregator"</span>)
+<span class="hljs-comment">// will look up sibling beneath same supervisor</span>
+context.actorSelection(<span class="hljs-string">"../joe"</span>)
+</code></pre>
+<p>其中指定的路径被解析为一个<code>java.net.URI</code>，它以<code>/</code>分隔成路径段。如果路径以<code>/</code>开始，表示一个绝对路径，且从根监管者（<code>&quot;/user&quot;</code>的父亲）开始查找；否则是从当前actor开始。如果某一个路径段为<code>..</code>，会找到当前所遍历到的actor的上一级，否则则会向下一级寻找具有该名字的子actor。 必须注意的是actor路径中的<code>..</code>总是表示逻辑结构，即其监管者。</p>
+<p>一个actor selection的路径元素中可能包含通配符，从而允许向匹配模式的集合广播该条消息：</p>
+<pre><code class="lang-scala"><span class="hljs-comment">// will look all children to serviceB with names starting with worker</span>
+context.actorSelection(<span class="hljs-string">"/user/serviceB/worker*"</span>)
+<span class="hljs-comment">// will look up all siblings beneath same supervisor</span>
+context.actorSelection(<span class="hljs-string">"../*"</span>)
+</code></pre>
+<p>消息可以通过<code>ActorSelection</code>发送，并且在投递每条消息时 <code>ActorSelection</code>的路径都会被查找。如果selection不匹配任何actor，则消息将被丢弃。</p>
+<p>要获得<code>ActorSelection</code>的<code>ActorRef</code>，你需要发送一条消息到selection，然后使用答复消息的<code>sender()</code>引用即可。有一个内置的<code>Identify</code>消息，所有actor会理解它并自动返回一个包含<code>ActorRef</code>的<code>ActorIdentity</code>消息。此消息被遍历到的actor特殊处理为，如果一个具体的名称查找失败（即一个不含通配符的路径没有对应的活动actor），则会生成一个否定结果。请注意这并不意味着应答消息有到达保证，它仍然是一个普通的消息。</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.{ <span class="hljs-type">Actor</span>, <span class="hljs-type">Props</span>, <span class="hljs-type">Identify</span>, <span class="hljs-type">ActorIdentity</span>, <span class="hljs-type">Terminated</span> }
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Follower</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">identifyId</span> =</span> <span class="hljs-number">1</span>
+  context.actorSelection(<span class="hljs-string">"/user/another"</span>) ! <span class="hljs-type">Identify</span>(identifyId)
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
+    <span class="hljs-keyword">case</span> <span class="hljs-type">ActorIdentity</span>(`identifyId`, <span class="hljs-type">Some</span>(ref)) =&gt;
+      context.watch(ref)
+      context.become(active(ref))
+    <span class="hljs-keyword">case</span> <span class="hljs-type">ActorIdentity</span>(`identifyId`, <span class="hljs-type">None</span>) =&gt; context.stop(self)
+
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">active</span>(</span>another: <span class="hljs-type">ActorRef</span>): <span class="hljs-type">Actor</span>.<span class="hljs-type">Receive</span> = {
+    <span class="hljs-keyword">case</span> <span class="hljs-type">Terminated</span>(`another`) =&gt; context.stop(self)
+  }
+}
+</code></pre>
+<p>你也可以通过<code>ActorSelection</code>的<code>resolveOne</code>方法获取<code>ActorSelection</code>的一个<code>ActorRef</code>。如果存在这样的actor，它将返回一个包含匹配的<code>ActorRef</code>的<code>Future</code>。如果没有这样的actor
+存在或识别没有在指定的时间内完成，它将以失败告终——<code>akka.actor.ActorNotFound</code>。</p>
+<p>如果开启了远程调用，则远程actor地址也可以被查找:</p>
+<pre><code>context.actorSelection(&quot;akka.tcp://app@otherhost:1234/user/serviceB&quot;)
+</code></pre><p>一个关于actor查找的示例见<a href="../chapter5/03_remoting.html#remote-sample-scala">远程查找</a>。</p>
+<blockquote>
+<p>注意</p>
+<p><code>actorFor</code>因被<code>actorSelection</code>替代而废弃，因为<code>actorFor</code>对本地和远程的actor表现有所不同。对一个本地actor引用，被查找的actor需要在查找之前就存在，否则获得的引用是一个<code>EmptyLocalActorRef</code>。即使后来与实际路径相符的actor被创建，所获得引用仍然是这样。对于<code>actorFor</code>行为获得的远程actor
+引用则不同，每条消息的发送都会在远程系统中进行一次按路径的查找。</p>
+</blockquote>
+<h3 id="">消息与不可变性</h3>
+<p><strong>重要</strong>：消息可以是任何类型的对象，但必须是不可变的。（目前） Scala还无法强制不可变性，所以这一点必须作为约定。String、Int、Boolean这些原始类型总是不可变的。 除了它们以外，推荐的做法是使用Scala case class，它们是不可变的（如果你不专门暴露状态的话），并与接收侧的模式匹配配合得非常好。</p>
+<p>以下是一个例子:</p>
+<pre><code class="lang-scala"><span class="hljs-comment">// define the case class</span>
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Register</span>(</span>user: <span class="hljs-type">User</span>)
+
+<span class="hljs-comment">// create a new case class message</span>
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">message</span> =</span> <span class="hljs-type">Register</span>(user)
+</code></pre>
+<h3 id="">发送消息</h3>
+<p>向actor发送消息需使用下列方法之一。</p>
+<ul>
+<li><code>!</code>意思是“fire-and-forget”，即异步发送一个消息并立即返回。也称为<code>tell</code>。</li>
+<li><code>?</code>异步发送一条消息并返回一个<code>Future</code>代表一个可能的回应。也称为<code>ask</code>。</li>
+</ul>
+<p>对每一个消息发送者，分别有消息顺序保证。</p>
+<blockquote>
+<p>注意</p>
+<p>使用<code>ask</code>有一些性能内涵，因为需要跟踪超时，需要有桥梁将<code>Promise</code>转为<code>ActorRef</code>，并且需要在远程情况下可访问。所以为了性能应该总选择<code>tell</code>，除非只能选择<code>ask</code>。</p>
+</blockquote>
+<p><span id="actors-tell-sender-scala"></span></p>
+<h5 id="tell-fire-forget">Tell: Fire-forget</h5>
+<p>这是发送消息的推荐方式。 不会阻塞地等待消息。它拥有最好的并发性和可扩展性。</p>
+<pre><code>actorRef ! message
+</code></pre><p>如果是在一个Actor中调用 ，那么发送方的actor引用会被隐式地作为消息的<code>sender(): ActorRef</code>成员一起发送。目的actor可以使用它来向源actor发送回应， 使用<code>sender() ! replyMsg</code>。</p>
+<p>如果<strong>不</strong>是从Actor实例发送的，sender成员缺省为 <code>deadLetters</code> actor引用。</p>
+<h5 id="ask-send-and-receive-future">Ask: Send-And-Receive-Future</h5>
+<p><code>ask</code>模式既包含actor也包含future，所以它是一种使用模式，而不是<code>ActorRef</code>的方法:</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.pattern.{ ask, pipe }
+<span class="hljs-keyword">import</span> system.dispatcher <span class="hljs-comment">// The ExecutionContext that will be used</span>
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Result</span>(</span>x: <span class="hljs-type">Int</span>, s: <span class="hljs-type">String</span>, d: <span class="hljs-type">Double</span>)
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">Request</span>
+</span>
+<span class="hljs-keyword">implicit</span> <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">timeout</span> =</span> <span class="hljs-type">Timeout</span>(<span class="hljs-number">5</span> seconds) <span class="hljs-comment">// needed for `?` below</span>
+
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f</span>:</span> <span class="hljs-type">Future</span>[<span class="hljs-type">Result</span>] =
+  <span class="hljs-keyword">for</span> {
+    x &lt;- ask(actorA, <span class="hljs-type">Request</span>).mapTo[<span class="hljs-type">Int</span>] <span class="hljs-comment">// call pattern directly</span>
+    s &lt;- (actorB ask <span class="hljs-type">Request</span>).mapTo[<span class="hljs-type">String</span>] <span class="hljs-comment">// call by implicit conversion</span>
+    d &lt;- (actorC ? <span class="hljs-type">Request</span>).mapTo[<span class="hljs-type">Double</span>] <span class="hljs-comment">// call by symbolic name</span>
+  } <span class="hljs-keyword">yield</span> <span class="hljs-type">Result</span>(x, s, d)
+
+f pipeTo actorD <span class="hljs-comment">// .. or ..</span>
+pipe(f) to actorD
+</code></pre>
+<p>上面的例子展示了将<code>ask</code>与future上的<code>pipeTo</code>模式一起使用，因为这是一种非常常用的组合。 请注意上面所有的调用都是完全非阻塞和异步的：<code>ask</code>产生 <code>Future</code>，三个<code>Future</code>通过for-语法组合成一个新的future，然后用<code>pipeTo</code>在future上安装一个<code>onComplete</code>-处理器来完成将收集到的<code>Result</code>发送到另一个actor的动作。</p>
+<p>使用<code>ask</code>将会像<code>tell</code>一样发送消息给接收方, 接收方必须通过<code>sender() ! reply</code>发送回应来为返回的<code>Future</code>填充数据。<code>ask</code>操作包括创建一个内部actor来处理回应，必须为这个内部actor指定一个超时期限，并且过期销毁该内部actor以防止内存泄露。</p>
+<blockquote>
+<p>警告</p>
+<p>如果要以异常来完成future你需要发送一个<code>Failure</code>消息给发送方。这个操作<em>不会在actor处理消息发生异常时自动完成</em>。</p>
+</blockquote>
+<pre><code class="lang-scala"><span class="hljs-keyword">try</span> {
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">result</span> =</span> operation()
+  sender() ! result
+} <span class="hljs-keyword">catch</span> {
+  <span class="hljs-keyword">case</span> e: <span class="hljs-type">Exception</span> =&gt;
+    sender() ! akka.actor.<span class="hljs-type">Status</span>.<span class="hljs-type">Failure</span>(e)
+    <span class="hljs-keyword">throw</span> e
+}
+</code></pre>
+<p>如果actor没有完成future，它会在超时时限到来时过期，以<code>AskTimeoutException</code>结束。超时的时限是按下面的代码来设置的:</p>
+<ol>
+<li>显式指定超时：</li>
+</ol>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.util.duration._
+<span class="hljs-keyword">import</span> akka.pattern.ask
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">future</span> =</span> myActor.ask(<span class="hljs-string">"hello"</span>)(<span class="hljs-number">5</span> seconds)
+</code></pre>
+<ol>
+<li>提供类型为<code>akka.util.Timeout</code>的隐式参数，例如，</li>
+</ol>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> scala.concurrent.duration._
+<span class="hljs-keyword">import</span> akka.util.<span class="hljs-type">Timeout</span>
+<span class="hljs-keyword">import</span> akka.pattern.ask
+<span class="hljs-keyword">implicit</span> <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">timeout</span> =</span> <span class="hljs-type">Timeout</span>(<span class="hljs-number">5</span> seconds)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">future</span> =</span> myActor ? <span class="hljs-string">"hello"</span>
+</code></pre>
+<p>参阅 <a href="../chapter4/01_futures.html#futures-scala">Futures (Scala)</a> 了解更多关于等待和查询future的信息。</p>
+<p><code>Future</code>的<code>onComplete</code>、<code>onSuccess</code>或<code>onFailure</code>方法可以用来注册一个回调，以便在Future完成时得到通知。从而提供一种避免阻塞的方法。</p>
+<blockquote>
+<p>警告</p>
+<p>在使用future回调如<code>onComplete</code>、<code>onSuccess</code>和<code>onFailure</code>时, 在actor内部你要小心避免捕捉该actor的引用，即不要在回调中调用该actor的方法或访问其可变状态。这会破坏actor的封装，会引用同步bug和竞态条件，因为回调会与此actor一同被并发调度。不幸的是目前还没有一种编译时的方法能够探测到这种非法访问。参阅: <a href="../chapter2/07_akka_and_the_java_memory_model.html#jmm-shared-state">Actor与共享可变状态</a></p>
+</blockquote>
+<h5 id="">转发消息</h5>
+<p>你可以将消息从一个actor转发给另一个。虽然经过了一个“中间人”，但最初的发送者地址/引用将保持不变。当实现类似路由器、负载均衡器、复制器等功能的actor时会很有用。</p>
+<pre><code>myActor.forward(message)
+</code></pre><h3 id="">接收消息</h3>
+<p>Actor必须实现<code>receive</code>方法来接收消息：</p>
+<pre><code>protected def receive: PartialFunction[Any, Unit]
+</code></pre><p>这个方法应返回一个<code>PartialFunction</code>，例如一个“match/case”子句，消息可以与其中的不同分支进行scala模式匹配。如下例:</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Actor</span>
+<span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Props</span>
+<span class="hljs-keyword">import</span> akka.event.<span class="hljs-type">Logging</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyActor</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">log</span> =</span> <span class="hljs-type">Logging</span>(context.system, <span class="hljs-keyword">this</span>)
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"test"</span> =&gt; log.info(<span class="hljs-string">"received test"</span>)
+    <span class="hljs-keyword">case</span> _      =&gt; log.info(<span class="hljs-string">"received unknown message"</span>)
+  }
+}
+</code></pre>
+<p><span id="actor-reply"></span></p>
+<h3 id="">回应消息</h3>
+<p>如果你需要一个用来发送回应消息的目标，可以使用<code>sender()</code>，它返回一个Actor引用。你可以用<code>sender() ! replyMsg</code>向这个引用发送回应消息。你也可以将这个ActorRef保存起来，将来再作回应或传给其它actor。如果没有<code>sender</code>（不是从actor发送的消息或者没有future上下文）那么<code>sender</code>缺省为 “死信”actor引用.</p>
+<pre><code class="lang-scala">  <span class="hljs-keyword">case</span> request =&gt;
+    <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">result</span> =</span> process(request)
+    sender() ! result       <span class="hljs-comment">// will have dead-letter actor as default</span>
+</code></pre>
+<h3 id="">接收超时</h3>
+<p><code>ActorContext</code>的<code>setReceiveTimeout</code>定义一个不活动时间，在这个时间到达后后，将触发一个<code>ReceiveTimeout</code>消息的发送。当指定超时时，接收函数应该能够处理<code>akka.actor.ReceiveTimeout</code>消息。最低支持的超时是 1 毫秒。</p>
+<p>请注意接收超时引发的<code>ReceiveTimeout</code>消息可能在另一条消息后加入队列；因此<strong>不能保证</strong>收到的接收超时必须与设置的空闲时间长度一致。</p>
+<p>一旦进行了设置，接收超时将一直有效（即继续在空闲期后重发）。通过传入<code>Duration.Undefined</code>关掉此功能。</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">ReceiveTimeout</span>
+<span class="hljs-keyword">import</span> scala.concurrent.duration._
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyActor</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
+  <span class="hljs-comment">// To set an initial delay</span>
+  context.setReceiveTimeout(<span class="hljs-number">30</span> milliseconds)
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"Hello"</span> =&gt;
+      <span class="hljs-comment">// To set in a response to a message</span>
+      context.setReceiveTimeout(<span class="hljs-number">100</span> milliseconds)
+    <span class="hljs-keyword">case</span> <span class="hljs-type">ReceiveTimeout</span> =&gt;
+      <span class="hljs-comment">// To turn it off</span>
+      context.setReceiveTimeout(<span class="hljs-type">Duration</span>.<span class="hljs-type">Undefined</span>)
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-type">RuntimeException</span>(<span class="hljs-string">"Receive timed out"</span>)
+  }
+}
+</code></pre>
+<p><span id="stopping-actors-scala"></span></p>
+<h3 id="actor">终止Actor</h3>
+<p>通过调用<code>ActorRefFactory</code>（即<code>ActorContext</code>或<code>ActorSystem</code>）的<code>stop</code>方法来终止一个actor。通常context用来终止子actor，而 system用来终止顶级actor。实际的终止操作是异步执行的，即<code>stop</code>可能在actor被终止之前返回。</p>
+<p>如果当前有正在处理的消息，对该消息的处理将在actor被终止之前完成，但是邮箱中的后续消息将不会被处理。缺省情况下这些消息会被送到<code>ActorSystem</code>的<code>deadLetters</code>中，但是这取决于邮箱的实现。</p>
+<p>actor的终止分两步: 第一步actor将挂起对邮箱的处理，并向所有子actor发送终止命令，然后处理来自子actor的终止消息直到所有的子actor都完成终止，最后终止自己（调用<code>postStop</code>，清空邮箱，向<a href="#deathwatch-scala">DeathWatch</a>发布<code>Terminated</code>，通知其监管者）。这个过程保证actor系统中的子树以一种有序的方式终止，将终止命令传播到叶子结点并收集它们回送的确认消息给被终止的监管者。如果其中某个actor没有响应（即由于处理消息用了太长时间以至于没有收到终止命令），整个过程将会被阻塞。</p>
+<p>在<code>ActorSystem.shutdown()</code>被调用时，系统根监管actor会被终止，以上的过程将保证整个系统的正确终止。</p>
+<p><code>postStop()</code> hook 是在actor被完全终止以后调用的。这是为了清理资源:</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">postStop</span>(</span>) {
+  <span class="hljs-comment">// clean up some resources ...</span>
+}
+</code></pre>
+<blockquote>
+<p>注意</p>
+<p>由于actor的终止是异步的，你不能马上使用你刚刚终止的子actor的名字；这会导致<code>InvalidActorNameException</code>。你应该 监视<code>watch()</code>正在终止的actor，并在<code>Terminated</code>最终到达后作为回应创建它的替代者。</p>
+</blockquote>
+<p><span id="poison-pill-scala"></span></p>
+<h5 id="poisonpill">PoisonPill</h5>
+<p>你也可以向actor发送<code>akka.actor.PoisonPill</code>消息，这个消息处理完成后actor会被终止。<code>PoisonPill</code>与普通消息一样被放进队列，因此会在已经入队列的其它消息之后被执行。</p>
+<h5 id="">优雅地终止</h5>
+<p>如果你需要等待终止过程的结束，或者组合若干actor的终止次序，可以使用<code>gracefulStop</code>：</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.pattern.gracefulStop
+<span class="hljs-keyword">import</span> scala.concurrent.<span class="hljs-type">Await</span>
+
+<span class="hljs-keyword">try</span> {
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">stopped</span>:</span> <span class="hljs-type">Future</span>[<span class="hljs-type">Boolean</span>] = gracefulStop(actorRef, <span class="hljs-number">5</span> seconds, <span class="hljs-type">Manager</span>.<span class="hljs-type">Shutdown</span>)
+  <span class="hljs-type">Await</span>.result(stopped, <span class="hljs-number">6</span> seconds)
+  <span class="hljs-comment">// the actor has been stopped</span>
+} <span class="hljs-keyword">catch</span> {
+  <span class="hljs-comment">// the actor wasn't stopped within 5 seconds</span>
+  <span class="hljs-keyword">case</span> e: akka.pattern.<span class="hljs-type">AskTimeoutException</span> =&gt;
+}
+</code></pre>
+<pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">Manager</span> {</span>
+  <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">Shutdown</span>
+</span>}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Manager</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
+  <span class="hljs-keyword">import</span> <span class="hljs-type">Manager</span>._
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">worker</span> =</span> context.watch(context.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">Cruncher</span>], <span class="hljs-string">"worker"</span>))
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"job"</span> =&gt; worker ! <span class="hljs-string">"crunch"</span>
+    <span class="hljs-keyword">case</span> <span class="hljs-type">Shutdown</span> =&gt;
+      worker ! <span class="hljs-type">PoisonPill</span>
+      context become shuttingDown
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">shuttingDown</span>:</span> <span class="hljs-type">Receive</span> = {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"job"</span> =&gt; sender() ! <span class="hljs-string">"service unavailable, shutting down"</span>
+    <span class="hljs-keyword">case</span> <span class="hljs-type">Terminated</span>(`worker`) =&gt;
+      context stop self
+  }
+}
+</code></pre>
+<p>当<code>gracefulStop()</code>成功返回时，actor的<code>postStop()</code> hook将会被执行：在<code>postStop()</code>结束和<code>gracefulStop()</code>返回之间存在happens-before边界。</p>
+<p>在上面的示例中自定义的<code>Manager.Shutdown</code>消息是发送到目标actor来启动actor的终止过程。你可以使用<code>PoisonPill</code>，但之后在停止目标actor之前，你与其他actor的互动的机会有限。在<code>postStop</code>中，可以处理简单的清理任务。</p>
+<blockquote>
+<p>警告</p>
+<p>请记住，actor停止和其名称被注销是彼此异步发生的独立事件。因此，在<code>gracefulStop()</code>返回后。你会发现其名称仍可能在使用中。为了保证正确注销，只在你控制的监管者内，并且只在响应<code>Terminated</code>消息时重用名称，即不是用于顶级actor。</p>
+</blockquote>
+<p><span id="actor-hotswap"></span></p>
+<h3 id="becomeunbecome">Become/Unbecome</h3>
+<h5 id="">升级</h5>
+<p>Akka支持在运行时对Actor消息循环（即其实现）进行实时替换：在actor中调用<code>context.become</code>方法。<code>become</code>要求一个<code>PartialFunction[Any, Unit]</code>参数作为新的消息处理实现。 被替换的代码被保存在一个栈中，可以被push和pop。</p>
+<blockquote>
+<p>警告</p>
+<p>请注意actor被其监管者重启后将恢复其最初的行为。</p>
+</blockquote>
+<p>使用<code>become</code>替换Actor的行为：</p>
+<pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HotSwapActor</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
+  <span class="hljs-keyword">import</span> context._
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">angry</span>:</span> <span class="hljs-type">Receive</span> = {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"foo"</span> =&gt; sender() ! <span class="hljs-string">"I am already angry?"</span>
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"bar"</span> =&gt; become(happy)
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">happy</span>:</span> <span class="hljs-type">Receive</span> = {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"bar"</span> =&gt; sender() ! <span class="hljs-string">"I am already happy :-)"</span>
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"foo"</span> =&gt; become(angry)
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"foo"</span> =&gt; become(angry)
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"bar"</span> =&gt; become(happy)
+  }
+}
+</code></pre>
+<p><code>become</code>方法的变种还有很多其它的用处，例如实现一个有限状态机（FSM，例子见<a href="http://www.typesafe.com/activator/template/akka-sample-fsm-scala" target="_blank">Dining Hakkers</a>）。它将取代当前的行为 （即行为堆栈的顶部），这意味着你不需要使用<code>unbecome</code>，相反下一个行为总是被显式安装。</p>
+<p>其他使用<code>become</code>的方式不是替换，而是添加到行为堆栈的顶部。在这种情况下必须小心，以确保长远而言，“pop”操作（即<code>unbecome</code>）与“push”操作相当，否则会导致内存泄漏 （这就是为什么这种行为不是默认的）。</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">Swap</span>
+</span><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Swapper</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
+  <span class="hljs-keyword">import</span> context._
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">log</span> =</span> <span class="hljs-type">Logging</span>(system, <span class="hljs-keyword">this</span>)
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
+    <span class="hljs-keyword">case</span> <span class="hljs-type">Swap</span> =&gt;
+      log.info(<span class="hljs-string">"Hi"</span>)
+      become({
+        <span class="hljs-keyword">case</span> <span class="hljs-type">Swap</span> =&gt;
+          log.info(<span class="hljs-string">"Ho"</span>)
+          unbecome() <span class="hljs-comment">// resets the latest 'become' (just for fun)</span>
+      }, discardOld = <span class="hljs-literal">false</span>) <span class="hljs-comment">// push on top instead of replace</span>
+  }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">SwapperApp</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">App</span> {</span>
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">system</span> =</span> <span class="hljs-type">ActorSystem</span>(<span class="hljs-string">"SwapperSystem"</span>)
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">swap</span> =</span> system.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">Swapper</span>], name = <span class="hljs-string">"swapper"</span>)
+  swap ! <span class="hljs-type">Swap</span> <span class="hljs-comment">// logs Hi</span>
+  swap ! <span class="hljs-type">Swap</span> <span class="hljs-comment">// logs Ho</span>
+  swap ! <span class="hljs-type">Swap</span> <span class="hljs-comment">// logs Hi</span>
+  swap ! <span class="hljs-type">Swap</span> <span class="hljs-comment">// logs Ho</span>
+  swap ! <span class="hljs-type">Swap</span> <span class="hljs-comment">// logs Hi</span>
+  swap ! <span class="hljs-type">Swap</span> <span class="hljs-comment">// logs Ho</span>
+}
+</code></pre>
+<h5 id="scala-actors-">对Scala Actors 嵌套接收消息进行编码而不会造成意外的内存泄露</h5>
+<p>参阅<a href="http://github.com/akka/akka/tree/v2.3.6/akka-docs/rst/scala/code/docs/actor/UnnestedReceives.scala" target="_blank">解嵌套接收消息示例</a>。</p>
+<h3 id="stash">贮藏(Stash)</h3>
+<p><code>Stash</code>特质使actor可以暂时贮藏消息，来跳过当前行为不能或不应该处理的消息。在actor的消息处理程序改变时，即调用<code>context.become</code>或<code>context.unbecome</code>前，所有贮藏的消息可以是“unstashed”，从而前置到actor的邮箱中。这种方式下，贮藏消息可以按照其原始接收顺序被处理。</p>
+<blockquote>
+<p>注意</p>
+<p><code>Stash</code>特质继承自标记特质<code>RequiresMessageQueue[DequeBasedMessageQueueSemantics]</code>，它要求系统自动为actor选择一个基于deque的邮箱实现。如果你想更好地控制该邮箱，参阅文档<a href="05_mailboxes.html">邮箱</a>。</p>
+</blockquote>
+<p>这里是<code>Stash</code>的一个实际例子：</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Stash</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ActorWithProtocol</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> <span class="hljs-title">Stash</span> {</span>
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"open"</span> =&gt;
+      unstashAll()
+      context.become({
+        <span class="hljs-keyword">case</span> <span class="hljs-string">"write"</span> =&gt; <span class="hljs-comment">// do writing...</span>
+        <span class="hljs-keyword">case</span> <span class="hljs-string">"close"</span> =&gt;
+          unstashAll()
+          context.unbecome()
+        <span class="hljs-keyword">case</span> msg =&gt; stash()
+      }, discardOld = <span class="hljs-literal">false</span>) <span class="hljs-comment">// stack on top instead of replacing</span>
+    <span class="hljs-keyword">case</span> msg =&gt; stash()
+  }
+}
+</code></pre>
+<p>调用<code>stash()</code>将当前消息（actor最后接收到的消息）添加到actor的贮藏处。通常在其它case语句不能处理该消息时，在默认处理中调用来把消息贮藏起来。两次贮藏同一个消息是非法的；这样做会抛出<code>IllegalStateException</code>。贮藏操作也可能是有界的，在这种情况下调用<code>stash()</code>可能会导致超出容量，结果抛出<code>StashOverflowException</code>。可以使用邮箱配置中的<code>stash-capacity</code>（一个<code>Int</code>）配置贮存能力。</p>
+<p>调用<code>unstashAll()</code>将把贮藏的消息转移到actor的邮箱中，直到邮箱满（请注意消息从贮藏处被前置到邮箱中的）。万一有界的邮箱溢出，则抛出<code>MessageQueueAppendFailedException</code>。贮藏箱被保证在调用<code>unstashAll()</code>后被清空。</p>
+<p>贮藏箱由<code>scala.collection.immutable.Vector</code>支持。其结果是，即使有很大数目的消息被贮藏也不会对性能有大的影响。</p>
+<blockquote>
+<p>警告</p>
+<p><code>Stash</code>特质必须在<code>preRestart</code>回调被任何一个特质/类重写之前，被混入到<code>Actor</code>（的一个子类）中。这意味着如果<code>MyActor</code>重写<code>preRestart</code>，则不可能这样写——<code>Actor with MyActor with Stash</code>。</p>
+</blockquote>
+<p>请注意贮藏箱是actor的瞬时状态，不同于邮箱。因此，它应该像actor中其他具有相同属性的状态一样被管理。<code>Stash</code>的<code>preRestart</code>实现将调用<code>unstashAll()</code>，这通常也是期望的行为。</p>
+<blockquote>
+<p>注意</p>
+<p>如果你想强制你的actor只能在无界贮藏箱下工作，则你应该换用 <code>UnboundedStash</code>特质。</p>
+</blockquote>
+<p><span id="killing-actors-scala"></span></p>
+<h3 id="actor">杀死actor</h3>
+<p>你可以发送<code>Kill</code>消息来杀死actor。这将导致actor抛出<code>ActorKilledException</code>，触发失败。该actor将暂停操作，其主管也将会被问及如何处理这一失败，这可能意味着恢复actor、 重新启动或完全终止它。更多的信息，请参阅<a href="../chapter2/04_supervision_and_monitoring.html#supervision-directives">监管的意思</a>。</p>
+<p>像这样使用<code>Kill</code>：</p>
+<pre><code class="lang-scala"><span class="hljs-comment">// kill the 'victim' actor</span>
+victim ! <span class="hljs-type">Kill</span>
+</code></pre>
+<h3 id="actor">Actor与异常</h3>
+<p>在消息被actor处理的过程中可能会抛出异常，例如数据库异常。</p>
+<h5 id="">消息会怎样</h5>
+<p>如果消息处理过程中（即从邮箱中取出并交给当前行为后）发生了异常，这个消息将被丢失。必须明白它不会被放回到邮箱中。所以如果你希望重试对消息的处理，你需要自己抓住异常然后在异常处理流程中重试。请确保限制重试的次数，因为你不会希望系统产生活锁 (从而消耗大量CPU而于事无补)。另一种可能性请参见<a href="../chapter8/05_external_contributions.html#peek-mailbox#mailbox-acking">PeekMailbox 模式</a>。</p>
+<h5 id="">邮箱会怎样</h5>
+<p>如果消息处理过程中发生异常，邮箱没有任何变化。如果actor被重启，仍然是相同的邮箱在那里。邮箱中的所有消息不会丢失。</p>
+<h5 id="actor">actor会怎样</h5>
+<p>如果actor代码抛出了异常，actor会被暂停并启动监管过程（参见<a href="../chapter2/04_supervision_and_monitoring.html">监管与监控</a>）。根据监管者的策略，actor可以被恢复（好像什么也没有发生过）、重启（消灭其内部状态并从零开始）或终止。</p>
+<h3 id="partialfunctionactor">使用PartialFunction链来扩展actor</h3>
+<p>有时在一些actor中分享共同的行为，或通过若干小的函数构成一个actor的行为是很有用的。这由于actor的<code>receive</code>方法返回一个<code>Actor.Receive</code>（<code>PartialFunction[Any,Unit]</code>的类型别名）而使之成为可能，多个偏函数可以使用<code>PartialFunction#orElse</code>链接在一起。你可以根据需要链接尽可能多的功能，但是你要牢记&quot;第一个匹配&quot;获胜——这在组合可以处理同一类型的消息的功能时会很重要。</p>
+<p>例如，假设你有一组actor是生产者<code>Producers</code>或消费者<code>Consumers</code>，然而有时候需要actor分享这两种行为。这可以很容易实现而无需重复代码，通过提取行为的特质和并将actor的<code>receive</code>实现为这些偏函数的组合。</p>
+<pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">trait</span> <span class="hljs-title">ProducerBehavior</span> {</span>
+  <span class="hljs-keyword">this</span>: <span class="hljs-type">Actor</span> =&gt;
+
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">producerBehavior</span>:</span> <span class="hljs-type">Receive</span> = {
+    <span class="hljs-keyword">case</span> <span class="hljs-type">GiveMeThings</span> =&gt;
+      sender() ! <span class="hljs-type">Give</span>(<span class="hljs-string">"thing"</span>)
+  }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">trait</span> <span class="hljs-title">ConsumerBehavior</span> {</span>
+  <span class="hljs-keyword">this</span>: <span class="hljs-type">Actor</span> <span class="hljs-keyword">with</span> <span class="hljs-type">ActorLogging</span> =&gt;
+
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">consumerBehavior</span>:</span> <span class="hljs-type">Receive</span> = {
+    <span class="hljs-keyword">case</span> ref: <span class="hljs-type">ActorRef</span> =&gt;
+      ref ! <span class="hljs-type">GiveMeThings</span>
+
+    <span class="hljs-keyword">case</span> <span class="hljs-type">Give</span>(thing) =&gt;
+      log.info(<span class="hljs-string">"Got a thing! It's {}"</span>, thing)
+  }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Producer</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> <span class="hljs-title">ProducerBehavior</span> {</span>
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> producerBehavior
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Consumer</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> <span class="hljs-title">ActorLogging</span> <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> <span class="hljs-title">ConsumerBehavior</span> {</span>
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> consumerBehavior
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ProducerConsumer</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> <span class="hljs-title">ActorLogging</span>
+</span>  <span class="hljs-keyword">with</span> <span class="hljs-type">ProducerBehavior</span> <span class="hljs-keyword">with</span> <span class="hljs-type">ConsumerBehavior</span> {
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> producerBehavior orElse consumerBehavior
+}
+
+<span class="hljs-comment">// protocol</span>
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">GiveMeThings</span>
+</span><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Give</span>(</span>thing: <span class="hljs-type">Any</span>)
+</code></pre>
+<p>不同于继承，相同的模式可以通过组合实现——可以简单地通过委托的偏函数组合成<code>receive</code>方法。</p>
+<h3 id="">初始化模式</h3>
+<p>actor丰富的生命周期钩子（hook）提供一个有用的工具包，可用于实现各种初始化模式。在<code>ActorRef</code>的生命中，actor可能会经历多次重启，老的实例被替换为新的实例，除观察者以外是觉察不到的，只能看到一个<code>ActorRef</code>。</p>
+<p>一个人可能把新实例看做是&quot;化身&quot;。初始化对actor每个化身都是必要的，但有时你需要初始化只在第一个实例创建时，即<code>ActorRef</code>创建时发生。以下各节提供了满足不同的初始化需求的模式。</p>
+<h5 id="">通过构造函数初始化</h5>
+<p>使用构造函数初始化有各种好处。首先，使得用<code>val</code>字段来存储在actor实例的生命周期内不变的状态成为可能，使actor的实现更加健壮。对actor的每个化身都会调用一次构造函数，因此，actor内部总是可以假定正确地完成初始化。这也是这种方法的缺点，例如当想要避免在重启时重新初始化内部状态的情况下。例如，跨重启保留子actor经常很有用。下面提供了该情况的一种模式。</p>
+<h5 id="prestart">通过preStart初始化</h5>
+<p>actor的<code>preStart()</code>方法只在第一个实例的初始化时调用一次，即<code>ActorRef</code>创建时。在重新启动后，<code>preStart()</code>是由<code>postRestart()</code>调用，因此如果重写，<code>preStart()</code>对每个化身都会被调用。然而，重写<code>postRestart()</code>可以禁用此行为，并确保只有一个对<code>preStart()</code>的调用。</p>
+<p>这种模式的一个有用用法是禁止在重启期间为子actor创建新<code>ActorRefs</code>。这可以通过重写<code>preRestart()</code>实现：</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">preStart</span>(</span>): <span class="hljs-type">Unit</span> = {
+  <span class="hljs-comment">// Initialize children here</span>
+}
+
+<span class="hljs-comment">// Overriding postRestart to disable the call to preStart()</span>
+<span class="hljs-comment">// after restarts</span>
+<span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">postRestart</span>(</span>reason: <span class="hljs-type">Throwable</span>): <span class="hljs-type">Unit</span> = ()
+
+<span class="hljs-comment">// The default implementation of preRestart() stops all the children</span>
+<span class="hljs-comment">// of the actor. To opt-out from stopping the children, we</span>
+<span class="hljs-comment">// have to override preRestart()</span>
+<span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">preRestart</span>(</span>reason: <span class="hljs-type">Throwable</span>, message: <span class="hljs-type">Option</span>[<span class="hljs-type">Any</span>]): <span class="hljs-type">Unit</span> = {
+  <span class="hljs-comment">// Keep the call to postStop(), but no stopping of children</span>
+  postStop()
+}
+</code></pre>
+<p>请注意，子actor<em>仍会重新启动</em>，但不会创建新的<code>ActorRef</code>。可以以递归方式为子actor应用相同的原则，确保其<code>preStart()</code>方法只在创建引用时被调用一次。</p>
+<p>有关更多信息，请参见<a href="../chapter2/04_supervision_and_monitoring.html#supervision-restart">重启的含义</a>。</p>
+<h5 id="">通过消息传递初始化</h5>
+<p>有些情况下不可能在构造函数中传入actor初始化所需要的所有信息，例如存在循环依赖关系。在这种情况下actor应该监听初始化消息，并使用<code>become()</code>或一个有限状态机状态转换来编码actor的初始化和未初始化状态。</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">var</span> initializeMe: <span class="hljs-type">Option</span>[<span class="hljs-type">String</span>] = <span class="hljs-type">None</span>
+
+<span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
+  <span class="hljs-keyword">case</span> <span class="hljs-string">"init"</span> =&gt;
+    initializeMe = <span class="hljs-type">Some</span>(<span class="hljs-string">"Up and running"</span>)
+    context.become(initialized, discardOld = <span class="hljs-literal">true</span>)
+
+}
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">initialized</span>:</span> <span class="hljs-type">Receive</span> = {
+  <span class="hljs-keyword">case</span> <span class="hljs-string">"U OK?"</span> =&gt; initializeMe foreach { sender() ! _ }
+}
+</code></pre>
+<p>如果actor在初始化之前可能收到消息，一个有用的<code>Stash</code>工具可以用来存储消息直到初始化完成，并在actor完成初始化后回放这些消息。</p>
+<blockquote>
+<p>警告</p>
+<p>此模式应小心使用，并且仅当上述模式都不适用时才应用。其潜在的问题之一是当发送到远程的actor时，消息可能会丢失。此外，发布一个处于未初始化状态的<code>ActorRef</code>可能会导致竞态条件，即在初始化完成前它接收到一个用户消息。</p>
+</blockquote>
+
+                    
+                    </section>
+                
+                
+                </div>
+            </div>
+        </div>
+
+        
+        <a href="../chapter3/actors.html" class="navigation navigation-prev " aria-label="Previous page: Actors"><i class="fa fa-angle-left"></i></a>
+        
+        
+        <a href="../chapter3/02_typed_actors.html" class="navigation navigation-next " aria-label="Next page: 有类型Actor"><i class="fa fa-angle-right"></i></a>
+        
+    </div>
+</div>
+
+        
+<script src="../gitbook/app.js"></script>
+
+    
+    <script src="https://cdn.mathjax.org/mathjax/2.4-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-mathjax/plugin.js"></script>
+    
+
+<script>
+require(["gitbook"], function(gitbook) {
+    var config = {"fontSettings":{"theme":null,"family":"sans","size":2}};
+    gitbook.start(config);
+});
+</script>
+
+        
+    </body>
+    
+</html>

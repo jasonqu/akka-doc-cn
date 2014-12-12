@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.4" data-basepath=".." data-revision="1411643601835">
+    <div class="book"  data-level="2.4" data-basepath=".." data-revision="1418396877209">
     
 
 <div class="book-summary">
@@ -349,10 +349,10 @@
         </li>
     
         
-        <li class="chapter " data-level="3" data-path="chapter3/Actors.html">
+        <li class="chapter " data-level="3" data-path="chapter3/actors.html">
             
                 
-                    <a href="../chapter3/Actors.html">
+                    <a href="../chapter3/actors.html">
                         <i class="fa fa-check"></i>
                         
                             <b>3.</b>
@@ -390,7 +390,7 @@
                         
                             <b>3.2.</b>
                         
-                         类型Actor
+                         有类型Actor
                     </a>
                 
             
@@ -410,6 +410,28 @@
                     </a>
                 
             
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="3.3.1" data-path="chapter3/03-1_fault_tolerance_sample.html">
+            
+                
+                    <a href="../chapter3/03-1_fault_tolerance_sample.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.3.1.</b>
+                        
+                         容错示例
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
             
         </li>
     
@@ -462,10 +484,10 @@
         </li>
     
         
-        <li class="chapter " data-level="3.7" data-path="chapter3/07_FSM.html">
+        <li class="chapter " data-level="3.7" data-path="chapter3/07_fsm.html">
             
                 
-                    <a href="../chapter3/07_FSM.html">
+                    <a href="../chapter3/07_fsm.html">
                         <i class="fa fa-check"></i>
                         
                             <b>3.7.</b>
@@ -1595,7 +1617,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_395">
+                    <section class="normal" id="section-gitbook_13">
                     
                         <h1 id="">监管与监控</h1>
 <p>这一节将简述监管背后的概念、原语及语义。要了解这些是如何转换成真实代码，请参阅相关的Scala和Java API章节。</p>
@@ -1617,21 +1639,21 @@
 <h3 id="">顶级监管者</h3>
 <p><img src="guardians.png" alt=""></p>
 <p>一个actor系统在其创建过程中至少要启动三个actor，如上图所示。有关actor路径及相关信息请参见<a href="05_actor_references_paths_and_addresses.html#toplevel-paths">Actor路径的顶级作用域</a>。</p>
-<h5 id="user-actor"><code>/user</code>: 守护Actor</h5>
+<h5 id="a-nameuser-guardiana-user-actor"><a name="user-guardian"></a> <code>/user</code>: 守护Actor</h5>
 <p>这个名为<code>&quot;/user&quot;</code>的守护者，作为所有用户创建actor的父actor，可能是需要打交道最多的。使用<code>system.actorOf()</code>创建的actor都是其子actor。这意味着，当该守护者终止时，系统中所有的普通actor都将被关闭。同时也意味着，该守护者的监管策略决定了普通顶级actor是如何被监督的。自Akka 2.1起就可以使用这个设定<code>akka.actor.guardian-supervisor-strategy</code>，以一个<code>SupervisorStrategyConfigurator</code>的完整类名进行配置。当这个守护者上升一个失败，根守护者的响应是终止该守护者，从而关闭整个actor系统。</p>
 <h5 id="system-"><code>/system</code>: 系统守护者</h5>
-<p>这个特殊的守护者被引入，是为了实现正确的关闭顺序，即日志（logging）要保持可用直到所有普通actor终止，即使日志本身也是用actor实现的。其实现方法是：系统守护者观察user守护者，并在收到<code>Terminated</code>消息初始化其自己的关闭过程。顶级的系统actor被监管的策略是，对收到的所有除<code>ActorInitializationException</code>和<code>ActorKilledException</code>之外的<code>Exception</code>无限地执行重启，这也将终止其所有子actor。所有其他<code>Throwable</code>被上升，然后将导致整个actor系统的关闭。</p>
+<p>这个特殊的守护者被引入，是为了实现正确的关闭顺序，即日志（logging）要保持可用直到所有普通actor终止，即使日志本身也是用actor实现的。其实现方法是：系统守护者观察user守护者，并在收到<code>Terminated</code>消息初始化其自己的关闭过程。顶级的系统actor被监管的策略是，对收到的除<code>ActorInitializationException</code>和<code>ActorKilledException</code>之外的所有<code>Exception</code>无限地执行重启，这也将终止其所有子actor。所有其他<code>Throwable</code>被上升，然后将导致整个actor系统的关闭。</p>
 <h5 id="-"><code>/</code>: 根守护者</h5>
 <p>根守护者所谓“顶级”actor的祖父，它监督所有在<a href="05_actor_references_paths_and_addresses.html#toplevel-paths">Actor路径的顶级作用域</a>中定义的特殊actor，使用发现任何<code>Exception</code>就终止子actor的<code>SupervisorStrategy.stoppingStrategy</code>策略。其他所有Throwable都会被上升……但是上升给谁？所有的真实actor都有一个监管者，但是根守护者没有父actor，因为它就是整个树结构的根。因此这里使用一个虚拟的<code>ActorRef</code>，在发现问题后立即停掉其子actor，并在根守护者完全终止之后（所有子actor递归停止），立即把actor系统的<code>isTerminated</code>置为<code>true</code>。</p>
-<h3 id="">重启的含义</h3>
+<h3 id="a-namesupervision-restarta"><a name="supervision-restart"></a>重启的含义</h3>
 <p>当actor在处理某条消息时失败时，失败的原因可以分成以下三类:</p>
 <ul>
 <li>对收到的特定消息的系统错误（即程序错误）</li>
 <li>处理消息时一些外部资源的（临时性）失败</li>
 <li>actor内部状态崩溃了</li>
 </ul>
-<p>除非故障能被专门识别，否则所述的第三个原因不能被排除，从而引出内部状态需要被清除的结论。如果监管者决定它的其他儿童或本身不会受到崩溃的影响——例如使用了错误内核模式的自恢复应用——因此最好只重启这个孩子。具体实现是通过建立底层<code>Actor</code>类的新实例，并用新的<code>ActorRef</code>更换故障实例；能做到这一点是因为将actor兜风装载了特殊的引用中。然后新actor恢复处理其邮箱，这意味着该启动在actor外部是不可见的，显着的例外是在发生失败期间的消息不会被重新处理。</p>
-<p>重启过程中发生的事件的精确次序是：</p>
+<p>除非故障能被专门识别，否则所述的第三个原因不能被排除，从而引出内部状态需要被清除的结论。如果监管者确定它的其他子actor或本身不会受到崩溃的影响——例如使用了错误内核模式的自恢复应用——因此最好只重启这个孩子。具体实现是通过建立底层<code>Actor</code>类的新实例，并用新的<code>ActorRef</code>更换故障实例；能做到这一点是因为将actor都封装载了特殊的引用中。然后新actor恢复处理其邮箱，这意味着该启动在actor外部是不可见的，显著的异常是在发生失败期间的消息不会被重新处理。</p>
+<p>重启过程中所发生事件的精确次序是：</p>
 <ol>
 <li>actor被挂起（意味着它不会处理正常消息直到被恢复），并递归挂起其所有子actor</li>
 <li>调用旧实例的 <code>preRestart</code> hook (缺省实现是向所有子actor发送终止请求并调用 <code>postStop</code>)</li>
@@ -1646,12 +1668,12 @@
 <p>注意</p>
 <p>生命周期监控在Akka中经常被引作<code>DeathWatch</code></p>
 </blockquote>
-<p>与上面所描述的特殊父子关系相对的，每一个actor都可以监控其他任意actor。由于actor从创建到完全可用和重启都是除了监管者之外都不可见的，所以唯一可用于监视的状态变化是可用到失效的转变。监视因此被用于绑两个actor，使监控者能对另一个actor的终止做出响应，而相应的，监督者是对失败做出响应。</p>
+<p>与上面所描述的特殊父子关系相对的，每一个actor都可以监控其他任意actor。由于actor从创建到完全可用和重启都是除了监管者之外都不可见的，所以唯一可用于监视的状态变化是可用到失效的转变。监视因此被用于绑定两个actor，使监控者能对另一个actor的终止做出响应，而相应的，监督者是对失败做出响应。</p>
 <p>生命周期监控是通过监管actor收到<code>Terminated</code>消息实现的，其默认行为是抛出一个<code>DeathPactException</code>。要开始监听<code>Terminated</code>消息，需要调用<code>ActorContext.watch(targetActorRef)</code>。要停止监听，需要调用<code>ActorContext.unwatch(targetActorRef)</code>。一个重要的特性是，消息将不考虑监控请求和目标终止发生的顺序，也就是说，即使在登记的时候目标已经死了，你仍然会得到消息。</p>
 <p>如果一个监管者不能简单地重启其子actor，而必须终止它们，这时监控就特别有用，例如在actor初始化时发生错误。在这种情况下，它应该监控这些子actor并重新创建它们，或安排自己在稍后的时间重试。</p>
 <p>另一个常见的应用情况是，一个actor需要在没有外部资源时失败，该资源也可能是它的子actor之一。如果第三方通过<code>system.stop(child)</code>或发送<code>PoisonPill</code>的方式终止子actor，其监管者很可能会受到影响。</p>
 <h3 id="-vs-">一对一策略 vs. 多对一策略</h3>
-<p>Akka中有两种类型的监管策略：<code>OneForOneStrategy</code> 和<code>AllForOneStrategy</code>。两者都配置有从异常类型监管指令间的映射（见<a href="04_supervision_and_monitoring.html#supervision-directives">上文</a>），并限制了一个孩子被终止之前允许失败的次数。它们之间的区别在于，前者只将所获得的指令应用在发生故障的子actor上，而后者则是应用在所有孩子上。通常情况下，你应该使用<code>OneForOneStrategy</code>，这也是默认的。</p>
+<p>Akka中有两种类型的监管策略：<code>OneForOneStrategy</code> 和<code>AllForOneStrategy</code>。两者都配置有从异常类型监管指令间的映射（见<a href="04_supervision_and_monitoring.html#supervision-directives">上文</a>），并限制了一个孩子被终止之前允许失败的次数。它们之间的区别在于，前者只将所获得的指令应用在发生故障的子actor上，而后者则是应用在所有孩子上。通常情况下，你应该使用<code>OneForOneStrategy</code>，这也是默认的策略。</p>
 <p><code>AllForOneStrategy</code>适用的情况是，子actor之间有很紧密的依赖，以至于一个actor的失败会影响其他孩子，即他们是不可分开的。由于重启不清除邮箱，所以往往最好是失败时终止孩子并在监管者显式地重建它们（通过观察孩子们的生命周期）；否则你必须确保重启前入队的消息在重启后处理是没有问题的。</p>
 <p>通常停止一个孩子（即不响应失败）不会自动终止多对一策略中其他的孩子；可以很容易地通过观察它们的生命周期来做到这点：如果<code>Terminated</code>的消息不能被监管者处理，它会抛出一个<code>DeathPactException</code>，并（这取决于其监管者）将重新启动，默认<code>preRestart</code>操作会终止所有的孩子。当然这也可以被显式地处理。</p>
 <p>请注意，在多对一监管者下创建一个临时的actor会导致一个问题：临时actor的失败上升会使所有永久actor受到影响。如果这不是所期望的，安装一个中间监管者；这可以很容易地通过为工作者声明大小为1的路由器来完成，请参阅路由<a href="../chapter3/06_routing.html">routing-scala</a>或<a href="#TODO">routing-java`</a>。</p>

@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.2" data-basepath=".." data-revision="1411643601835">
+    <div class="book"  data-level="2.2" data-basepath=".." data-revision="1418396877209">
     
 
 <div class="book-summary">
@@ -349,10 +349,10 @@
         </li>
     
         
-        <li class="chapter " data-level="3" data-path="chapter3/Actors.html">
+        <li class="chapter " data-level="3" data-path="chapter3/actors.html">
             
                 
-                    <a href="../chapter3/Actors.html">
+                    <a href="../chapter3/actors.html">
                         <i class="fa fa-check"></i>
                         
                             <b>3.</b>
@@ -390,7 +390,7 @@
                         
                             <b>3.2.</b>
                         
-                         类型Actor
+                         有类型Actor
                     </a>
                 
             
@@ -410,6 +410,28 @@
                     </a>
                 
             
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="3.3.1" data-path="chapter3/03-1_fault_tolerance_sample.html">
+            
+                
+                    <a href="../chapter3/03-1_fault_tolerance_sample.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.3.1.</b>
+                        
+                         容错示例
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
             
         </li>
     
@@ -462,10 +484,10 @@
         </li>
     
         
-        <li class="chapter " data-level="3.7" data-path="chapter3/07_FSM.html">
+        <li class="chapter " data-level="3.7" data-path="chapter3/07_fsm.html">
             
                 
-                    <a href="../chapter3/07_FSM.html">
+                    <a href="../chapter3/07_fsm.html">
                         <i class="fa fa-check"></i>
                         
                             <b>3.7.</b>
@@ -1595,7 +1617,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_405">
+                    <section class="normal" id="section-gitbook_16">
                     
                         <h1 id="actor">Actor系统</h1>
 <p>Actor是封装状态和行为的对象，他们唯一的通讯方式是交换消息——把消息存放在接收方的邮箱里。从某种意义上来说，actor是面向对象最严格的形式，不过最好把它们比作人：在使用actor来对解决方案建模时，把actor想象成一群人，把子任务分配给他们，将他们的功能整理成一个有组织的结构，考虑如何将失败逐级上传（好在我们并不需要真正跟人打交道，这样我们就不需要关心他们的情绪状态和道德问题）。这个结果就可以作为软件实现的思维框架。</p>
@@ -1604,7 +1626,7 @@
 <p>一个Actor系统是一个很重的结构，它会分配一到N个线程，所以对每一个逻辑应用创建一个就够了。</p>
 </blockquote>
 <h3 id="">树形结构</h3>
-<p>象一个经济组织一样，actor自然形成树形结构。程序中负责某一功能的actor，可能需要把它的任务分拆成更小的、更易管理的部分。为此它启动子Actor并监督它们。虽然<a href="04_supervision_and_monitoring.html">后面章节</a>会解释监督机制的细节，我们会集中在这一节里介绍其中的根本思想，唯一需要了解的前提是每个actor有且仅有一个监管者，就是创建它的那个actor。</p>
+<p>象一个经济组织一样，actor自然形成树形结构。程序中负责某一功能的actor，可能需要把它的任务分拆成更小的、更易管理的部分。为此它启动子actor并监督它们。虽然<a href="04_supervision_and_monitoring.html">后面章节</a>会解释监督机制的细节，我们会集中在这一节里介绍其中的根本思想，唯一需要了解的前提是每个actor有且仅有一个监管者，就是创建它的那个actor。</p>
 <p>Actor系统的精髓在于任务被拆开、委托，直到任务小到可以被完整地处理。这样做不仅清晰地划分出了任务本身的结构，而且最终的actor也能按照它们“应该处理什么类型的消息”，“如何处理正常流程”以及“如何应对失败流程”来进行推理。如果一个actor对某种状况无法进行处理，它会发送相应的失败消息给它的监管者请求帮助。这样的递归结构使得失败能够在正确的层次得到处理。</p>
 <p>可以将这种思想与分层的设计方法进行比较。分层的设计方法最终很容易形成防护性编程，以防止任何失败被泄露出来；相比之下把问题交由正确的人处理会是比将所有的事情“藏在深处”更好的解决方案。</p>
 <p>现在，设计这种系统的难度在于如何决定谁应该监管什么。这当然没有唯一的最佳方案，但是有一些指导原则可能会有帮助：</p>
@@ -1615,7 +1637,7 @@
 </ul>
 <p>当然以上的规则都会有例外，但无论是遵循这些规则还是打破它们，都需要有足够的理由。</p>
 <h3 id="">配置容器</h3>
-<p>actor系统是多个协作actor的组，它天生就是管理调度服务、配置、日志等共享设施的单元。使用不同配置的多个actor系统可以在同一个jvm中共存，Akka自身没有全局共享的状态。将这与actor系统之间的透明通讯（在同一节点上或者跨网络连接的多个节点）结合，可以看到actor系统本身可以被作为功能层次中的构件单元。</p>
+<p>actor系统是多个协作actor的组，它天生就是管理调度服务、配置、日志等共享设施的单元。使用不同配置的多个actor系统可以在同一个jvm中共存，Akka自身没有全局共享的状态。将这与actor系统之间的透明通讯（在同一节点上或者跨网络连接的多个节点）结合，可以看到actor系统本身可以被作为功能层次中的构建单元。</p>
 <h3 id="actor">Actor最佳实践</h3>
 <ul>
 <li>Actor应该被视为友好的同事：高效完成其工作，不会无必要地打扰其它人，也不会争抢资源。对应在编程中，其意思是以事件驱动的方式来处理事件并生成响应（或更多的请求）。Actor不应该因为某一个外部实体而阻塞（即占据一个线程又被动等待），这个外部实体可能是一个锁、一个网络socket等等；除非它是不可避免的，如下一节所述。</li>
@@ -1624,7 +1646,7 @@
 <li>顶级actor在错误内核最深处，所以尽量少创建它们并且选择真正的树形分层系统。这对故障处理有好处（同时考虑到配置的粒度和性能），它也减少了对监管actor这个竞争单点的过度使用。</li>
 </ul>
 <h3 id="">阻塞需要仔细的管理</h3>
-<p>在某些情况下，阻塞操作是不可避免的，即不定期休眠一个线程，等待外部事件唤醒。例如传统的关系型数据库的驱动程序或消息传递API，而深层的原因通常是出现幕后的（网络）I/O。面对这一点，你可能受到诱惑，只是将阻塞调用包装在 <code>Future</code> 中来替之工作，但这个策略太简单了：当应用的负载增加，你很可能会发现性能瓶颈，或者内存或线程出现耗尽。</p>
+<p>在某些情况下，阻塞操作是不可避免的，即必须不定期地休眠一个线程，等待外部事件唤醒。例如传统的关系型数据库的驱动程序或消息传递API，而深层的原因通常是出现幕后的（网络）I/O。面对这一点，你可能受到诱惑，只是将阻塞调用包装在 <code>Future</code> 中来替之工作，但这个策略太简单了：当应用的负载增加，你很可能会发现性能瓶颈，或者内存或线程出现耗尽。</p>
 <p>对“阻塞问题”的充分解决方案的清单是不会穷尽的，但肯定会有下面的建议：</p>
 <ul>
 <li>在一个actor（或由一个路由器[<a href="#TODO">Java</a>, <a href="../chapter3/06_routing.html">Scala</a>]管理的一组actor内）内进行阻塞调用，并确保配置一个线程池，它要足够大或者专门用于这一目的。</li>
@@ -1633,9 +1655,10 @@
 <li>奉献一个单独的线程来管理一组阻塞资源（如一个NIO选择器驱动多个频道），并在事件发生时把它们作为actor消息发送。</li>
 </ul>
 <p>第一个建议对本质上是单线程的资源特别适合，如传统数据库句柄一次只能执行一个未完成的查询，并使用内部同步保证这一点。一个常见的模式是对N个actor创建一个router，每个actor包装一个数据库连接，并处理发送给这个router的查询。数目<code>N</code>必须被调整为最大吞吐量，这个数字取决于什么数据库管理系统部署在什么硬件上。</p>
-<p>NOte
-注意
-配置线程池的任务最好代理给Akka来做，只要在<code>application.conf</code>中配置，并由<code>ActorSystem</code> [<a href="#TODO">Java</a>, <a href="../chapter3/04_dispatchers.html#dispatcher-lookup-scala">Scala</a>] 实例化即可。</p>
+<blockquote>
+<p>注意</p>
+<p>配置线程池的任务最好代理给Akka来做，只要在<code>application.conf</code>中配置，并由<code>ActorSystem</code> [<a href="#TODO">Java</a>, <a href="../chapter3/04_dispatchers.html#dispatcher-lookup-scala">Scala</a>] 实例化即可。</p>
+</blockquote>
 <h3 id="">你不应该担心的事</h3>
 <p>一个actor系统管理它所配置使用的资源，运行它所包含的actor。 在一个系统中可能有上百万个actor，不用担心，内存一定是够用的，因为每个actor实例仅占差不多300个字节。自然地，一个大系统中消息处理的具体顺序是不受应用开发者控制的，但这并不是有意为之。放松些，让Akka去做幕后的繁重事务吧。</p>
 

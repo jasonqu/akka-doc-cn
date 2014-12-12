@@ -1,0 +1,2322 @@
+<!DOCTYPE HTML>
+<html lang="en-US" >
+    
+    <head>
+        
+        <meta charset="UTF-8">
+        <title>路由 | AKKA 2.3.6 Scala 文档</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 1.0.3">
+        <meta name="HandheldFriendly" content="true"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+        <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+        
+    
+    
+    
+    <link rel="next" href="../chapter3/07_fsm.html" />
+    
+    
+    <link rel="prev" href="../chapter3/05_mailboxes.html" />
+    
+
+        
+    </head>
+    <body>
+        
+        
+<link rel="stylesheet" href="../gitbook/style.css">
+
+
+        
+    <div class="book"  data-level="3.6" data-basepath=".." data-revision="1418396877209">
+    
+
+<div class="book-summary">
+    <div class="book-search">
+        <input type="text" placeholder="Type to search" class="form-control" />
+    </div>
+    <ul class="summary">
+        
+    	
+    	
+    	
+
+        
+
+        
+    
+        
+        <li class="chapter " data-level="0" data-path="index.html">
+            
+                
+                    <a href="../index.html">
+                        <i class="fa fa-check"></i>
+                        
+                         Introduction
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="1" data-path="chapter1/introduction.html">
+            
+                
+                    <a href="../chapter1/introduction.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.</b>
+                        
+                         引言
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="1.1" data-path="chapter1/01_what_is_akka.html">
+            
+                
+                    <a href="../chapter1/01_what_is_akka.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.1.</b>
+                        
+                         Akka是什么?
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="1.2" data-path="chapter1/02_why_akka.html">
+            
+                
+                    <a href="../chapter1/02_why_akka.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.2.</b>
+                        
+                         为什么使用Akka?
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="1.3" data-path="chapter1/03_getting_started.html">
+            
+                
+                    <a href="../chapter1/03_getting_started.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.3.</b>
+                        
+                         入门
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="1.4" data-path="chapter1/04_the_obligatory_hello_world.html">
+            
+                
+                    <a href="../chapter1/04_the_obligatory_hello_world.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.4.</b>
+                        
+                         必修的“Hello World”
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="1.5" data-path="chapter1/05_usecase_and_deployment_scenarios.html">
+            
+                
+                    <a href="../chapter1/05_usecase_and_deployment_scenarios.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.5.</b>
+                        
+                         用例和部署场景
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="1.6" data-path="chapter1/06_examples_of_usecases_for_akka.html">
+            
+                
+                    <a href="../chapter1/06_examples_of_usecases_for_akka.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.6.</b>
+                        
+                         Akka使用实例
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2" data-path="chapter2/general.html">
+            
+                
+                    <a href="../chapter2/general.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.</b>
+                        
+                         概述
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="2.1" data-path="chapter2/01_terminology_concepts.html">
+            
+                
+                    <a href="../chapter2/01_terminology_concepts.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.1.</b>
+                        
+                         术语，概念
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2.2" data-path="chapter2/02_actor_systems.html">
+            
+                
+                    <a href="../chapter2/02_actor_systems.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.2.</b>
+                        
+                         Actor系统
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2.3" data-path="chapter2/03_what_is_an_actor.html">
+            
+                
+                    <a href="../chapter2/03_what_is_an_actor.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.3.</b>
+                        
+                         什么是Actor?
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2.4" data-path="chapter2/04_supervision_and_monitoring.html">
+            
+                
+                    <a href="../chapter2/04_supervision_and_monitoring.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.4.</b>
+                        
+                         监管与监控
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2.5" data-path="chapter2/05_actor_references_paths_and_addresses.html">
+            
+                
+                    <a href="../chapter2/05_actor_references_paths_and_addresses.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.5.</b>
+                        
+                         Actor引用, 路径与地址
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2.6" data-path="chapter2/06_location_transparency.html">
+            
+                
+                    <a href="../chapter2/06_location_transparency.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.6.</b>
+                        
+                         位置透明性
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2.7" data-path="chapter2/07_akka_and_the_java_memory_model.html">
+            
+                
+                    <a href="../chapter2/07_akka_and_the_java_memory_model.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.7.</b>
+                        
+                         Akka与Java内存模型
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2.8" data-path="chapter2/08_message_delivery_reliability.html">
+            
+                
+                    <a href="../chapter2/08_message_delivery_reliability.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.8.</b>
+                        
+                         消息发送语义
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="2.9" data-path="chapter2/09_configuration.html">
+            
+                
+                    <a href="../chapter2/09_configuration.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.9.</b>
+                        
+                         配置
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3" data-path="chapter3/actors.html">
+            
+                
+                    <a href="../chapter3/actors.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.</b>
+                        
+                         Actors
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="3.1" data-path="chapter3/01_actors.html">
+            
+                
+                    <a href="../chapter3/01_actors.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.1.</b>
+                        
+                         Actors
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.2" data-path="chapter3/02_typed_actors.html">
+            
+                
+                    <a href="../chapter3/02_typed_actors.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.2.</b>
+                        
+                         有类型Actor
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.3" data-path="chapter3/03_fault_tolerance.html">
+            
+                
+                    <a href="../chapter3/03_fault_tolerance.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.3.</b>
+                        
+                         容错
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="3.3.1" data-path="chapter3/03-1_fault_tolerance_sample.html">
+            
+                
+                    <a href="../chapter3/03-1_fault_tolerance_sample.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.3.1.</b>
+                        
+                         容错示例
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.4" data-path="chapter3/04_dispatchers.html">
+            
+                
+                    <a href="../chapter3/04_dispatchers.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.4.</b>
+                        
+                         调度器
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.5" data-path="chapter3/05_mailboxes.html">
+            
+                
+                    <a href="../chapter3/05_mailboxes.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.5.</b>
+                        
+                         邮箱
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter active" data-level="3.6" data-path="chapter3/06_routing.html">
+            
+                
+                    <a href="../chapter3/06_routing.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.6.</b>
+                        
+                         路由
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.7" data-path="chapter3/07_fsm.html">
+            
+                
+                    <a href="../chapter3/07_fsm.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.7.</b>
+                        
+                         有限状态机(FSM)
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.8" data-path="chapter3/08_persistence.html">
+            
+                
+                    <a href="../chapter3/08_persistence.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.8.</b>
+                        
+                         持久化
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.9" data-path="chapter3/09_testing_actor_systems.html">
+            
+                
+                    <a href="../chapter3/09_testing_actor_systems.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.9.</b>
+                        
+                         测试Actor系统
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="3.10" data-path="chapter3/10_actor_dsl.html">
+            
+                
+                    <a href="../chapter3/10_actor_dsl.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.10.</b>
+                        
+                         Actor DSL
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="4" data-path="chapter4/futures_and_agents.html">
+            
+                
+                    <a href="../chapter4/futures_and_agents.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>4.</b>
+                        
+                         Futures与Agents
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="4.1" data-path="chapter4/01_futures.html">
+            
+                
+                    <a href="../chapter4/01_futures.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>4.1.</b>
+                        
+                         Futures
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="4.2" data-path="chapter4/02_agents.html">
+            
+                
+                    <a href="../chapter4/02_agents.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>4.2.</b>
+                        
+                         Agents
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5" data-path="chapter5/networking.html">
+            
+                
+                    <a href="../chapter5/networking.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.</b>
+                        
+                         网络
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="5.1" data-path="chapter5/01_cluster_cpecification.html">
+            
+                
+                    <a href="../chapter5/01_cluster_cpecification.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.1.</b>
+                        
+                         集群规格
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5.2" data-path="chapter5/02_cluster_usage.html">
+            
+                
+                    <a href="../chapter5/02_cluster_usage.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.2.</b>
+                        
+                         集群用法
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5.3" data-path="chapter5/03_remoting.html">
+            
+                
+                    <a href="../chapter5/03_remoting.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.3.</b>
+                        
+                         远程
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5.4" data-path="chapter5/04_serialization.html">
+            
+                
+                    <a href="../chapter5/04_serialization.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.4.</b>
+                        
+                         序列化
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5.5" data-path="chapter5/05_io.html">
+            
+                
+                    <a href="../chapter5/05_io.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.5.</b>
+                        
+                         I/O
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5.6" data-path="chapter5/06_using_tcp.html">
+            
+                
+                    <a href="../chapter5/06_using_tcp.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.6.</b>
+                        
+                         使用TCP
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5.7" data-path="chapter5/07_using_udp.html">
+            
+                
+                    <a href="../chapter5/07_using_udp.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.7.</b>
+                        
+                         使用UDP
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5.8" data-path="chapter5/08_zeromq.html">
+            
+                
+                    <a href="../chapter5/08_zeromq.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.8.</b>
+                        
+                         ZeroMQ
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="5.9" data-path="chapter5/09_camel.html">
+            
+                
+                    <a href="../chapter5/09_camel.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.9.</b>
+                        
+                         Camel
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="6" data-path="chapter6/utilities.html">
+            
+                
+                    <a href="../chapter6/utilities.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.</b>
+                        
+                         实用工具
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="6.1" data-path="chapter6/01_event_bus.html">
+            
+                
+                    <a href="../chapter6/01_event_bus.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.1.</b>
+                        
+                         事件总线
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="6.2" data-path="chapter6/02_logging.html">
+            
+                
+                    <a href="../chapter6/02_logging.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.2.</b>
+                        
+                         日志
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="6.3" data-path="chapter6/03_scheduler.html">
+            
+                
+                    <a href="../chapter6/03_scheduler.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.3.</b>
+                        
+                         调度器
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="6.4" data-path="chapter6/04_duration.html">
+            
+                
+                    <a href="../chapter6/04_duration.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.4.</b>
+                        
+                         Duration
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="6.5" data-path="chapter6/05_circuit_breaker.html">
+            
+                
+                    <a href="../chapter6/05_circuit_breaker.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.5.</b>
+                        
+                         线路断路器
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="6.6" data-path="chapter6/06_akka_extensions.html">
+            
+                
+                    <a href="../chapter6/06_akka_extensions.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.6.</b>
+                        
+                         Akka扩展
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="6.7" data-path="chapter6/07_microkernel.html">
+            
+                
+                    <a href="../chapter6/07_microkernel.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.7.</b>
+                        
+                         微内核
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7" data-path="chapter7/howto_common_patterns.html">
+            
+                
+                    <a href="../chapter7/howto_common_patterns.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.</b>
+                        
+                         如何使用：常用模式
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="7.1" data-path="chapter7/01_throttling_messages.html">
+            
+                
+                    <a href="../chapter7/01_throttling_messages.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.1.</b>
+                        
+                         消息限流
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.2" data-path="chapter7/02_balancing_workload_across_nodes.html">
+            
+                
+                    <a href="../chapter7/02_balancing_workload_across_nodes.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.2.</b>
+                        
+                         跨节点平衡工作负载
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.3" data-path="chapter7/03_work_pulling_pattern.html">
+            
+                
+                    <a href="../chapter7/03_work_pulling_pattern.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.3.</b>
+                        
+                         工作拉取模式，来限流和分发工作，防止邮箱溢出
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.4" data-path="chapter7/04_ordered_termination.html">
+            
+                
+                    <a href="../chapter7/04_ordered_termination.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.4.</b>
+                        
+                         顺序终止
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.5" data-path="chapter7/05_akka_amqp_proxies.html">
+            
+                
+                    <a href="../chapter7/05_akka_amqp_proxies.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.5.</b>
+                        
+                         Akka AMQP代理
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.6" data-path="chapter7/06_shutdown_patterns.html">
+            
+                
+                    <a href="../chapter7/06_shutdown_patterns.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.6.</b>
+                        
+                         Akka 2中的关闭模式
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.7" data-path="chapter7/07_distributed_graph_processing.html">
+            
+                
+                    <a href="../chapter7/07_distributed_graph_processing.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.7.</b>
+                        
+                         使用Akka做分布式（内存）图像处理
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.8" data-path="chapter7/08_an_autoupdating_cache_using_actors.html">
+            
+                
+                    <a href="../chapter7/08_an_autoupdating_cache_using_actors.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.8.</b>
+                        
+                         案例分析：一个使用Actor的自动更新缓存
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.9" data-path="chapter7/09_spider_pattern.html">
+            
+                
+                    <a href="../chapter7/09_spider_pattern.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.9.</b>
+                        
+                         使用蜘蛛模式发现actor系统的消息流向
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.10" data-path="chapter7/10_scheduling_periodic_messages.html">
+            
+                
+                    <a href="../chapter7/10_scheduling_periodic_messages.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.10.</b>
+                        
+                         周期信息调度
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="7.11" data-path="chapter7/11_template_pattern.html">
+            
+                
+                    <a href="../chapter7/11_template_pattern.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.11.</b>
+                        
+                         模板模式
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="8" data-path="chapter8/experimental_modules.html">
+            
+                
+                    <a href="../chapter8/experimental_modules.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.</b>
+                        
+                         实验模块
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="8.1" data-path="chapter3/08_persistence.html">
+            
+                
+                    <a href="../chapter3/08_persistence.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.1.</b>
+                        
+                         持久化
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="8.2" data-path="chapter8/02_multi_node_testing.html">
+            
+                
+                    <a href="../chapter8/02_multi_node_testing.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.2.</b>
+                        
+                         多节点测试
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="8.3" data-path="chapter8/03_actors.html">
+            
+                
+                    <a href="../chapter8/03_actors.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.3.</b>
+                        
+                         Actors(使用Java的Lambda支持)
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="8.4" data-path="chapter8/04_fsm.html">
+            
+                
+                    <a href="../chapter8/04_fsm.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.4.</b>
+                        
+                         FSM(使用Java的Lambda支持)
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="8.5" data-path="chapter8/05_external_contributions.html">
+            
+                
+                    <a href="../chapter8/05_external_contributions.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.5.</b>
+                        
+                         外部贡献
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="9" data-path="chapter9/information_for_akka_developers.html">
+            
+                
+                    <a href="../chapter9/information_for_akka_developers.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.</b>
+                        
+                         Akka开发者信息
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="9.1" data-path="chapter9/01_building_akka.html">
+            
+                
+                    <a href="../chapter9/01_building_akka.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.1.</b>
+                        
+                         构建Akka
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="9.2" data-path="chapter9/02_multi_jvm_testing.html">
+            
+                
+                    <a href="../chapter9/02_multi_jvm_testing.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.2.</b>
+                        
+                         多JVM测试
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="9.3" data-path="chapter9/03_io_layer_design.html">
+            
+                
+                    <a href="../chapter9/03_io_layer_design.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.3.</b>
+                        
+                         I/O层设计
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="9.4" data-path="chapter9/04_developer_guidelines.html">
+            
+                
+                    <a href="../chapter9/04_developer_guidelines.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.4.</b>
+                        
+                         开发指南
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="9.5" data-path="chapter9/05_documentation_guidelines.html">
+            
+                
+                    <a href="../chapter9/05_documentation_guidelines.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.5.</b>
+                        
+                         文档指南
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="9.6" data-path="chapter9/06_team.html">
+            
+                
+                    <a href="../chapter9/06_team.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.6.</b>
+                        
+                         团队
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="10" data-path="chapter10/project_information.html">
+            
+                
+                    <a href="../chapter10/project_information.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>10.</b>
+                        
+                         工程信息
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="10.1" data-path="chapter10/01_migration_guides.html">
+            
+                
+                    <a href="../chapter10/01_migration_guides.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>10.1.</b>
+                        
+                         迁移指南
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="10.2" data-path="chapter10/02_issue_tracking.html">
+            
+                
+                    <a href="../chapter10/02_issue_tracking.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>10.2.</b>
+                        
+                         问题追踪
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="10.3" data-path="chapter10/03_licenses.html">
+            
+                
+                    <a href="../chapter10/03_licenses.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>10.3.</b>
+                        
+                         许可证
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="10.4" data-path="chapter10/04_sponsors.html">
+            
+                
+                    <a href="../chapter10/04_sponsors.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>10.4.</b>
+                        
+                         赞助商
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="10.5" data-path="chapter10/05_project.html">
+            
+                
+                    <a href="../chapter10/05_project.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>10.5.</b>
+                        
+                         项目
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="11" data-path="chapter11/additional_information.html">
+            
+                
+                    <a href="../chapter11/additional_information.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>11.</b>
+                        
+                         附加信息
+                    </a>
+                
+            
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="11.1" data-path="chapter11/01_faq.html">
+            
+                
+                    <a href="../chapter11/01_faq.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>11.1.</b>
+                        
+                         常见问题
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="11.2" data-path="chapter11/02_books.html">
+            
+                
+                    <a href="../chapter11/02_books.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>11.2.</b>
+                        
+                         图书
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="11.3" data-path="chapter11/03_other_language_bindings.html">
+            
+                
+                    <a href="../chapter11/03_other_language_bindings.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>11.3.</b>
+                        
+                         其他语言绑定
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="11.4" data-path="chapter11/04_akka_in_osgi.html">
+            
+                
+                    <a href="../chapter11/04_akka_in_osgi.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>11.4.</b>
+                        
+                         Akka与OSGi
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="11.5" data-path="chapter11/05_incomplete_list_of_http_frameworks.html">
+            
+                
+                    <a href="../chapter11/05_incomplete_list_of_http_frameworks.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>11.5.</b>
+                        
+                         部分HTTP框架名单
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+
+        
+        <li class="divider"></li>
+        <li>
+            <a href="http://www.gitbook.io/" target="blank" class="gitbook-link">Published using GitBook</a>
+        </li>
+        
+    </ul>
+</div>
+
+    <div class="book-body">
+        <div class="body-inner">
+            <div class="book-header">
+    <!-- Actions Left -->
+    <a href="#" class="btn pull-left toggle-summary" aria-label="Toggle summary"><i class="fa fa-align-justify"></i></a>
+    <a href="#" class="btn pull-left toggle-search" aria-label="Toggle search"><i class="fa fa-search"></i></a>
+    
+    <div id="font-settings-wrapper" class="dropdown pull-left">
+        <a href="#" class="btn toggle-dropdown" aria-label="Toggle font settings"><i class="fa fa-font"></i>
+        </a>
+        <div class="dropdown-menu font-settings">
+    <div class="dropdown-caret">
+        <span class="caret-outer"></span>
+        <span class="caret-inner"></span>
+    </div>
+
+    <div class="buttons">
+        <button type="button" id="reduce-font-size" class="button size-2">A</button>
+        <button type="button" id="enlarge-font-size" class="button size-2">A</button>
+    </div>
+
+    <div class="buttons font-family-list">
+        <button type="button" data-font="0" class="button">Serif</button>
+        <button type="button" data-font="1" class="button">Sans</button>
+    </div>
+
+    <div class="buttons color-theme-list">
+        <button type="button" id="color-theme-preview-0" class="button size-3" data-theme="0">White</button>
+        <button type="button" id="color-theme-preview-1" class="button size-3" data-theme="1">Sepia</button>
+        <button type="button" id="color-theme-preview-2" class="button size-3" data-theme="2">Night</button>
+    </div>
+</div>
+
+    </div>
+
+    <!-- Actions Right -->
+    
+    <div class="dropdown pull-right">
+        <a href="#" class="btn toggle-dropdown" aria-label="Toggle share dropdown"><i class="fa fa-share-alt"></i>
+        </a>
+        <div class="dropdown-menu font-settings dropdown-left">
+            <div class="dropdown-caret">
+                <span class="caret-outer"></span>
+                <span class="caret-inner"></span>
+            </div>
+            <div class="buttons">
+                <button type="button" data-sharing="twitter" class="button">Twitter</button>
+                <button type="button" data-sharing="google-plus" class="button">Google</button>
+                <button type="button" data-sharing="facebook" class="button">Facebook</button>
+                <button type="button" data-sharing="weibo" class="button">Weibo</button>
+                <button type="button" data-sharing="instapaper" class="button">Instapaper</button>
+            </div>
+        </div>
+    </div>
+    
+
+    
+    <a href="#" target="_blank" class="btn pull-right google-plus-sharing-link sharing-link" data-sharing="google-plus" aria-label="Share on Google Plus"><i class="fa fa-google-plus"></i></a>
+    
+    
+    <a href="#" target="_blank" class="btn pull-right facebook-sharing-link sharing-link" data-sharing="facebook" aria-label="Share on Facebook"><i class="fa fa-facebook"></i></a>
+    
+    
+    <a href="#" target="_blank" class="btn pull-right twitter-sharing-link sharing-link" data-sharing="twitter" aria-label="Share on Twitter"><i class="fa fa-twitter"></i></a>
+    
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="../" >AKKA 2.3.6 Scala 文档</a>
+    </h1>
+</div>
+
+            <div class="page-wrapper" tabindex="-1">
+                <div class="page-inner">
+                
+                
+                    <section class="normal" id="section-gitbook_20">
+                    
+                        <h1 id="">路由</h1>
+<p>消息可以通过路由器发送，以便有效地将它们路由到目的actor，称为其<em>routee</em>。一个<code>Router</code>可以在actor内部或外部使用，并且你可以自己管理routee或使用有配置功能的自我包含的路由actor。</p>
+<p>根据你应用程序的需求，可以使用不同的路由策略。Akka附带了几个有用的路由策略，开箱即用。但是正如将在这一章中看到地，你也可以<a href="#custom-router-scala">创建自己的路由</a>。</p>
+<p><span id="simple-router-scala"></span></p>
+<h3 id="">一个简单的路由器</h3>
+<p>下面的示例阐释如何使用<code>Router</code>和在actor内管理routee。</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.routing.<span class="hljs-type">ActorRefRoutee</span>
+<span class="hljs-keyword">import</span> akka.routing.<span class="hljs-type">Router</span>
+<span class="hljs-keyword">import</span> akka.routing.<span class="hljs-type">RoundRobinRoutingLogic</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Master</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
+  <span class="hljs-keyword">var</span> router = {
+    <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">routees</span> =</span> <span class="hljs-type">Vector</span>.fill(<span class="hljs-number">5</span>) {
+      <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">r</span> =</span> context.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>])
+      context watch r
+      <span class="hljs-type">ActorRefRoutee</span>(r)
+    }
+    <span class="hljs-type">Router</span>(<span class="hljs-type">RoundRobinRoutingLogic</span>(), routees)
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
+    <span class="hljs-keyword">case</span> w: <span class="hljs-type">Work</span> =&gt;
+      router.route(w, sender())
+    <span class="hljs-keyword">case</span> <span class="hljs-type">Terminated</span>(a) =&gt;
+      router = router.removeRoutee(a)
+      <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">r</span> =</span> context.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>])
+      context watch r
+      router = router.addRoutee(r)
+  }
+}
+</code></pre>
+<p>我们创建一个<code>Router</code>，并指定当路由消息到routee时，它应该使用<code>RoundRobinRoutingLogic</code>。</p>
+<p>Akka自带的路由逻辑如下：</p>
+<ul>
+<li><code>akka.routing.RoundRobinRoutingLogic</code></li>
+<li>``akka.routing.RandomRoutingLogic```</li>
+<li><code>akka.routing.SmallestMailboxRoutingLogic</code></li>
+<li><code>akka.routing.BroadcastRoutingLogic</code></li>
+<li><code>akka.routing.ScatterGatherFirstCompletedRoutingLogic</code></li>
+<li><code>akka.routing.TailChoppingRoutingLogic</code></li>
+<li><code>akka.routing.ConsistentHashingRoutingLogic</code></li>
+</ul>
+<p>我们像在<code>ActorRefRoutee</code>包装下创建普通子actor一样创建routee。我们监控routee从而能够在它们被终止的请款下取代他们。</p>
+<p>通过路由器发送消息是用<code>route</code>方法完成的，像上面例子中的<code>Work</code>消息一样。</p>
+<p><code>Router</code>是不可变的，而<code>RoutingLogic</code>是线程安全的；意味着他们也可以在actor外部使用。</p>
+<blockquote>
+<p>注意</p>
+<p>一般情况下，任何发送到路由器的消息将被向前发送到它的routee，但有一个例外。特别地<a href="#broadcast-messages-scala">广播消息</a>将发送到路由器下<em>所有</em>的routee</p>
+</blockquote>
+<h3 id="actor">一个路由actor</h3>
+<p>一个路由器也可以被创建为一个自包含的actor，来管理routee，载入路由逻辑和其他配置设置。</p>
+<p>这种类型的路由actor有两种不同的模式：</p>
+<ul>
+<li>池——路由器创建routee作为子actor，并在其终止时将它从路由器中移除。</li>
+<li>群组——routee actor在路由器外部创建，而路由器将通过使用actor选择将消息发送到指定路径，而不监控其终止。</li>
+</ul>
+<p>路由actor可以通过在配置中或以编程方式被定义。虽然路由actor可以在配置文件中定义，但仍然必须以编程方式创建，即你不能只通过外部配置创建路由器。如果你在配置文件中定义路由actor，则实际将使用这些设置，而不是以编程方式提供的参数。</p>
+<p>你可以通过路由actor向routee 发送消息，就像向普通actor发消息一样，即通过其<code>ActorRef</code>。路由actor转发消息给routee时不会更改原始发件人。当routee答复路由消息时，回复将发送到原始发件人，而不是路由actor。</p>
+<blockquote>
+<p>注意</p>
+<p>一般地，任何发送到路由器的消息将被向前发送到它的routee，但也有几个例外。这些记录在下面<a href="#router-special-messages-scala">特殊处理消息</a>一节中。</p>
+</blockquote>
+<h5 id="">池</h5>
+<p>下面的代码和配置片段展示了如何创建一个将消息转发给五个<code>Worker</code> routee的<a href="#round-robin-router-scala">轮循(<code>round-robin</code>)路由器</a>。Routees 将被创建为路由器的子actor。</p>
+<pre><code>akka.actor.deployment {
+  /parent/router1 {
+    router = round-robin-pool
+    nr-of-instances = 5
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router1</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router1"</span>)
+</code></pre>
+<p>这里是相同的例子，但路由配置是以编程方式而不是从配置获取。</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router2</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">RoundRobinPool</span>(<span class="hljs-number">5</span>).props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router2"</span>)
+</code></pre>
+<h5 id="routee">远程部署的Routee</h5>
+<p>除了能够创建本地actor作为routee，你可以指示路由器来部署其子actor到一系列远程主机上。Routee将以轮循方式被部署。若要远程部署routee，将路由配置包在一个<code>RemoteRouterConfig</code>下，附加要部署到的节点的远程地址。远程部署要求<code>akka-remote</code>模块被包含在类路径中。</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.{ <span class="hljs-type">Address</span>, <span class="hljs-type">AddressFromURIString</span> }
+<span class="hljs-keyword">import</span> akka.remote.routing.<span class="hljs-type">RemoteRouterConfig</span>
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">addresses</span> =</span> <span class="hljs-type">Seq</span>(
+  <span class="hljs-type">Address</span>(<span class="hljs-string">"akka.tcp"</span>, <span class="hljs-string">"remotesys"</span>, <span class="hljs-string">"otherhost"</span>, <span class="hljs-number">1234</span>),
+  <span class="hljs-type">AddressFromURIString</span>(<span class="hljs-string">"akka.tcp://othersys@anotherhost:1234"</span>))
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">routerRemote</span> =</span> system.actorOf(
+  <span class="hljs-type">RemoteRouterConfig</span>(<span class="hljs-type">RoundRobinPool</span>(<span class="hljs-number">5</span>), addresses).props(<span class="hljs-type">Props</span>[<span class="hljs-type">Echo</span>]))
+</code></pre>
+<h5 id="">发送者</h5>
+<p>默认情况下，当一个routee发送一条消息，它将<a href="01_actors.html#actors-tell-sender-scala">隐式地设置自身为发送者</a>。</p>
+<pre><code class="lang-scala">sender() ! x <span class="hljs-comment">// replies will go to this actor</span>
+</code></pre>
+<p>然而，通常为routee将<em>路由器</em>设置为发送者更有用。例如，你可能想要将路由器设置为发件人，如果你想要隐藏在路由器后面routee的 细节。下面的代码片段演示如何设置父路由器作为发送者。</p>
+<pre><code class="lang-scala">sender().tell(<span class="hljs-string">"reply"</span>, context.parent) <span class="hljs-comment">// replies will go back to parent</span>
+sender().!(<span class="hljs-string">"reply"</span>)(context.parent) <span class="hljs-comment">// alternative syntax (beware of the parens!)</span>
+</code></pre>
+<h5 id="">监管</h5>
+<p>由池路由器创建的routee将成为路由器的孩子。因此，路由器也是子actor的监管者。</p>
+<p>可以用该池的<code>supervisorStrategy</code>属性配置路由器actor的监管策略。如果没有提供配置，路由器的默认策略是&quot;总是上溯&quot;。这意味着错误都会向上传递给路由器的监管者进行处理。路由器的监管者将决定对任何错误该做什么。</p>
+<p>请注意路由器的监管者将把错误视为路由器本身的错误。因此一个指令，用于停止或重新启动将导致路由器<em>本身</em>以停止或重新启动。此路由器，反过来，将导致它的孩子停止并重新启动。</p>
+<p>应该提到的是路由器重新启动行为已被重写，以便重新启动时，仍重新创建这些孩子，并会在池中保留相同数量的actor。</p>
+<p>这意味着如果你还没有指定路由器或其父节点中的<code>supervisorStrategy</code>，routee的失败会升级到路由器，并将在默认情况下重新启动路由器，从而将重新启动所有的routee（它使用升级。并在重新启动过程中不停止routee）。原因是为了使类似在子actor定义中添加<code>.withRouter</code>这样的默认行为，不会更改应用于子actor的监管策略。你可以在定义路由器时指定策略来避免低效。</p>
+<p>设置策略是很容易完成的：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">escalator</span> =</span> <span class="hljs-type">OneForOneStrategy</span>() {
+  <span class="hljs-keyword">case</span> e ⇒ testActor ! e; <span class="hljs-type">SupervisorStrategy</span>.<span class="hljs-type">Escalate</span>
+}
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router</span> =</span> system.actorOf(<span class="hljs-type">RoundRobinPool</span>(<span class="hljs-number">1</span>, supervisorStrategy = escalator).props(
+  routeeProps = <span class="hljs-type">Props</span>[<span class="hljs-type">TestActor</span>]))
+</code></pre>
+<p><p class="first admonition-title">Note</p></p>
+<blockquote>
+<p>注意</p>
+<p>如果路由器池的子actor终止，池路由器不会自动产生一个新的actor。在所有池路由器所有儿童都终止的事件中，路由器将终止本身除非它是一个动态的路由器，例如使用了大小调整。</p>
+</blockquote>
+<h5 id="">群组</h5>
+<p>有时候，相比于由路由actor创建其routee，我们更希望单独创建 routee，并提供路由器供其使用。你可以通过将 routee路径传递给路由器的配置来实现。消息将通过<code>ActorSelection</code>发送到这些路径。</p>
+<p>下面的示例演示如何通过提供三个routee actor的路径字符串来创建一个路由器。</p>
+<pre><code>akka.actor.deployment {
+  /parent/router3 {
+    router = round-robin-group
+    routees.paths = [&quot;/user/workers/w1&quot;, &quot;/user/workers/w2&quot;, &quot;/user/workers/w3&quot;]
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router3</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(), <span class="hljs-string">"router3"</span>)
+</code></pre>
+<p>这里是相同的例子，但路由配置是以编程方式而不是从配置获取。</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router4</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">RoundRobinGroup</span>(paths).props(), <span class="hljs-string">"router4"</span>)
+</code></pre>
+<p>Routee actor将在路由器外部被创建：</p>
+<pre><code class="lang-scala">system.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">Workers</span>], <span class="hljs-string">"workers"</span>)
+</code></pre>
+<pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Workers</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
+  context.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>], name = <span class="hljs-string">"w1"</span>)
+  context.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>], name = <span class="hljs-string">"w2"</span>)
+  context.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>], name = <span class="hljs-string">"w3"</span>)
+  <span class="hljs-comment">// ...</span>
+</code></pre>
+<p>在路径中可能包含为actor在远程主机上运行的协议和地址信息。远程部署要求<code>akka-remote</code>模块被包含在类路径中。</p>
+<h3 id="">路由器使用</h3>
+<p>在本节中，我们将描述如何创建不同类型的路由actor。</p>
+<p>本节中的路由actor将由名为<code>parent</code>的顶级actor创建。请注意在配置中的部署路径以<code>/parent/</code>开头，并紧接着路由actor的名字。</p>
+<pre><code class="lang-scala">system.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">Parent</span>], <span class="hljs-string">"parent"</span>)
+</code></pre>
+<p><span id="round-robin-router-scala"></span></p>
+<h5 id="roundrobinpool--roundrobingroup">RoundRobinPool 和 RoundRobinGroup</h5>
+<p>对其routee使用<a href="http://en.wikipedia.org/wiki/Round-robin" target="_blank">轮循机制(round-robin)</a>轮询。</p>
+<p>在配置中定义的RoundRobinPool：</p>
+<pre><code>akka.actor.deployment {
+  /parent/router1 {
+    router = round-robin-pool
+    nr-of-instances = 5
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router1</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router1"</span>)
+</code></pre>
+<p>在代码中定义的RoundRobinPool：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router2</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">RoundRobinPool</span>(<span class="hljs-number">5</span>).props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router2"</span>)
+</code></pre>
+<p>在配置中定义的RoundRobinGroup：</p>
+<pre><code>akka.actor.deployment {
+  /parent/router3 {
+    router = round-robin-group
+    routees.paths = [&quot;/user/workers/w1&quot;, &quot;/user/workers/w2&quot;, &quot;/user/workers/w3&quot;]
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router3</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(), <span class="hljs-string">"router3"</span>)
+</code></pre>
+<p>在代码中定义的RoundRobinGroup：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">paths</span> =</span> <span class="hljs-type">List</span>(<span class="hljs-string">"/user/workers/w1"</span>, <span class="hljs-string">"/user/workers/w2"</span>, <span class="hljs-string">"/user/workers/w3"</span>)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router4</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">RoundRobinGroup</span>(paths).props(), <span class="hljs-string">"router4"</span>)
+</code></pre>
+<h5 id="randompool--randomgroup">RandomPool 和 RandomGroup</h5>
+<p>该路由器类型会对每一条消息随机选择其routee。</p>
+<p>在配置中定义的RandomPool：</p>
+<pre><code>akka.actor.deployment {
+  /parent/router5 {
+    router = random-pool
+    nr-of-instances = 5
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router5</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router5"</span>)
+</code></pre>
+<p>在代码中定义的RandomPool：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router6</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">RandomPool</span>(<span class="hljs-number">5</span>).props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router6"</span>)
+</code></pre>
+<p>在配置中定义的RandomGroup：</p>
+<pre><code>akka.actor.deployment {
+  /parent/router7 {
+    router = random-group
+    routees.paths = [&quot;/user/workers/w1&quot;, &quot;/user/workers/w2&quot;, &quot;/user/workers/w3&quot;]
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router7</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(), <span class="hljs-string">"router7"</span>)
+</code></pre>
+<p>在代码中定义的RandomGroup：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">paths</span> =</span> <span class="hljs-type">List</span>(<span class="hljs-string">"/user/workers/w1"</span>, <span class="hljs-string">"/user/workers/w2"</span>, <span class="hljs-string">"/user/workers/w3"</span>)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router8</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">RandomGroup</span>(paths).props(), <span class="hljs-string">"router8"</span>)
+</code></pre>
+<p><span id="balancing-pool-scala"></span></p>
+<h5 id="balancingpool">BalancingPool</h5>
+<p>将尝试重新从繁忙routee分配分配任务到空闲routee的路由器。所有routee都共享同一个邮箱。</p>
+<p>在配置中定义的BalancingPool：</p>
+<pre><code>akka.actor.deployment {
+  /parent/router9 {
+    router = balancing-pool
+    nr-of-instances = 5
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router9</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router9"</span>)
+</code></pre>
+<p>在代码中定义的BalancingPool：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router10</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">BalancingPool</span>(<span class="hljs-number">5</span>).props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router10"</span>)
+</code></pre>
+<p>平衡调度器的额外配置，被池使用，可以通过路由部署配置的<code>pool-dispatcher</code>节进行设定。</p>
+<pre><code class="lang-scala">akka.actor.deployment {
+  /parent/router9b {
+    router = balancing-pool
+    nr-of-instances = <span class="hljs-number">5</span>
+    pool-dispatcher {
+      attempt-teamwork = off
+    }
+  }
+}
+</code></pre>
+<p>对BalancingPool没有群组变体。</p>
+<h5 id="smallestmailboxpool">SmallestMailboxPool</h5>
+<p>试图向邮箱中有最少消息的非暂停子routee发送消息的路由器。按此顺序进行选择：</p>
+<ul>
+<li>挑选有空邮箱的空闲routee（不处理消息）</li>
+<li>选择任一空邮箱routee</li>
+<li>选择邮箱中有最少挂起消息的routee</li>
+<li>选择任一远程routee，远程actor考虑优先级最低，因为其邮箱大小未知</li>
+</ul>
+<p>在配置中定义的SmallestMailboxPool：</p>
+<pre><code>akka.actor.deployment {
+  /parent/router11 {
+    router = smallest-mailbox-pool
+    nr-of-instances = 5
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router11</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router11"</span>)
+</code></pre>
+<p>在代码中定义的SmallestMailboxPool：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router12</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">SmallestMailboxPool</span>(<span class="hljs-number">5</span>).props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router12"</span>)
+</code></pre>
+<p>SmallestMailboxPool没有群组变体，因为邮箱大小和actor的内部调度状态从routee的路径看实际上是不可用的。</p>
+<h5 id="broadcastpool--broadcastgroup">BroadcastPool 和 BroadcastGroup</h5>
+<p>广播的路由器将接收到的消息转发到它<em>所有</em>的routee。</p>
+<p>在配置中定义的BroadcastPool：</p>
+<pre><code>akka.actor.deployment {
+  /parent/router13 {
+    router = broadcast-pool
+    nr-of-instances = 5
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router13</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router13"</span>)
+</code></pre>
+<p>在代码中定义的BroadcastPool：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router14</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">BroadcastPool</span>(<span class="hljs-number">5</span>).props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router14"</span>)
+</code></pre>
+<p>在配置中定义的BroadcastGroup：</p>
+<pre><code>akka.actor.deployment {
+  /parent/router15 {
+    router = broadcast-group
+    routees.paths = [&quot;/user/workers/w1&quot;, &quot;/user/workers/w2&quot;, &quot;/user/workers/w3&quot;]
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router15</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(), <span class="hljs-string">"router15"</span>)
+</code></pre>
+<p>在代码中定义的BroadcastGroup：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">paths</span> =</span> <span class="hljs-type">List</span>(<span class="hljs-string">"/user/workers/w1"</span>, <span class="hljs-string">"/user/workers/w2"</span>, <span class="hljs-string">"/user/workers/w3"</span>)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router16</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">BroadcastGroup</span>(paths).props(), <span class="hljs-string">"router16"</span>)
+</code></pre>
+<blockquote>
+<p>注意</p>
+<p>Broadcast路由器总是向其routee广播<em>每一条</em>消息。如果你不想播出每条消息，则你可以使用非广播路由器并使用所需的<a href="#broadcast-messages-scala">广播消息</a>。</p>
+</blockquote>
+<h5 id="scattergatherfirstcompletedpool--scattergatherfirstcompletedgroup">ScatterGatherFirstCompletedPool 和 ScatterGatherFirstCompletedGroup</h5>
+<p>ScatterGatherFirstCompletedRouter将会把消息发送到它所有的routee。然后它等待知道收到的第一个答复。该结果将发送回原始发送者。其他的答复将被丢弃。</p>
+<p>在配置的时间内，它期待至少一个答复，否则它将回复一个包含<code>akka.pattern.AskTimeoutException</code>的<code>akka.actor.Status.Failure</code>。</p>
+<p>在配置中定义的ScatterGatherFirstCompletedPool：</p>
+<pre><code>akka.actor.deployment {
+  /parent/router17 {
+    router = scatter-gather-pool
+    nr-of-instances = 5
+    within = 10 seconds
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router17</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router17"</span>)
+</code></pre>
+<p>在代码中定义的ScatterGatherFirstCompletedPool：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router18</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">ScatterGatherFirstCompletedPool</span>(<span class="hljs-number">5</span>, within = <span class="hljs-number">10.</span>seconds).
+    props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router18"</span>)
+</code></pre>
+<p>在配置中定义的ScatterGatherFirstCompletedGroup：</p>
+<pre><code>akka.actor.deployment {
+  /parent/router19 {
+    router = scatter-gather-group
+    routees.paths = [&quot;/user/workers/w1&quot;, &quot;/user/workers/w2&quot;, &quot;/user/workers/w3&quot;]
+    within = 10 seconds
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router19</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(), <span class="hljs-string">"router19"</span>)
+</code></pre>
+<p>在代码中定义的ScatterGatherFirstCompletedGroup：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">paths</span> =</span> <span class="hljs-type">List</span>(<span class="hljs-string">"/user/workers/w1"</span>, <span class="hljs-string">"/user/workers/w2"</span>, <span class="hljs-string">"/user/workers/w3"</span>)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router20</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">ScatterGatherFirstCompletedGroup</span>(paths,
+    within = <span class="hljs-number">10.</span>seconds).props(), <span class="hljs-string">"router20"</span>)
+</code></pre>
+<h5 id="tailchoppingpool--tailchoppinggroup">TailChoppingPool 和 TailChoppingGroup</h5>
+<p>TailChoppingRouter 将首先发送消息到一个随机挑取的routee，短暂的延迟后发给第二个routee（从剩余的routee中随机挑选），以此类推。它等待第一个答复，并将它转回给原始发送者。其他答复将被丢弃。</p>
+<p>此路由器的目标是通过查询到多个routee来减少延迟，假设其他的actor之一仍可能比第一个actor更快响应。</p>
+<p>Peter Bailis很好地在一篇博客文章中描述了这个优化： <a href="http://www.bailis.org/blog/doing-redundant-work-to-speed-up-distributed-queries/" target="_blank">做冗余的工作，以加快分布式查询</a>。</p>
+<p>在配置中定义的TailChoppingPool：</p>
+<pre><code>akka.actor.deployment {
+  /parent/router21 {
+    router = tail-chopping-pool
+    nr-of-instances = 5
+    within = 10 seconds
+    tail-chopping-router.interval = 20 milliseconds
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router21</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router21"</span>)
+</code></pre>
+<p>在代码中定义的TailChoppingPool：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router22</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">TailChoppingPool</span>(<span class="hljs-number">5</span>, within = <span class="hljs-number">10.</span>seconds, interval = <span class="hljs-number">20.</span>millis).
+    props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router22"</span>)
+</code></pre>
+<p>在配置中定义的TailChoppingGroup：</p>
+<pre><code>akka.actor.deployment {
+  /parent/router23 {
+    router = tail-chopping-group
+    routees.paths = [&quot;/user/workers/w1&quot;, &quot;/user/workers/w2&quot;, &quot;/user/workers/w3&quot;]
+    within = 10 seconds
+    tail-chopping-router.interval = 20 milliseconds
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router23</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(), <span class="hljs-string">"router23"</span>)
+</code></pre>
+<p>在代码中定义的TailChoppingGroup：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">paths</span> =</span> <span class="hljs-type">List</span>(<span class="hljs-string">"/user/workers/w1"</span>, <span class="hljs-string">"/user/workers/w2"</span>, <span class="hljs-string">"/user/workers/w3"</span>)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router24</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">TailChoppingGroup</span>(paths,
+    within = <span class="hljs-number">10.</span>seconds, interval = <span class="hljs-number">20.</span>millis).props(), <span class="hljs-string">"router24"</span>)
+</code></pre>
+<h5 id="consistenthashingpool--consistenthashinggroup">ConsistentHashingPool 和 ConsistentHashingGroup</h5>
+<p>ConsistentHashingPool基于已发送的消息使用<a href="http://en.wikipedia.org/wiki/Consistent_hashing" target="_blank">一致性哈希(consistent hashing)</a>选择routee。<a href="http://weblogs.java.net/blog/tomwhite/archive/2007/11/consistent_hash.html" target="_blank">这篇文章</a>给出了如何实现一致性哈希非常好的见解。</p>
+<p>有三种方式来定义使用哪些数据作为一致的散列键。</p>
+<ul>
+<li>您可以定义路由的<code>hashMapping</code>，将传入的消息映射到它们一致散列键。这使决策对发送者透明。</li>
+<li>这些消息可能会实现<code>akka.routing.ConsistentHashingRouter.ConsistentHashable</code>。键是消息的一部分，并很方便地与消息定义一起定义。</li>
+<li>消息可以被包装在一个<code>akka.routing.ConsistentHashingRouter.ConsistentHashableEnvelope</code>中，来定义哪些数据可以用来做一致性哈希。发送者知道要使用的键。</li>
+</ul>
+<p>这些定义一致性哈希键的方法，可以同时对一个路由器在一起使用。<code>hashMapping</code>被第一个尝试。</p>
+<p>代码示例：</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Actor</span>
+<span class="hljs-keyword">import</span> akka.routing.<span class="hljs-type">ConsistentHashingRouter</span>.<span class="hljs-type">ConsistentHashable</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Cache</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
+  <span class="hljs-keyword">var</span> cache = <span class="hljs-type">Map</span>.empty[<span class="hljs-type">String</span>, <span class="hljs-type">String</span>]
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
+    <span class="hljs-keyword">case</span> <span class="hljs-type">Entry</span>(key, value) =&gt; cache += (key -&gt; value)
+    <span class="hljs-keyword">case</span> <span class="hljs-type">Get</span>(key)          =&gt; sender() ! cache.get(key)
+    <span class="hljs-keyword">case</span> <span class="hljs-type">Evict</span>(key)        =&gt; cache -= key
+  }
+}
+
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Evict</span>(</span>key: <span class="hljs-type">String</span>)
+
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Get</span>(</span>key: <span class="hljs-type">String</span>) <span class="hljs-keyword">extends</span> <span class="hljs-type">ConsistentHashable</span> {
+  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">consistentHashKey</span>:</span> <span class="hljs-type">Any</span> = key
+}
+
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Entry</span>(</span>key: <span class="hljs-type">String</span>, value: <span class="hljs-type">String</span>)
+</code></pre>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Props</span>
+<span class="hljs-keyword">import</span> akka.routing.<span class="hljs-type">ConsistentHashingPool</span>
+<span class="hljs-keyword">import</span> akka.routing.<span class="hljs-type">ConsistentHashingRouter</span>.<span class="hljs-type">ConsistentHashMapping</span>
+<span class="hljs-keyword">import</span> akka.routing.<span class="hljs-type">ConsistentHashingRouter</span>.<span class="hljs-type">ConsistentHashableEnvelope</span>
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">hashMapping</span>:</span> <span class="hljs-type">ConsistentHashMapping</span> = {
+  <span class="hljs-keyword">case</span> <span class="hljs-type">Evict</span>(key) =&gt; key
+}
+
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">cache</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">ConsistentHashingPool</span>(<span class="hljs-number">10</span>, hashMapping = hashMapping).
+    props(<span class="hljs-type">Props</span>[<span class="hljs-type">Cache</span>]), name = <span class="hljs-string">"cache"</span>)
+
+cache ! <span class="hljs-type">ConsistentHashableEnvelope</span>(
+  message = <span class="hljs-type">Entry</span>(<span class="hljs-string">"hello"</span>, <span class="hljs-string">"HELLO"</span>), hashKey = <span class="hljs-string">"hello"</span>)
+cache ! <span class="hljs-type">ConsistentHashableEnvelope</span>(
+  message = <span class="hljs-type">Entry</span>(<span class="hljs-string">"hi"</span>, <span class="hljs-string">"HI"</span>), hashKey = <span class="hljs-string">"hi"</span>)
+
+cache ! <span class="hljs-type">Get</span>(<span class="hljs-string">"hello"</span>)
+expectMsg(<span class="hljs-type">Some</span>(<span class="hljs-string">"HELLO"</span>))
+
+cache ! <span class="hljs-type">Get</span>(<span class="hljs-string">"hi"</span>)
+expectMsg(<span class="hljs-type">Some</span>(<span class="hljs-string">"HI"</span>))
+
+cache ! <span class="hljs-type">Evict</span>(<span class="hljs-string">"hi"</span>)
+cache ! <span class="hljs-type">Get</span>(<span class="hljs-string">"hi"</span>)
+expectMsg(<span class="hljs-type">None</span>)
+</code></pre>
+<p>在上面的例子中可以看到<code>Get</code>消息自己实现了<code>ConsistentHashable</code>，而<code>Entry</code>消息包裹在一个<code>ConsistentHashableEnvelope</code>中。<code>Evict</code>消息由<code>hashMapping</code>偏函数处理。</p>
+<p>在配置中定义的ConsistentHashingPool：</p>
+<pre><code>akka.actor.deployment {
+  /parent/router25 {
+    router = consistent-hashing-pool
+    nr-of-instances = 5
+    virtual-nodes-factor = 10
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router25</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router25"</span>)
+</code></pre>
+<p>在代码中定义的ConsistentHashingPool：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router26</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">ConsistentHashingPool</span>(<span class="hljs-number">5</span>).props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]),
+    <span class="hljs-string">"router26"</span>)
+</code></pre>
+<p>在配置中定义的ConsistentHashingGroup：</p>
+<pre><code>akka.actor.deployment {
+  /parent/router27 {
+    router = consistent-hashing-group
+    routees.paths = [&quot;/user/workers/w1&quot;, &quot;/user/workers/w2&quot;, &quot;/user/workers/w3&quot;]
+    virtual-nodes-factor = 10
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router27</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(), <span class="hljs-string">"router27"</span>)
+</code></pre>
+<p>在代码中定义的ConsistentHashingGroup：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">paths</span> =</span> <span class="hljs-type">List</span>(<span class="hljs-string">"/user/workers/w1"</span>, <span class="hljs-string">"/user/workers/w2"</span>, <span class="hljs-string">"/user/workers/w3"</span>)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router28</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">ConsistentHashingGroup</span>(paths).props(), <span class="hljs-string">"router28"</span>)
+</code></pre>
+<p><code>virtual-nodes-factor</code>(虚拟节点因子)是每个routee的虚拟节点数，用来在在一致性哈希节点环中使用，使分布更加均匀。</p>
+<p><span id="router-special-messages-scala"></span></p>
+<h3 id="">特殊处理的消息</h3>
+<p>发送到路由actor的大多数消息将根据路由器的路由逻辑进行转发。然而，有几种具有特殊行为的消息类型。</p>
+<p>请注意这些特别的消息，除了<code>Broadcast</code>消息之外，只被自我包含的路由actor处理，而不是<a href="#simple-router-scala">简单的路由器</a>中描述的<code>akka.routing.Router</code>组件。</p>
+<p><span id="broadcast-messages-scala"></span></p>
+<h5 id="">广播消息</h5>
+<p><code>Broadcast</code>消息可用于向路由器的<em>所有</em>routee发送一条消息。当路由器接收一个<code>Broadcast</code>消息时，它将把消息的<em>有效载荷</em>发给所有的routee，不管该路由器通常如何路由其消息。</p>
+<p>下面的示例演示了如何使用<code>Broadcast</code>消息向路由器下的每个routee发送一个非常重要的信息。</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.routing.<span class="hljs-type">Broadcast</span>
+router ! <span class="hljs-type">Broadcast</span>(<span class="hljs-string">"Watch out for Davy Jones' locker"</span>)
+</code></pre>
+<p>在此示例中路由器接收的广播消息，提取其有效载荷（<code>&quot;Watch out for Davy Jones&#39; locker&quot;</code>），然后发送到有效载荷路由器的所有routee。它是由每个 routee actor来处理接收到的有效负载消息。</p>
+<h5 id="poisonpill">PoisonPill消息</h5>
+<p>PoisonPill消息对所有actor，包括路由actor，都有特殊的处理。当任何一个actor收到<code>PoisonPill</code>消息时，该actor将被停止。有关详细信息请参见<a href="01_actors.html#poison-pill-scala">PoisonPill</a>。</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">PoisonPill</span>
+router ! <span class="hljs-type">PoisonPill</span>
+</code></pre>
+<p>对于路由器，通常将消息传递给routee，需要认识到的很重要一点是<code>PoisonPill</code>消息只被路由器处理。发送到路由器的<code>PoisonPill</code>消息将<em>不会</em>发送到routee。</p>
+<p>然而，发送到路由器的<code>PoisonPill</code>消息可能仍会影响其routee，因为路由器停止时它也会停止其子actor。停止子actor是普通的actor行为。路由器将会停止它作为子actor创建的routee。每个孩子将处理其当前的消息，然后停止。这可能会导致一些消息未被处理。停止actor的详细信息，请参阅<a href="01_actors.html#stopping-actors-scala">文档</a>。</p>
+<p>如果你希望停止路由器极其routee，但你希望routee在停止前先处理目前在其邮箱中的所有消息，则你不应该发送<code>PoisonPill</code>消息。相反，你应该将<code>PoisonPill</code>包装在一个<code>Broadcast</code>，以便每个routee都能收到<code>PoisonPill</code>消息。请注意这将停止所有的routee，即使routee不是路由器的孩子，即即使是通过编程方式提供给router的routee。</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">PoisonPill</span>
+<span class="hljs-keyword">import</span> akka.routing.<span class="hljs-type">Broadcast</span>
+router ! <span class="hljs-type">Broadcast</span>(<span class="hljs-type">PoisonPill</span>)
+</code></pre>
+<p>如上代码所示，每个routee将收到一个<code>PoisonPill`消息。每个routee会继续如常处理其邮件，最终处理</code>PoisonPill``。这将导致routee停止。所有routee后，路由器将<a href="#note-router-terminated-children-scala">自动停止</a>自己，除非它是一个动态的路由器，例如尺寸调整器。</p>
+<blockquote>
+<p>注意</p>
+<p>Brendan W McAdams的优秀博客文章<a href="http://blog.evilmonkeylabs.com/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/" target="_blank">“分布化Akka工作负载——以及完成后的关闭”</a>更详细地讨论了如何使用<code>PoisonPill</code>消息来关闭路由器和routee。</p>
+</blockquote>
+<h5 id="kill">Kill消息</h5>
+<p><code>Kill</code>消息是另一种需要特殊处理的消息类型。请参阅<a href="01_actors.html#killing-actors-scala">“如何杀掉一个actor”</a>来获取actor如何处理<code>Kill</code>消息的一般信息。</p>
+<p>当<code>Kill</code>消息被发送到路由器，路由器将内部处理该消息，并且<em>不会</em>将它发送到其routee。路由器将抛出<code>ActorKilledException</code>并失败。然后它将被恢复、 重新启动或终止，取决于它如何被监督。</p>
+<p>路由器的子routee亦将暂停，并将受应用在路由器上的监管指令影响。对不是路由器的孩子的Routee，即那些在路由器外部被创建的，将不受影响。</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Kill</span>
+router ! <span class="hljs-type">Kill</span>
+</code></pre>
+<p>相比于<code>PoisonPill</code>消息，杀死一个路由器，间接杀死其子（即那些routee），和直接杀死routee（其中有些未必是起孩子）之间是有明显区别的。要直接杀死routee，路由器应发送包裹着<code>Kill</code>消息的<code>Broadcast</code>消息。</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Kill</span>
+<span class="hljs-keyword">import</span> akka.routing.<span class="hljs-type">Broadcast</span>
+router ! <span class="hljs-type">Broadcast</span>(<span class="hljs-type">Kill</span>)
+</code></pre>
+<h5 id="managagement">Managagement消息</h5>
+<ul>
+<li>发送<code>akka.routing.GetRoutees</code>到一个路由actor，使其回送一个包含当前使用routee的<code>akka.routing.Routees</code>消息。</li>
+<li>发送<code>akka.routing.AddRoutee</code>到一个路由actor会将那个routee添加到其routee集合中。</li>
+<li>发送<code>akka.routing.RemoveRoutee</code>到一个路由actor将从其routee集合删除该routee。</li>
+<li>发送<code>akka.routing.AdjustPoolSize</code>到一个池路由actor将从其routee结合中添加或删除该数目的routee。</li>
+</ul>
+<p>这些管理消息可能晚于其他消息处理，所以如果你发送<code>AddRoutee</code>后立即发送普通消息，并不能保证当普通消息被路由时，routee已被更改。如果你需要知道更改何时生效，你可以发送<code>AddRoutee</code>紧跟着<code>GetRoutees</code>，当你收到<code>Routees</code>答复，你就知道前面的变化已被应用。</p>
+<p><span id="resizable-routers-scala"></span></p>
+<h3 id="">动态改变大小的池</h3>
+<p>大多数池可以使用固定数量的routee或有一个调整策略来动态调整routee数。</p>
+<p>在配置中定义的包含resizer的池：</p>
+<pre><code>akka.actor.deployment {
+  /parent/router29 {
+    router = round-robin-pool
+    resizer {
+      lower-bound = 2
+      upper-bound = 15
+      messages-per-resize = 100
+    }
+  }
+}
+</code></pre><pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router29</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">FromConfig</span>.props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]), <span class="hljs-string">"router29"</span>)
+</code></pre>
+<p>更多选项在<a href="../chapter2/09_configuration.html">配置</a>的<code>akka.actor.deployment.default.resizer</code>部分中有描述。</p>
+<p>在代码中定义的包含resizer的池：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">resizer</span> =</span> <span class="hljs-type">DefaultResizer</span>(lowerBound = <span class="hljs-number">2</span>, upperBound = <span class="hljs-number">15</span>)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router30</span>:</span> <span class="hljs-type">ActorRef</span> =
+  context.actorOf(<span class="hljs-type">RoundRobinPool</span>(<span class="hljs-number">5</span>, <span class="hljs-type">Some</span>(resizer)).props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]),
+    <span class="hljs-string">"router30"</span>)
+</code></pre>
+<p><em>需要指出如果你在配置文件中定义了<code>router</code>，那么这个值将比在代码中传入的参数有更高的优先级。</em></p>
+<blockquote>
+<p>注意</p>
+<p>改变大小的行为是通过向actor池发送消息来触发的，但它不是完全同步的；而是向<code>RouterActor</code>的“head”发送消息来执行修改. 所以在别的actor忙碌时，你不能假设改变大小的操作会立即创建新的工作actor，因为消息会被发到忙碌actor的邮箱中排队。要解决这个问题，配置actor池使用一个平衡的派发器，更多信息见<a href="#configuring-dispatchers">Configuring Dispatchers</a>。</p>
+</blockquote>
+<p><span id="router-design-scala"></span></p>
+<h3 id="akka">Akka中的路由是如何设计的</h3>
+<p>从表面看，路由器就像普通的actor，但是它们实际实现是不同的。路由器在收消息和快速发消息给routee被设计的极度优化。</p>
+<p>一个普通的actor可以用来路由消息，但是actor的单线程处理会成为一个瓶颈。路由器可以通过优化原有消息处理pipeline来支持多线程，从而达到更高的吞吐量。这里是通过直接嵌入路由逻辑到其<code>ActorRef</code>，而不是在路由actor本身。发送到路由器<code>ActorRef</code>的消息可以直接被路由到routee，从而完全跳过单线程的路由actor。</p>
+<p>当然，这个改进的成本是路由代码的内部构造相比于使用普通actor构造来说复杂许多。幸运的是所有这种复杂性对于路由API消费者来说是不可见的。然而，这却是你在实现自己的路由器时需要意识到的。</p>
+<p><span id="custom-router-scala"></span></p>
+<h3 id="actor">自定义路由actor</h3>
+<p>如果觉得Akka自带的路由actor都不合用，你也可以创建自己的路由actor。要创建自己的路由，你需要满足本节中所列出的条件。</p>
+<p>在创建您自己的路由器之前，您应该考虑一个拥有类似路由器行为的普通actor是否能完成一个成熟路由器的功能。正如<a href="#router-design-scala">上文</a>解释，路由器相比于普通actor主要好处是他们拥有更高的性能。但相比普通actor他们的代码也更为复杂。因此，如果在你的应用程序中较低的最大吞吐量是可以接受的，则不妨继续使用传统的actor。不过这一节假定你想要获得最大性能，并因而演示如何创建你自己的路由器。</p>
+<p>在此示例中创建的路由器将把每个消息复制到几个目的地。</p>
+<p>首先从路由逻辑开始：</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> scala.collection.immutable
+<span class="hljs-keyword">import</span> scala.concurrent.forkjoin.<span class="hljs-type">ThreadLocalRandom</span>
+<span class="hljs-keyword">import</span> akka.routing.<span class="hljs-type">RoundRobinRoutingLogic</span>
+<span class="hljs-keyword">import</span> akka.routing.<span class="hljs-type">RoutingLogic</span>
+<span class="hljs-keyword">import</span> akka.routing.<span class="hljs-type">Routee</span>
+<span class="hljs-keyword">import</span> akka.routing.<span class="hljs-type">SeveralRoutees</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RedundancyRoutingLogic</span>(</span>nbrCopies: <span class="hljs-type">Int</span>) <span class="hljs-keyword">extends</span> <span class="hljs-type">RoutingLogic</span> {
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">roundRobin</span> =</span> <span class="hljs-type">RoundRobinRoutingLogic</span>()
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">select</span>(</span>message: <span class="hljs-type">Any</span>, routees: immutable.<span class="hljs-type">IndexedSeq</span>[<span class="hljs-type">Routee</span>]): <span class="hljs-type">Routee</span> = {
+    <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">targets</span> =</span> (<span class="hljs-number">1</span> to nbrCopies).map(_ =&gt; roundRobin.select(message, routees))
+    <span class="hljs-type">SeveralRoutees</span>(targets)
+  }
+}
+</code></pre>
+<p>在这个例子中<code>select</code>将被每个消息调用来使用轮询来挑选几个目的地，通过重用现有的<code>RoundRobinRoutingLogic</code>并将结果包装在一个<code>SeveralRoutees</code>实例中。<code>SeveralRoutees</code>将会把消息发送给所有提供的routee。</p>
+<p>路由逻辑的实现必须是线程安全的，因为它可能在actor外被使用。</p>
+<p>路由逻辑的一个单元测试：</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TestRoutee</span>(</span>n: <span class="hljs-type">Int</span>) <span class="hljs-keyword">extends</span> <span class="hljs-type">Routee</span> {
+  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">send</span>(</span>message: <span class="hljs-type">Any</span>, sender: <span class="hljs-type">ActorRef</span>): <span class="hljs-type">Unit</span> = ()
+}
+
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">logic</span> =</span> <span class="hljs-keyword">new</span> <span class="hljs-type">RedundancyRoutingLogic</span>(nbrCopies = <span class="hljs-number">3</span>)
+
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">routees</span> =</span> <span class="hljs-keyword">for</span> (n &lt;- <span class="hljs-number">1</span> to <span class="hljs-number">7</span>) <span class="hljs-keyword">yield</span> <span class="hljs-type">TestRoutee</span>(n)
+
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">r1</span> =</span> logic.select(<span class="hljs-string">"msg"</span>, routees)
+  r1.asInstanceOf[<span class="hljs-type">SeveralRoutees</span>].routees should be(
+    <span class="hljs-type">Vector</span>(<span class="hljs-type">TestRoutee</span>(<span class="hljs-number">1</span>), <span class="hljs-type">TestRoutee</span>(<span class="hljs-number">2</span>), <span class="hljs-type">TestRoutee</span>(<span class="hljs-number">3</span>)))
+
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">r2</span> =</span> logic.select(<span class="hljs-string">"msg"</span>, routees)
+  r2.asInstanceOf[<span class="hljs-type">SeveralRoutees</span>].routees should be(
+    <span class="hljs-type">Vector</span>(<span class="hljs-type">TestRoutee</span>(<span class="hljs-number">4</span>), <span class="hljs-type">TestRoutee</span>(<span class="hljs-number">5</span>), <span class="hljs-type">TestRoutee</span>(<span class="hljs-number">6</span>)))
+
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">r3</span> =</span> logic.select(<span class="hljs-string">"msg"</span>, routees)
+  r3.asInstanceOf[<span class="hljs-type">SeveralRoutees</span>].routees should be(
+    <span class="hljs-type">Vector</span>(<span class="hljs-type">TestRoutee</span>(<span class="hljs-number">7</span>), <span class="hljs-type">TestRoutee</span>(<span class="hljs-number">1</span>), <span class="hljs-type">TestRoutee</span>(<span class="hljs-number">2</span>)))
+</code></pre>
+<p>你可以停在这儿，通过<code>akka.routing.Router</code>使用 <code>RedundancyRoutingLogic</code>，如<a href="#simple-router-scala">一个简单路由器</a>中所述。</p>
+<p>让我们继续，并使之成为一个自包含的、可配置的路由器actor。</p>
+<p>创建一个类来扩展<code>Pool</code>，<code>Group</code>或<code>CustomRouterConfig</code>。该类是一个路由逻辑的工厂，并持有路由器的配置。在这里，我们把它变成一个<code>Group</code>。</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.dispatch.<span class="hljs-type">Dispatchers</span>
+<span class="hljs-keyword">import</span> akka.routing.<span class="hljs-type">Group</span>
+<span class="hljs-keyword">import</span> akka.routing.<span class="hljs-type">Router</span>
+<span class="hljs-keyword">import</span> akka.japi.<span class="hljs-type">Util</span>.immutableSeq
+<span class="hljs-keyword">import</span> com.typesafe.config.<span class="hljs-type">Config</span>
+
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RedundancyGroup</span>(</span><span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">paths</span>:</span> immutable.<span class="hljs-type">Iterable</span>[<span class="hljs-type">String</span>], nbrCopies: <span class="hljs-type">Int</span>) <span class="hljs-keyword">extends</span> <span class="hljs-type">Group</span> {
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">this</span>(</span>config: <span class="hljs-type">Config</span>) = <span class="hljs-keyword">this</span>(
+    paths = immutableSeq(config.getStringList(<span class="hljs-string">"routees.paths"</span>)),
+    nbrCopies = config.getInt(<span class="hljs-string">"nbr-copies"</span>))
+
+  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">createRouter</span>(</span>system: <span class="hljs-type">ActorSystem</span>): <span class="hljs-type">Router</span> =
+    <span class="hljs-keyword">new</span> <span class="hljs-type">Router</span>(<span class="hljs-keyword">new</span> <span class="hljs-type">RedundancyRoutingLogic</span>(nbrCopies))
+
+  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">routerDispatcher</span>:</span> <span class="hljs-type">String</span> = <span class="hljs-type">Dispatchers</span>.<span class="hljs-type">DefaultDispatcherId</span>
+}
+</code></pre>
+<p>这可以像Akka提供的路由actor完全一样使用。</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">for</span> (n &lt;- <span class="hljs-number">1</span> to <span class="hljs-number">10</span>) system.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">Storage</span>], <span class="hljs-string">"s"</span> + n)
+
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">paths</span> =</span> <span class="hljs-keyword">for</span> (n &lt;- <span class="hljs-number">1</span> to <span class="hljs-number">10</span>) <span class="hljs-keyword">yield</span> (<span class="hljs-string">"/user/s"</span> + n)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">redundancy1</span>:</span> <span class="hljs-type">ActorRef</span> =
+  system.actorOf(<span class="hljs-type">RedundancyGroup</span>(paths, nbrCopies = <span class="hljs-number">3</span>).props(),
+    name = <span class="hljs-string">"redundancy1"</span>)
+redundancy1 ! <span class="hljs-string">"important"</span>
+</code></pre>
+<p>请注意我们在<code>RedundancyGroup</code>添加一个以<code>Config</code>为参数的构造函数。这样一来，我们就可能在配置中定义。</p>
+<pre><code>akka.actor.deployment {
+  /redundancy2 {
+    router = &quot;docs.routing.RedundancyGroup&quot;
+    routees.paths = [&quot;/user/s1&quot;, &quot;/user/s2&quot;, &quot;/user/s3&quot;]
+    nbr-copies = 5
+  }
+}
+</code></pre><p>请注意<code>router</code>属性中的类的全名。路由器类必须继承<code>akka.routing.RouterConfig</code>（<code>Pool</code>，<code>Group</code>或<code>CustomRouterConfig</code>），并且有一个以<code>com.typesafe.config.Config</code>为参数的构造函数。配置的部署部分将被传递给构造函数。</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">redundancy2</span>:</span> <span class="hljs-type">ActorRef</span> = system.actorOf(<span class="hljs-type">FromConfig</span>.props(),
+  name = <span class="hljs-string">"redundancy2"</span>)
+redundancy2 ! <span class="hljs-string">"very important"</span>
+</code></pre>
+<h3 id="">配置调度器</h3>
+<p>为池的创建孩子的调度器将取自<code>Props</code>，如<a href="04_dispatchers.html">调度器</a>中所述。</p>
+<p>为了可以很容易地定义池routee的调度器，你可以在配置的部署一节中定义内联调度器。</p>
+<pre><code>akka.actor.deployment {
+  /poolWithDispatcher {
+    router = random-pool
+    nr-of-instances = 5
+    pool-dispatcher {
+      fork-join-executor.parallelism-min = 5
+      fork-join-executor.parallelism-max = 5
+    }
+  }
+}
+</code></pre><p>这是启用一个池专用调度器，你唯一需要做的。</p>
+<blockquote>
+<p>注意</p>
+<p>如果你使用actor群，并路由到它们的路径，然后他们将仍然使用配置在其<code>Props</code>的相同的调度器，不可能在actor创建后改变actor的调度器。</p>
+</blockquote>
+<p>“头”路由器不能总是在相同的调度器上运行，因为它不处理同一类型的消息，因此这个特殊的actor没有使用配置的调度器，但相反，使用<code>RouterConfig</code>的<code>routerDispatcher</code>，它是actor系统默认调度器默认的。所有标准路由器允许它们在构造函数或工厂方法中设置此属性，自定义路由器必须以适当的方式实现该方法。</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">router</span>:</span> <span class="hljs-type">ActorRef</span> = system.actorOf(
+  <span class="hljs-comment">// “head” router actor will run on "router-dispatcher" dispatcher</span>
+  <span class="hljs-comment">// Worker routees will run on "pool-dispatcher" dispatcher  </span>
+  <span class="hljs-type">RandomPool</span>(<span class="hljs-number">5</span>, routerDispatcher = <span class="hljs-string">"router-dispatcher"</span>).props(<span class="hljs-type">Props</span>[<span class="hljs-type">Worker</span>]),
+  name = <span class="hljs-string">"poolWithDispatcher"</span>)
+</code></pre>
+<blockquote>
+<p>注意</p>
+<p>不允许配置<code>routerDispatcher</code>为<code>akka.dispatch.BalancingDispatcherConfigurator</code>，因为用于特殊路由actor的消息不能被其他任意actor处理。</p>
+</blockquote>
+
+                    
+                    </section>
+                
+                
+                </div>
+            </div>
+        </div>
+
+        
+        <a href="../chapter3/05_mailboxes.html" class="navigation navigation-prev " aria-label="Previous page: 邮箱"><i class="fa fa-angle-left"></i></a>
+        
+        
+        <a href="../chapter3/07_fsm.html" class="navigation navigation-next " aria-label="Next page: 有限状态机(FSM)"><i class="fa fa-angle-right"></i></a>
+        
+    </div>
+</div>
+
+        
+<script src="../gitbook/app.js"></script>
+
+    
+    <script src="https://cdn.mathjax.org/mathjax/2.4-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-mathjax/plugin.js"></script>
+    
+
+<script>
+require(["gitbook"], function(gitbook) {
+    var config = {"fontSettings":{"theme":null,"family":"sans","size":2}};
+    gitbook.start(config);
+});
+</script>
+
+        
+    </body>
+    
+</html>

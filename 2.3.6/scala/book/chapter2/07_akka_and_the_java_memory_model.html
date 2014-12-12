@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.7" data-basepath=".." data-revision="1411643601835">
+    <div class="book"  data-level="2.7" data-basepath=".." data-revision="1418396877209">
     
 
 <div class="book-summary">
@@ -349,10 +349,10 @@
         </li>
     
         
-        <li class="chapter " data-level="3" data-path="chapter3/Actors.html">
+        <li class="chapter " data-level="3" data-path="chapter3/actors.html">
             
                 
-                    <a href="../chapter3/Actors.html">
+                    <a href="../chapter3/actors.html">
                         <i class="fa fa-check"></i>
                         
                             <b>3.</b>
@@ -390,7 +390,7 @@
                         
                             <b>3.2.</b>
                         
-                         类型Actor
+                         有类型Actor
                     </a>
                 
             
@@ -410,6 +410,28 @@
                     </a>
                 
             
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="3.3.1" data-path="chapter3/03-1_fault_tolerance_sample.html">
+            
+                
+                    <a href="../chapter3/03-1_fault_tolerance_sample.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.3.1.</b>
+                        
+                         容错示例
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
             
         </li>
     
@@ -462,10 +484,10 @@
         </li>
     
         
-        <li class="chapter " data-level="3.7" data-path="chapter3/07_FSM.html">
+        <li class="chapter " data-level="3.7" data-path="chapter3/07_fsm.html">
             
                 
-                    <a href="../chapter3/07_FSM.html">
+                    <a href="../chapter3/07_fsm.html">
                         <i class="fa fa-check"></i>
                         
                             <b>3.7.</b>
@@ -1595,7 +1617,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_391">
+                    <section class="normal" id="section-gitbook_10">
                     
                         <h1 id="akkajava">Akka与Java内存模型</h1>
 <p>使用包含Scala和Akka在内的Typesafe平台的主要好处是它简化了并发软件的编写过程。本文将讨论Typesafe平台，尤其是Akka是如何在并发应用中访问共享内存的。</p>
@@ -1615,7 +1637,7 @@
 <p>使用Akka中的Actor实现，有两种方法让多个线程对共享的内存进行操作：</p>
 <ul>
 <li>如果一条消息被（例如，从另一个actor）发送到一个actor，大多数情况下消息是不可变的，但是如果这条消息不是一个正确创建的不可变对象，如果没有 “发生先于” 规则, 有可能接收方会看到部分初始化的数据，甚至可能看到无中生有的数据（long/double）。</li>
-<li>如果一个actor在处理某条消息时改变了自己的内部状态，而之后又在处理其它消息时又访问了这个状态。一条很重要的需要了解的是，在使用actor模型时你无法保证，同一个线程会在处理不同的消息时使用同一个actor。</li>
+<li>如果一个actor在处理某条消息时改变了自己的内部状态，而之后又在处理其它消息时又访问了这个状态。一条很重要的需要了解的规则是，在使用actor模型时你无法保证，同一个线程会在处理不同的消息时使用同一个actor。</li>
 </ul>
 <p>为了避免actor中的可见性和重排序问题，Akka保证以下两条 “发生在先” 规则:</p>
 <ul>
@@ -1639,7 +1661,7 @@
 </ul>
 <p>这条规则非常象JMM中的 ‘volatile 变量’ 规则。目前Akka STM只支持延迟写，所以对共享内存的实际写操作会被延迟到事务提交之时。在事务中发生的写操作会被存放在一个本地缓冲区内 (事务的写操作集) ，并且对其它事务是不可见的。这就是为什么脏读是不可能的。</p>
 <p>这些规则在Akka中的实现会随时间而变化，精确的细节甚至可能依赖于所使用的配置。但是它们是建立在其它JMM规则之上的，如监视器锁规则、volatile变量规则。 这意味着Akka用户不需要操心为了提供“发生先于”关系而增加同步，因为这是Akka的工作。这样你可以腾出手来处理业务逻辑，让Akka框架来保证这些规则的满足。</p>
-<h3 id="actor">Actor与共享的可变状态</h3>
+<h3 id="a-namejmm-shared-stateaactor"><a name="jmm-shared-state"></a>Actor与共享的可变状态</h3>
 <p>因为Akka运行在JVM上，所以还有一些其它的规则需要遵守。</p>
 <ul>
 <li>捕捉Actor内部状态并暴露给其它线程</li>

@@ -24,7 +24,7 @@
 | 1       | ``Storage``抛出 ``StorageException``。 |
 | 2       | ``CounterService``是``Storage``的监管者，``StorageException``被抛出时它将重启``Storage``。 |
 | 3, 4, 5, 6 | ``Storage``仍旧失败，又被重启. |
-| 7    | 在5秒内三次失败和重启后``Storage``被它的监管者，即``CounterService终止``终止。|
+| 7    | 在5秒内三次失败和重启后``Storage``被它的监管者，即``CounterService``终止。|
 | 8    | ``CounterService``同时监视着``Storage``并在``Storage``被终止时收到``Terminated``消息...|
 | 9, 10, 11 | 告诉``Counter``当前没有可用的``Storage``。|
 | 12   | ``CounterService``计划一个``Reconnect``消息发给自己。|

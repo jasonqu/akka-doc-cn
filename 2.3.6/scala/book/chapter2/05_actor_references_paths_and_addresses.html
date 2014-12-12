@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.5" data-basepath=".." data-revision="1411643601835">
+    <div class="book"  data-level="2.5" data-basepath=".." data-revision="1418396877209">
     
 
 <div class="book-summary">
@@ -349,10 +349,10 @@
         </li>
     
         
-        <li class="chapter " data-level="3" data-path="chapter3/Actors.html">
+        <li class="chapter " data-level="3" data-path="chapter3/actors.html">
             
                 
-                    <a href="../chapter3/Actors.html">
+                    <a href="../chapter3/actors.html">
                         <i class="fa fa-check"></i>
                         
                             <b>3.</b>
@@ -390,7 +390,7 @@
                         
                             <b>3.2.</b>
                         
-                         类型Actor
+                         有类型Actor
                     </a>
                 
             
@@ -410,6 +410,28 @@
                     </a>
                 
             
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="3.3.1" data-path="chapter3/03-1_fault_tolerance_sample.html">
+            
+                
+                    <a href="../chapter3/03-1_fault_tolerance_sample.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.3.1.</b>
+                        
+                         容错示例
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
             
         </li>
     
@@ -462,10 +484,10 @@
         </li>
     
         
-        <li class="chapter " data-level="3.7" data-path="chapter3/07_FSM.html">
+        <li class="chapter " data-level="3.7" data-path="chapter3/07_fsm.html">
             
                 
-                    <a href="../chapter3/07_FSM.html">
+                    <a href="../chapter3/07_fsm.html">
                         <i class="fa fa-check"></i>
                         
                             <b>3.7.</b>
@@ -1595,7 +1617,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_397">
+                    <section class="normal" id="section-gitbook_14">
                     
                         <h1 id="actor-">Actor引用, 路径与地址</h1>
 <p>本章描述actor如何被确定，以及在一个可能是分布式的actor系统中如何定位。这与 <a href="02_actor_systems.html">Actor系统</a> 的核心概念有关：固有的树形监管结构和跨多个网络节点的actor之间进行透明通讯。</p>
@@ -1640,24 +1662,24 @@
 <p>顺着actor的父监管链一直到根的唯一路径被称为actor逻辑路径。这个路径与actor的创建祖先关系完全吻合，所以当actor系统的远程调用配置（和配置中路径的地址部分）设置好后它就是完全确定的了。</p>
 <h5 id="actor">Actor物理路径</h5>
 <p>Actor逻辑路径描述它在一个actor系统内部的功能位置，而基于配置的远程部署意味着一个actor可能在另外一台网络主机上被创建，即另一个actor系统中。在这种情况下，从根守护者穿过actor路径来找到该actor肯定需要访问网络，这是一个很昂贵的操作。因此，每一个actor同时还有一条物理路径，从actor对象实际所在的actor系统的根开始。与其它actor通信时使用物理路径作为发送方引用，能够让接收方直接回复到这个actor上，将路由延迟降到最小。</p>
-<p>物理路径的一个重要方面是它决不会跨多个actor系统或跨JVM虚拟机。这意味着如果一个actor有祖先被远程监管，则其逻辑路径（监管树）和物理路径（actor部署）可能会分叉。</p>
+<p>物理路径的一个重要性质是它决不会跨多个actor系统或跨JVM虚拟机。这意味着如果一个actor有祖先被远程监管，则其逻辑路径（监管树）和物理路径（actor部署）可能会分叉。</p>
 <h3 id="actor">如何获得Actor引用？</h3>
 <p>actor引用的获取方法分为两类：通过创建actor，或者通过查找actor。后一种功能又分两种：通过具体的actor路径来创建actor引用，和查询actor逻辑树。</p>
 <h5 id="actor">创建Actor</h5>
 <p>一个actor系统通常是在根守护者上使用<code>ActorSystem.actorOf</code>创建actor来启动，然后在创建出的actor中使用<code>ActorContext.actorOf</code>来展开actor树。这些方法返回的是指向新创建的actor的引用。每个actor都拥有到它的父亲，它自己和它的子actor的引用（通过<code>ActorContext</code>访问）。这些引用可以与消息一起被发送给别的actor，以便接收方直接回复。</p>
 <h5 id="actor">通过具体的路径来查找actor</h5>
-<p>另外，可以使用<code>ActorSystem.actorSelection</code>来查找actor引用。选择可被用在已有actor与被选择的actor进行通讯的时候用到，在投递每条消息的时候都会用到查找。</p>
+<p>另外，可以使用<code>ActorSystem.actorSelection</code>来查找actor引用。“选择”可在已有actor与被选择的actor进行通讯的时候用到，在投递每条消息的时候都会用到查找。</p>
 <p>为了获得一个绑定到指定actor生命周期的<code>ActorRef</code>，你需要发送一个消息，如内置的<code>Identify</code>信息，向指定的actor，所获得的<code>sender()</code>即为所求。</p>
 <blockquote>
 <p>注意</p>
-<p><code>actorFor</code>因被<code>actorSelection</code>替代而废弃，因为<code>actorFor</code>对本地和远程的actor表现有所不同。对一个本地actor引用，被查找的actor需要在查找之前就存在，否而获得的引用是一个<code>EmptyLocalActorRef</code>。即使后来与实际路径相符的actor被创建，所获得引用仍然是这样。对于<code>actorFor</code>行为获得的远程actor
-引用则不同，每封邮件的发送都会在远程系统中进行一次按路径的查找。</p>
+<p><code>actorFor</code>因被<code>actorSelection</code>替代而废弃，因为<code>actorFor</code>对本地和远程的actor表现有所不同。对一个本地actor引用，被查找的actor需要在查找之前就存在，否则获得的引用是一个<code>EmptyLocalActorRef</code>。即使后来与实际路径相符的actor被创建，所获得引用仍然是这样。对于<code>actorFor</code>行为获得的远程actor
+引用则不同，每条消息的发送都会在远程系统中进行一次按路径的查找。</p>
 </blockquote>
 <h3 id="-vs-">绝对路径 vs 相对路径</h3>
 <p>除了<code>ActorSystem.actorSelection</code>还有一个<code>ActorContext.actorSelection</code>，这是可以在任何一个actor实例中通过<code>context.actorSelection</code>访问的。它的actor查找与<code>ActorSystem</code>的返回值非常类似，不同在于它的路径查找是从当前actor开始的，而不是从actor树的根开始。可以用 &quot;..&quot; 路径来访问父actor. 例如，你可以向一个指定兄弟发送消息：</p>
-<pre><code>context.actorFor(&quot;../brother&quot;) ! msg
+<pre><code>context.actorSelection(&quot;../brother&quot;) ! msg
 </code></pre><p>当然绝对路径也可以在 context 中使用，即</p>
-<pre><code>context.actorFor(&quot;/user/serviceA&quot;) ! msg
+<pre><code>context.actorSelection(&quot;/user/serviceA&quot;) ! msg
 </code></pre><p>也能正确运行。</p>
 <h5 id="actor">查询逻辑Actor树</h5>
 <p>由于actor系统是一个类似文件系统的树形结构，对actor路径的匹配与Unix shell中支持的一样：你可以将路径（中的一部分）用通配符(«*» 和 «?»)替换，来组成对0个或多个实际actor的选择。由于匹配的结果不是一个单一的actor引用，它拥有一个不同的类型<code>ActorSelection</code>，这个类型不完全支持<code>ActorRef</code>的所有操作。选择也可以用<code>ActorSystem.actorSelection</code>或<code>ActorContext.actorSelection</code>两种方式来获得，并且支持发送消息：</p>
@@ -1674,11 +1696,11 @@
 </ul>
 </blockquote>
 <h3 id="actor">Actor引用和路径相等性</h3>
-<p><code>ActorRef</code>的相等性与<code>ActorRef</code>的目的匹配，即它对应的目标actor化身。两个actor引用进行比较时，如果它们有相同的路径且指向同一个actor化身，则两者相等。指向一个已终止的actor的引用，与指向具有相同路径但却是另一个（重新创建）actor的引用是不相等的。需要注意的是，由于失败造导致的actor重启，仍意味着它是同一个actor化身，即重新启动对<code>ActorRef</code>消费者是不可见的。</p>
+<p><code>ActorRef</code>的相等性与<code>ActorRef</code>的目的匹配，即一个<code>ActorRef</code>对应一个目标actor化身。两个actor引用进行比较时，如果它们有相同的路径且指向同一个actor化身，则两者相等。指向一个已终止的actor的引用，与指向具有相同路径但却是另一个（重新创建）actor的引用是不相等的。需要注意的是，由于失败造导致的actor重启，仍意味着它是同一个actor化身，即重新启动对<code>ActorRef</code>消费者是不可见的。</p>
 <p>由<code>actorFor</code>获得的远程actor引用不包括其身份的所有信息，因此，这种引用不能等于<code>actorOf</code>，<code>sender</code>或<code>context.self</code>的引用。正因如此<code>actorFor</code>被<code>actorSelection</code>替换废弃。</p>
 <p>如果你需要跟踪一个集合中的actor引用，并不关心具体的actor化身，你可以使用<code>ActorPath</code>为键（key），因为目标actor的标识符在比较actor路径时没有被用到。</p>
 <h3 id="actor">重用Actor路径</h3>
-<p>当一个actor被终止，其引用将指向一个死信邮箱，DeathWatch将发布其最终的转变，并且一般地它也不会起死回生（因为actor的生命周期不允许这样）。虽然以后可能创建一个具有相同路径的actor——如果无法保留actor系统开始以来创建的所有可用actor，则无法保证其反向成立——因而这不是一个好的实践：通过<code>acterFor</code>获取的已经‘死亡’的远程actor引用突然再次开始工作，但没有这种过渡和任何其他事件之间顺序的任何保证，因此，该路径的新居民可能收到本意是送给其以前住户的消息。</p>
+<p>当一个actor被终止，其引用将指向一个死信邮箱，DeathWatch将发布其最终的转变，并且一般地它也不会起死回生（因为actor的生命周期不允许这样）。虽然以后可能创建一个具有相同路径的actor——如果无法保留actor系统开始以来创建的所有可用actor，则无法保证其反向成立——但是这不是一个好的实践：通过<code>acterFor</code>获取的已经‘死亡’的远程actor引用突然再次开始工作，但没有这种过渡和任何其他事件之间顺序的任何保证，因此，该路径的新居民可能收到本意是送给其以前住户的消息。</p>
 <p>在某些非常特殊的情况下这可能是正确的事情，但一定要限制这种处理只能由其监管者操作，因为它是唯一可以可靠地检测名称正确注销的actor，在此之前的新创建的孩子将失败。</p>
 <p>它在测试中可能也是必要的，当测试对象取决于某个特定路径被实例化的时候。在这种情况下，最好mock其监管者，这样它会将终止消息转发至测试过程正确的点，使后者能够等待登记名字的正确注销。</p>
 <h3 id="">与远程部署之间的互操作</h3>
@@ -1693,7 +1715,7 @@
 <li><code>&quot;/system&quot;</code> 是所有由系统创建的顶级actor的监管者，如日志监听器，或由配置指定在actor系统启动时自动部署的actor。</li>
 <li><code>&quot;/deadLetters&quot;</code> 是死信actor，所有发往已经终止或不存在的actor的消息会被重定向到这里（以尽最大努力为基础：即使在本地JVM，消息也可能丢失）</li>
 <li><code>&quot;/temp&quot;</code>是所有系统创建的短时actor的监管者，例如那些在<code>ActorRef.ask</code>的实现中用到的actor。</li>
-<li><code>&quot;/remote&quot;</code> 是一个人造路径，用来存放所有其监管者是远程actor引用的actor。</li>
+<li><code>&quot;/remote&quot;</code> 是一个人造虚拟路径，用来存放所有其监管者是远程actor引用的actor。</li>
 </ul>
 <p>需要为actor构建这样的名称空间源于一个核心的非常简单的设计目标：在层次结构中的一切都是一个actor，以及所有的actor都以相同方式工作。因此，你不仅可以查找你所创建的actor，你也可以查找系统守护者并发送消息（在这种情况下它会忠实地丢弃之）。这个强大的原则意味着不需要记住额外的怪异模式，它使整个系统更加统一和一致。</p>
 <p>如果您想了解更多关于actor系统的顶层结构，参考<a href="04_supervision_and_monitoring.html#toplevel-supervisors">顶级监管者</a>。</p>
