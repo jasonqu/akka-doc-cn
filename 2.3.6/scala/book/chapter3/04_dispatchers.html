@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="3.4" data-basepath=".." data-revision="1418396877209">
+    <div class="book"  data-level="3.4" data-basepath=".." data-revision="1418482047463">
     
 
 <div class="book-summary">
@@ -528,6 +528,28 @@
                     </a>
                 
             
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="3.9.1" data-path="chapter3/09_1_testkit-example.html">
+            
+                
+                    <a href="../chapter3/09_1_testkit-example.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.9.1.</b>
+                        
+                         TestKit实例
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
             
         </li>
     
@@ -1617,7 +1639,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_24">
+                    <section class="normal" id="section-gitbook_117">
                     
                         <h1 id="">调度器</h1>
 <p>Akka <code>MessageDispatcher</code>是维持 Akka Actor “运作”的部分, 可以说它是整个机器的引擎。所有的<code>MessageDispatcher</code>实现也同时也是一个<code>ExecutionContext</code>，这意味着它们可以用来执行任何代码，例如<a href="../chapter4/01_futures.html">Future(Scala)</a>。</p>
@@ -1631,46 +1653,44 @@
 <h3 id="actor">为Actor指定派发器</h3>
 <p>如果你希望为你的<code>Actor</code>设置非缺省的派发器，你需要做两件事，首先是配置派发器：</p>
 <pre><code>my-dispatcher {
-  # Dispatcher is the name of the event-based dispatcher
+  # Dispatcher 是基于事件的派发器的名称
   type = Dispatcher
-  # What kind of ExecutionService to use
+  # 使用何种ExecutionService
   executor = &quot;fork-join-executor&quot;
-  # Configuration for the fork join pool
+  # 配置 fork join 池
   fork-join-executor {
-    # Min number of threads to cap factor-based parallelism number to
+    # 容纳基于因子的并行数量的线程数下限
     parallelism-min = 2
-    # Parallelism (threads) ... ceil(available processors * factor)
+    # 并行数（线程）... ceil(可用CPU数＊因子）
     parallelism-factor = 2.0
-    # Max number of threads to cap factor-based parallelism number to
+    # 容纳基于因子的并行数量的线程数上限
     parallelism-max = 10
   }
-  # Throughput defines the maximum number of messages to be
-  # processed per actor before the thread jumps to the next actor.
-  # Set to 1 for as fair as possible.
+  # Throughput 定义了线程切换到下一个actor之前处理的消息数上限
+  # 设置成1表示尽可能公平。
   throughput = 100
 }
 </code></pre><p>以下是另一个使用“thread-pool-executor”的例子：</p>
 <pre><code>my-thread-pool-dispatcher {
-  # Dispatcher is the name of the event-based dispatcher
+  # Dispatcher是基于事件的派发器的名称
   type = Dispatcher
-  # What kind of ExecutionService to use
+  # 使用何种 ExecutionService
   executor = &quot;thread-pool-executor&quot;
-  # Configuration for the thread pool
+  # 配置线程池
   thread-pool-executor {
-    # minimum number of threads to cap factor-based core number to
+    # 容纳基于因子的内核数的线程数下限
     core-pool-size-min = 2
-    # No of core threads ... ceil(available processors * factor)
+    # 内核线程数 .. ceil(可用CPU数＊倍数）
     core-pool-size-factor = 2.0
-    # maximum number of threads to cap factor-based number to
+    # 容纳基于倍数的并行数量的线程数上限
     core-pool-size-max = 10
   }
-  # Throughput defines the maximum number of messages to be
-  # processed per actor before the thread jumps to the next actor.
-  # Set to 1 for as fair as possible.
+  # Throughput 定义了线程切换到下一个actor之前处理的消息数上限
+  # 设置成1表示尽可能公平.
   throughput = 100
 }
 </code></pre><p>更多选项，请参阅<a href="../chapter2/09_configuration.html">配置</a>的缺省派发器(default-dispatcher)一节。</p>
-<p>然后可以像往常一样创建actor并在部署配置中定义的调度器。</p>
+<p>然后可以像往常一样创建actor并在部署配置中定义调度器。</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Props</span>
 <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">myActor</span> =</span> context.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">MyActor</span>], <span class="hljs-string">"myactor"</span>)
 </code></pre>
@@ -1680,8 +1700,7 @@
   }
 }
 </code></pre><p>部署配置的替代方法是在代码中定义调度器。如果你在部署配置中定义<code>dispatcher</code>，则实际使用的将是此值，而不是以编程方式提供的参数。</p>
-<pre><code class="lang-scala">
-<span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Props</span>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Props</span>
 <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">myActor</span> =</span>
   context.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">MyActor</span>].withDispatcher(<span class="hljs-string">"my-dispatcher"</span>), <span class="hljs-string">"myactor1"</span>)
 </code></pre>
@@ -1694,62 +1713,44 @@
 <ul>
 <li><p>Dispatcher</p>
 <ul>
-<li><p>这是基于事件的调度器，将一组actor绑定到线程池。如果未指定，则它将被使用为默认调度。</p>
-</li>
-<li><p>可共享性：无限制</p>
-</li>
-<li><p>邮箱：任何，为每一个Actor创建一个</p>
-</li>
-<li><p>使用场景：缺省派发器，Bulkheading</p>
-</li>
-<li><p>底层驱动：<code>java.util.concurrent.ExecutorService</code>
-指定的&quot;executor&quot;可使用&quot;fork-join-executor&quot;、&quot;thread-pool-executor&quot;或一个<code>akka.dispatcher.ExecutorServiceConfigurator</code>的FQCN </p>
-</li>
+<li>这是基于事件的调度器，将一组actor绑定到线程池。如果未指定派发器，则它将被用作默认调度器。</li>
+<li>可共享性：无限制</li>
+<li>邮箱：任意，为每一个Actor创建一个</li>
+<li>使用场景：缺省派发器，Bulkheading</li>
+<li>底层驱动：<code>java.util.concurrent.ExecutorService</code>
+  通过&quot;executor&quot;指定，可使用&quot;fork-join-executor&quot;、&quot;thread-pool-executor&quot;或一个<code>akka.dispatcher.ExecutorServiceConfigurator</code>的限定</li>
 </ul>
 </li>
 <li><p>PinnedDispatcher</p>
 <ul>
-<li><p>这个调度器为每一个使用它的actor分配一个独立的线程；即每个actor会有其自己的只有一个线程的线程池。</p>
-</li>
-<li><p>可共享性: 无</p>
-</li>
-<li><p>邮箱: 任何，为每个Actor创建一个</p>
-</li>
-<li><p>使用场景: Bulkheading</p>
-</li>
-<li><p>底层驱动: 任何<code>akka.dispatch.ThreadPoolExecutorConfigurator</code>
-缺省为一个“thread-pool-executor”</p>
-</li>
+<li>这个调度器为每一个使用它的actor分配一个独立的线程；即每个actor会有其独有的只有一个线程的线程池。</li>
+<li>可共享性：无</li>
+<li>邮箱：任意，为每个Actor创建一个</li>
+<li>使用场景：Bulkheading</li>
+<li>底层驱动：<strong>任意</strong><code>akka.dispatch.ThreadPoolExecutorConfigurator</code>
+  缺省为一个“thread-pool-executor”</li>
 </ul>
 </li>
 <li><p>BalancingDispatcher</p>
 <ul>
-<li><p>这是基于事件的调度器，将尝试从繁忙的actor到空闲的actor重新分配工作。</p>
-</li>
-<li><p>所有actor分享单个邮箱，并从中获取他们的消息。</p>
-</li>
-<li><p>这里假定所有使用此调度器的actor都可以处理发送到其中一个actor的所有的消息；即actor属于actor池，并且对客户端来说没有保证是哪个actor实例实际上处理某个特定的消息。</p>
-</li>
-<li><p>可共享性: 仅对同一类型的Actor共享</p>
-</li>
-<li><p>邮箱: 任何，为所有的Actor创建一个</p>
-</li>
-<li><p>使用场景: Work-sharing</p>
-</li>
-<li><p>底层驱动：<code>java.util.concurrent.ExecutorService</code>
-指定使用 “executor” 使用 “fork-join-executor”, “thread-pool-executor” 或<code>akka.dispatcher.ExecutorServiceConfigurator</code>的全称</p>
-</li>
-<li><p>请注意<strong>不能</strong>作为一个<strong>路由器调度程序</strong>使用 <code>BalancingDispatcher</code>。（但是你可以使用它为<strong>Routees</strong>）</p>
-</li>
+<li>这是基于事件的调度器，将尝试从繁忙的actor重新分配工作到空闲的actor。</li>
+<li>所有actor共享单个邮箱，并从中获取他们的消息。</li>
+<li>这里假定所有使用此调度器的actor都可以处理发送到其中一个actor的所有的消息；即actor属于actor池，并且对客户端来说没有保证来决定哪个actor实例实际上处理某个特定的消息。</li>
+<li>可共享性：仅对同一类型的Actor共享</li>
+<li>邮箱：任意，为所有的Actor创建一个</li>
+<li>使用场景：Work-sharing</li>
+<li>底层驱动：<code>java.util.concurrent.ExecutorService</code>
+  通过&quot;executor&quot;指定，可使用 “fork-join-executor”, “thread-pool-executor” 或<code>akka.dispatcher.ExecutorServiceConfigurator</code>的限定</li>
+<li>请注意<strong>不能</strong>将<code>BalancingDispatcher</code>用作一个<strong>路由器调度程序</strong>。（但是你可以把它用作<strong>Routees</strong>）</li>
 </ul>
 </li>
 <li><p>CallingThreadDispatcher</p>
 <ul>
 <li>该调度器只在当前线程上调用。该调度器不会创建任何新的线程，但它可以被相同的actor从不同的线程同时使用。更多信息和限制，请参阅<a href="09_testing_actor_systems.html#scala-callingthreaddispatcher">CallingThreadDispatcher</a>。</li>
-<li>可共享性: 无限制</li>
-<li>邮箱: 任何，每Actor每线程创建一个（需要时）</li>
-<li>使用场景: 测试</li>
-<li>底层使用: 调用的线程 (duh)</li>
+<li>可共享性：无限制</li>
+<li>邮箱：任意，每Actor每线程创建一个（需要时）</li>
+<li>使用场景：测试</li>
+<li>底层使用：调用的线程 (duh)</li>
 </ul>
 </li>
 </ul>
@@ -1763,7 +1764,7 @@
 <pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">myActor</span> =</span>
   context.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">MyActor</span>].withDispatcher(<span class="hljs-string">"my-pinned-dispatcher"</span>), <span class="hljs-string">"myactor2"</span>)
 </code></pre>
-<p>注意<code>thread-pool-executor</code>配置按上述<code>my-thread-pool-dispatcher</code>的调度程序例子并不适用。这是因为每个actor使用<code>PinnedDispatcher</code>时，会有其自己的线程池，并且该池将只有一个线程。</p>
+<p>注意<code>thread-pool-executor</code>配置按上述<code>my-thread-pool-dispatcher</code>的调度程序例子并<strong>不</strong>适用。这是因为每个actor使用<code>PinnedDispatcher</code>时，会有其自己的线程池，并且该池将只有一个线程。</p>
 <p>注意没有保证随时间推移，<strong>相同</strong>的线程会被使用，由于核心池超时被<code>PinnedDispatcher</code>用于在空闲actor的情况下降低资源使用率。总是使用相同的线程需要在<code>PinnedDispatcher</code>的配置中添加<code>thread-pool-executor.allow-core-timeout=off</code>。</p>
 
                     

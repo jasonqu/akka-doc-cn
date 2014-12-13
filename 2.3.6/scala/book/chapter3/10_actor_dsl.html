@@ -21,7 +21,7 @@
     <link rel="next" href="../chapter4/futures_and_agents.html" />
     
     
-    <link rel="prev" href="../chapter3/09_testing_actor_systems.html" />
+    <link rel="prev" href="../chapter3/09_1_testkit-example.html" />
     
 
         
@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="3.10" data-basepath=".." data-revision="1418396877209">
+    <div class="book"  data-level="3.10" data-basepath=".." data-revision="1418482047463">
     
 
 <div class="book-summary">
@@ -528,6 +528,28 @@
                     </a>
                 
             
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="3.9.1" data-path="chapter3/09_1_testkit-example.html">
+            
+                
+                    <a href="../chapter3/09_1_testkit-example.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.9.1.</b>
+                        
+                         TestKit实例
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
             
         </li>
     
@@ -1617,7 +1639,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_30">
+                    <section class="normal" id="section-gitbook_124">
                     
                         <h1 id="actor-dsl">Actor DSL</h1>
 <h3 id="the-actor-dsl">The Actor DSL</h3>
@@ -1635,8 +1657,8 @@
 })
 </code></pre>
 <p>在这里，<code>actor</code>方法，根据其调用的上下文，取代了<code>system.actorOf</code>或
-<code>context.actorOf</code>： 它需要一个隐式的 <code>ActorRefFactory</code>，其中在actor内可以通过以下方式获取<code>implicit val context: ActorContext</code>。在actor外，你不得不要声明隐式的<code>ActorSystem</code>，或者你可以显式地提供工厂（具体参见下文）。</p>
-<p>两种发起<code>context.become</code>（更换或添加新的行为） 的可能方式是单独提供的，从而支持了使一个不凌乱的嵌套接收标记：</p>
+<code>context.actorOf</code>：它需要一个隐式的 <code>ActorRefFactory</code>，其中在actor内可以通过以下方式获取<code>implicit val context: ActorContext</code>。在actor外，你不得不要声明隐式的<code>ActorSystem</code>，或者你可以显式地提供工厂（具体参见下文）。</p>
+<p>两种发起<code>context.become</code>（更换或添加新的行为）的可能方式是分别提供的，从而支持不凌乱的嵌套接收标记语法：</p>
 <pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">a</span> =</span> actor(<span class="hljs-keyword">new</span> <span class="hljs-type">Act</span> {
   become { <span class="hljs-comment">// this will replace the initial (empty) behavior</span>
     <span class="hljs-keyword">case</span> <span class="hljs-string">"info"</span> ⇒ sender() ! <span class="hljs-string">"A"</span>
@@ -1649,16 +1671,15 @@
   }
 })
 </code></pre>
-<p>TODO
-请注意，在原始行为安装后，更多地使用 <code>unbecome</code> 而不是 <code>becomeStacked</code> ，当<code>Act</code>特质是空行为时 （外部<code>become</code>只是在构造过程中替换它）。</p>
+<p>请注意，调用 <code>unbecome</code> 比 <code>becomeStacked</code> 次数多将导致原始行为被安装，对<code>Act</code>特质来说是空行为（外部<code>become</code>只是在构造过程中替换它）。</p>
 <h5 id="">生命周期管理</h5>
-<p>生命周期挂钩也可以暴露为 DSL 元素使用 （见<a href="01_actors.html#start-hook-scala">开始钩起</a>和<a href="01_actors.html#stop-hook-scala">停止钩起</a>），在那里如下所示的调用方法可以取代各自挂钩的内容：</p>
+<p>生命周期挂钩也可以暴露为 DSL 元素使用 （见<a href="01_actors.html#start-hook-scala">启动Hook</a>和<a href="01_actors.html#stop-hook-scala">终止Hook</a>），在那里如下所示的调用方法可以取代各自挂钩的内容：</p>
 <pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">a</span> =</span> actor(<span class="hljs-keyword">new</span> <span class="hljs-type">Act</span> {
   whenStarting { testActor ! <span class="hljs-string">"started"</span> }
   whenStopping { testActor ! <span class="hljs-string">"stopped"</span> }
 })
 </code></pre>
-<p>如果actor的逻辑生命周期匹配重新启动周期（即 <code>whenStopping</code> 在重新启动之前执行，并且<code>whenStarting</code>在重启 之后执行），上面的代码就足够了。如果这不是所期望的，可以使用下面的两个挂钩 （请参阅<a href="(01_actors.html#restart-hook-scala">重新启动钩</a>)）：</p>
+<p>如果actor的逻辑生命周期匹配重新启动周期（即 <code>whenStopping</code> 在重新启动之前执行，并且<code>whenStarting</code>在重启之后执行），上面的代码就足够了。如果这不是所期望的，可以使用下面的两个挂钩（请参阅<a href="01_actors.html#restart-hook-scala">重启Hook</a>）：</p>
 <pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">a</span> =</span> actor(<span class="hljs-keyword">new</span> <span class="hljs-type">Act</span> {
   become {
     <span class="hljs-keyword">case</span> <span class="hljs-string">"die"</span> ⇒ <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-type">Exception</span>
@@ -1680,7 +1701,7 @@
 </code></pre>
 <blockquote>
 <p>注意</p>
-<p>在某些情况下必须显式传递<code>ActorRefFactory</code>给<code>actor()</code>方法 （当编译器告诉你出现了模糊蕴涵(implicits)时，你会发现的） ActorRefFactory。</p>
+<p>在某些情况下必须显式传递<code>ActorRefFactory</code>给<code>actor()</code>方法（当编译器告诉你出现了模糊蕴涵(implicits)时，你会发现的）。</p>
 </blockquote>
 <p>孙子actor会被子actor监管；此外这类关系的监管策略也可以使用 DSL 元素进行配置（监管指令是<code>Act</code>特质的一部分）：</p>
 <pre><code class="lang-scala">superviseWith(<span class="hljs-type">OneForOneStrategy</span>() {
@@ -1710,7 +1731,7 @@
         </div>
 
         
-        <a href="../chapter3/09_testing_actor_systems.html" class="navigation navigation-prev " aria-label="Previous page: 测试Actor系统"><i class="fa fa-angle-left"></i></a>
+        <a href="../chapter3/09_1_testkit-example.html" class="navigation navigation-prev " aria-label="Previous page: TestKit实例"><i class="fa fa-angle-left"></i></a>
         
         
         <a href="../chapter4/futures_and_agents.html" class="navigation navigation-next " aria-label="Next page: Futures与Agents"><i class="fa fa-angle-right"></i></a>

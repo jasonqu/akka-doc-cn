@@ -29,6 +29,7 @@
    * [有限状态机(FSM)](chapter3/07_fsm.md)
    * [持久化](chapter3/08_persistence.md)
    * [测试Actor系统](chapter3/09_testing_actor_systems.md)
+       * [TestKit实例](chapter3/09_1_testkit-example.md)
    * [Actor DSL](chapter3/10_actor_dsl.md)
 * [Futures与Agents](chapter4/futures_and_agents.md)
    * [Futures](chapter4/01_futures.md)

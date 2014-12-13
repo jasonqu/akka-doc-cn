@@ -21,9 +21,9 @@ val a = actor(new Act {
 ```
 
 在这里，`actor`方法，根据其调用的上下文，取代了``system.actorOf``或
-``context.actorOf``： 它需要一个隐式的 `ActorRefFactory`，其中在actor内可以通过以下方式获取``implicit val context: ActorContext``。在actor外，你不得不要声明隐式的`ActorSystem`，或者你可以显式地提供工厂（具体参见下文）。
+``context.actorOf``：它需要一个隐式的 `ActorRefFactory`，其中在actor内可以通过以下方式获取``implicit val context: ActorContext``。在actor外，你不得不要声明隐式的`ActorSystem`，或者你可以显式地提供工厂（具体参见下文）。
 
-两种发起``context.become``（更换或添加新的行为） 的可能方式是单独提供的，从而支持了使一个不凌乱的嵌套接收标记：
+两种发起``context.become``（更换或添加新的行为）的可能方式是分别提供的，从而支持不凌乱的嵌套接收标记语法：
 
 ```scala
 val a = actor(new Act {
@@ -39,12 +39,11 @@ val a = actor(new Act {
 })
 ```
 
-TODO
-请注意，在原始行为安装后，更多地使用 ``unbecome`` 而不是 ``becomeStacked`` ，当`Act`特质是空行为时 （外部``become``只是在构造过程中替换它）。
+请注意，调用 ``unbecome`` 比 ``becomeStacked`` 次数多将导致原始行为被安装，对`Act`特质来说是空行为（外部``become``只是在构造过程中替换它）。
 
 #####生命周期管理
 
-生命周期挂钩也可以暴露为 DSL 元素使用 （见[开始钩起](01_actors.md#start-hook-scala)和[停止钩起](01_actors.md#stop-hook-scala)），在那里如下所示的调用方法可以取代各自挂钩的内容：
+生命周期挂钩也可以暴露为 DSL 元素使用 （见[启动Hook](01_actors.md#start-hook-scala)和[终止Hook](01_actors.md#stop-hook-scala)），在那里如下所示的调用方法可以取代各自挂钩的内容：
 
 ```scala
 val a = actor(new Act {
@@ -53,7 +52,7 @@ val a = actor(new Act {
 })
 ```
 
-如果actor的逻辑生命周期匹配重新启动周期（即 ``whenStopping`` 在重新启动之前执行，并且`` whenStarting``在重启 之后执行），上面的代码就足够了。如果这不是所期望的，可以使用下面的两个挂钩 （请参阅[重新启动钩]((01_actors.md#restart-hook-scala))）：
+如果actor的逻辑生命周期匹配重新启动周期（即 ``whenStopping`` 在重新启动之前执行，并且`` whenStarting``在重启之后执行），上面的代码就足够了。如果这不是所期望的，可以使用下面的两个挂钩（请参阅[重启Hook](01_actors.md#restart-hook-scala)）：
 
 ```scala
 val a = actor(new Act {
@@ -81,7 +80,7 @@ val a = actor(system, "fred")(new Act {
 
 > 注意
 
-> 在某些情况下必须显式传递`ActorRefFactory`给`actor()`方法 （当编译器告诉你出现了模糊蕴涵(implicits)时，你会发现的） ActorRefFactory。
+> 在某些情况下必须显式传递`ActorRefFactory`给`actor()`方法（当编译器告诉你出现了模糊蕴涵(implicits)时，你会发现的）。
 
 孙子actor会被子actor监管；此外这类关系的监管策略也可以使用 DSL 元素进行配置（监管指令是`Act`特质的一部分）：
 

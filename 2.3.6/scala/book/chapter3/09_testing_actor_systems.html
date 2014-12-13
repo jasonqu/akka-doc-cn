@@ -18,7 +18,7 @@
     
     
     
-    <link rel="next" href="../chapter3/10_actor_dsl.html" />
+    <link rel="next" href="../chapter3/09_1_testkit-example.html" />
     
     
     <link rel="prev" href="../chapter3/08_persistence.html" />
@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="3.9" data-basepath=".." data-revision="1418396877209">
+    <div class="book"  data-level="3.9" data-basepath=".." data-revision="1418482047463">
     
 
 <div class="book-summary">
@@ -528,6 +528,28 @@
                     </a>
                 
             
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="3.9.1" data-path="chapter3/09_1_testkit-example.html">
+            
+                
+                    <a href="../chapter3/09_1_testkit-example.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.9.1.</b>
+                        
+                         TestKit实例
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
             
         </li>
     
@@ -1617,25 +1639,25 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_29">
+                    <section class="normal" id="section-gitbook_123">
                     
                         <h1 id="actor">测试Actor系统</h1>
 <ul>
-<li><a href="testkit-example.html">TestKit 实例 (Scala)</a></li>
+<li><a href="09_1_testkit_example.html">TestKit 实例 (Scala)</a></li>
 </ul>
-<p>对于任何软件开发，自动化测试都是开发过程中一个重要组成部分。actor 模型对于代码单元如何划分，它们之间如何交互提供了一种新的视角，这对如何编写测试也造成了影响.</p>
-<p>Akka 有一个专门的模块——<code>akka-testkit</code>来支持不同层次上的测试, 测试很明显有两个类别:</p>
+<p>对于任何软件开发，自动化测试都是开发过程中一个重要组成部分。actor 模型对于代码单元如何划分，它们之间如何交互提供了一种新的视角，这对如何编写测试也造成了影响。</p>
+<p>Akka 有一个专门的模块——<code>akka-testkit</code>来支持不同层次上的测试，测试很明显有两个类别：</p>
 <ul>
 <li>测试独立的、不包括actor模型的代码，即没有多线程的内容；这意味着给事件发生的次序给定，有完全确定的行为，没有任何并发考虑，这在下文中称为 <strong>单元测试（Unit Testing）</strong>。</li>
 <li>测试（多个）包装过的actor，包括多线程调度；这意味着事件的次序没有确定性，但由于使用了actor模型而不需要考虑并发，这在下文中被称为 <strong>集成测试（Integration Testing）</strong>。</li>
 </ul>
-<p>当然这两个类型有着不同的测试粒度, 单元测试通常是白盒测试，而集成测试是对完整的actor网络进行的功能测试。是否把并发考虑为测试的一部分，是其中重要的区别。我们提供的工具将在下面的章节中详细介绍。</p>
+<p>当然这两个类型有着不同的测试粒度，单元测试通常是白盒测试，而集成测试是对完整的actor网络进行的功能测试。是否把并发考虑为测试的一部分，是其中重要的区别。我们提供的工具将在下面的章节中详细介绍。</p>
 <blockquote>
 <p>注意</p>
 <p>请确保在依赖项中加入<code>akka-testkit</code>模块。</p>
 </blockquote>
 <h3 id="testactorref">用<code>TestActorRef</code>做同步单元测试</h3>
-<p><code>Actor</code>类中的业务逻辑测试可以分为两部分: 首先，每个原子操作必须独立工作，然后输入的事件序列必须被正确处理，即使事件的次序存在一些可能的变化。前者是单线程单元测试的主要使用场景，而后者可以在集成测试中进行确认。</p>
+<p><code>Actor</code>类中的业务逻辑测试可以分为两部分：首先，每个原子操作必须独立工作，然后输入的事件序列必须被正确处理，即使事件的次序存在一些可能的变化。前者是单线程单元测试的主要使用场景，而后者可以在集成测试中进行确认。</p>
 <p>通常，<code>ActorRef</code>将实际的<code>Actor</code>实例与外界隔离开，唯一的通信通道是actor的邮箱。这个限制是单元测试的障碍，所以我们引入了<code>TestActorRef</code>。这个特殊类型的引用是专门为测试而设计的，它允许以两种方式访问actor：通过获取实际actor实例的引用，或者通过调用或查询actor的行为（<code>receive</code>）。下文中对每一种方式都有专门的章节介绍。</p>
 <h5 id="actor">获取一个<code>Actor</code>的引用</h5>
 <p>能够访问到实际的<code>Actor</code>对象使得所有的传统单元测试技术都可以用于测试其中的方法。可以像这样获取一个引用：</p>
@@ -1645,7 +1667,7 @@
 <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">actor</span> =</span> actorRef.underlyingActor
 </code></pre>
 <p>由于<code>TestActorRef</code>是actor类型的高阶类型（泛型），因此它返回的底层actor具有正确的静态类型。这样以后你就可以象平常一样将任何单元测试工具用于actor上了。</p>
-<h5 id="">测试有限状态机</h5>
+<h5 id="a-nametestfsmrefa"><a name="testfsmref"></a>测试有限状态机</h5>
 <p>如果你要测试的actor是一个<code>FSM</code>，你可以使用专门的<code>TestFSMRef</code>，它拥有普通<code>TestActorRef</code>的所有功能，并且额外地允许访问其内部状态：</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.testkit.<span class="hljs-type">TestFSMRef</span>
 <span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">FSM</span>
@@ -1670,7 +1692,7 @@ assert(fsm.isTimerActive(<span class="hljs-string">"test"</span>) == <span class
 fsm.cancelTimer(<span class="hljs-string">"test"</span>)
 assert(fsm.isTimerActive(<span class="hljs-string">"test"</span>) == <span class="hljs-literal">false</span>)
 </code></pre>
-<p>由于Scala类型推测的限制，只有一个如上所示的工厂方法，所以你很可能需要写像<code>TestFSMRef(new MyFSM)</code>这样的代码，而不是想象中的类似<code>ActorRef</code>的<code>TestFSMRef[MyFSM]</code>。上例所示的所有方法都直接访问FSM的状态，不作任何同步；这在使用<code>CallingThreadDispatcher</code>且没有其它线程参与的情况下是合适的，但如果你实际上需要 处理定时器事件可能会导致意外的情形，因为它们是在<code>Scheduler</code>线程中执行的。</p>
+<p>由于Scala类型推断的限制，只有一个如上所示的工厂方法，所以你很可能需要写像<code>TestFSMRef(new MyFSM)</code>这样的代码，而不是想象中的类似<code>ActorRef</code>的<code>TestFSMRef[MyFSM]</code>。上例所示的所有方法都直接访问FSM的状态，不作任何同步；这在使用<code>CallingThreadDispatcher</code>且没有其它线程参与的情况下是合适的，但如果你实际上需要处理定时器事件可能会导致意外的情形，因为它们是在<code>Scheduler</code>线程中执行的。</p>
 <h5 id="actor">测试Actor的行为</h5>
 <p>当消息派发器调用actor的逻辑来处理一条消息时，它实际上是对当前注册到actor的行为调用了<code>apply</code>。行为的初始值是代码中声明的<code>receive</code>方法的返回值，但可以通过对外部消息的响应调用<code>become</code>和<code>unbecome</code>来改变这个行为。所有这些特性使得进行actor的行为测试不太容易。因此<code>TestActorRef</code>提供了一种不同的操作方式来对<code>Actor</code>的测试进行补充：它支持所有正常的<code>ActorRef</code>中的操作。发往actor的消息在当前线程中同步处理，应答象往常一样回送。这个技巧来自下面所介绍的<a href="#CallingThreadDispatcher"><code>CallingThreadDispatcher</code></a>；这个派发器被隐式地用于所有实例化为<code>TestActorRef</code>的actor。</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.testkit.<span class="hljs-type">TestActorRef</span>
@@ -1688,10 +1710,10 @@ result should be(<span class="hljs-number">42</span>)
 <p>另一个在单线程测试中被覆盖的特殊点是<code>receiveTimeout</code>，由于包含了它会产生异步的<code>ReceiveTimeout</code>消息队列，因此与同步约定矛盾。</p>
 <blockquote>
 <p>警告</p>
-<p>综上所述：<code>TestActorRef</code>重写了两个成员: 它设置派发器为<code>CallingThreadDispatcher.global</code>，设置<code>receiveTimeout</code>为None。</p>
+<p>综上所述：<code>TestActorRef</code>重写了两个成员：它设置派发器为<code>CallingThreadDispatcher.global</code>，设置<code>receiveTimeout</code>为None。</p>
 </blockquote>
 <h5 id="">介于两者之间方法：期望异常</h5>
-<p>如果你想要测试actor的行为，包括热替换，但是不涉及消息派发器，也不希望<code>TestActorRef</code>吞掉所有抛出的异常，那么为你准备了另一种模式: 只要使用 <code>TestActorRef</code> 的 <code>receive</code> 方法 , 这将会把消息转发给内部的 actor:</p>
+<p>如果你想要测试actor的行为，包括热替换，但是不涉及消息派发器，也不希望<code>TestActorRef</code>吞掉所有抛出的异常，那么为你准备了另一种模式：只要使用 <code>TestActorRef</code> 的 <code>receive</code> 方法 ，这将会把消息转发给内部的 actor:</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.testkit.<span class="hljs-type">TestActorRef</span>
 
 <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">actorRef</span> =</span> <span class="hljs-type">TestActorRef</span>(<span class="hljs-keyword">new</span> <span class="hljs-type">Actor</span> {
@@ -1709,7 +1731,7 @@ intercept[<span class="hljs-type">IllegalArgumentException</span>] { actorRef.re
 </ul>
 <p>放心大胆地对各种可能性进行实验，如果你发现了有用的模式，快让Akka论坛知道它！常用操作甚至可能放进优美的DSL中，谁知道呢。</p>
 <h3 id="testkit">用<code>TestKit</code>进行异步集成测试</h3>
-<p>当基本确定你的actor的业务逻辑是正确的之后，下一步就是确认它在目标环境中也能正确工作（如果actor个体都足够简单，可能是因为他们使用了 <code>FSM</code> 模块, 这也可以放到第一步). 关于环境的定义当然很大程度上由手头的问题和 你打算测试的程度来决定, 从功能/集成测试到完整的系统测试. 最简单的步骤包括测试过程（提供所期望的触发条件）、要测试的actor和接收应答的actor。大一些的系统将被测的actor替换成一组actor网络，将触发条件应用于不同的切入点，并整理将会从不同的输出位置发送的结果，但基本的原则保持不变，就是测试由一个单独的流程来驱动。</p>
+<p>当基本确定你的actor的业务逻辑是正确的之后，下一步就是确认它在目标环境中也能正确工作（如果actor个体都足够简单，可能是因为他们使用了 <code>FSM</code> 模块，这也可以放到第一步)。关于环境的定义当然很大程度上由手头的问题和你打算测试的程度来决定，从功能/集成测试到完整的系统测试。最简单的步骤包括测试过程（提供所期望的触发条件）、要测试的actor和接收应答的actor。大一些的系统将被测的actor替换成一组actor网络，将触发条件应用于不同的切入点，并整理将会从不同的输出位置发送的结果，但基本的原则保持不变，就是测试由一个单独的流程来驱动。</p>
 <p><code>TestKit</code> 类包含一组工具来简化这些常用的工作.</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">ActorSystem</span>
 <span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Actor</span>
@@ -1739,52 +1761,52 @@ intercept[<span class="hljs-type">IllegalArgumentException</span>] { actorRef.re
   }
 }
 </code></pre>
-<p><code>TestKit</code> 中有一个名为 <code>testActor</code> 的actor作为将要被不同的 <code>expectMsg...</code>断言检查的消息的入口，下面会详细介绍这些断言。 当混入了 <code>ImplicitSender</code> trait后, 这个测试actor会在整个测试过程中，被隐式地用作消息的发送者引用. <code>testActor</code> 也可以像平常一样被 发送给其它的actor，通常是订阅成为通知监听器. 有一套检查方法, 例如 接收所有匹配某些条件的消息，接收一系列固定的消息序列或类，在某段时间内收不到消息，等。</p>
-<p>作为参数传递到TestKit构造函数的ActorSystem 可以通过<code>system</code>成员来访问。记得在测试完成后关闭actor系统 (即使是在测试失败的情况下) 以保证所有的actor——包括测试actor——被停止.</p>
+<p><code>TestKit</code> 中有一个名为 <code>testActor</code> 的actor作为将要被不同的 <code>expectMsg...</code>断言检查的消息的入口，下面会详细介绍这些断言。 当混入了 <code>ImplicitSender</code> trait后，这个测试actor会在整个测试过程中，被隐式地用作消息的发送者引用。<code>testActor</code> 也可以像平常一样被发送给其它的actor，通常是订阅成为通知监听器。有一套检查方法，例如 接收所有匹配某些条件的消息，接收一系列固定的消息序列或类，在某段时间内收不到消息，等。</p>
+<p>作为参数传递到<code>TestKit</code>构造函数的<code>ActorSystem</code>可以通过<code>system</code>成员来访问。记得在测试完成后关闭actor系统 (即使是在测试失败的情况下) 以保证所有的actor——包括测试actor——被停止.</p>
 <h5 id="">内置断言</h5>
-<p>上面提到的 <code>expectMsg</code>并不是唯一的对收到的消息进行断言的方法. 以下是完整的列表:</p>
+<p>上面提到的 <code>expectMsg</code>并不是唯一的对收到的消息进行断言的方法。以下是完整的列表:</p>
 <ul>
-<li><p><code>expectMsg[T](d: Duration, msg: T): T</code>
-给定的消息对象必须在指定的时间内到达；该消息对象将被返回.</p>
+<li><p><code>expectMsg[T](d: Duration, msg: T): T</code></p>
+<p>给定的消息对象必须在指定的时间内到达；该消息对象将被返回。</p>
 </li>
 <li><p><code>expectMsgPF[T](d: Duration)(pf: PartialFunction[Any, T]): T</code></p>
-<p>在给定的时间段内，必须有一条消息到达，必须为这类消息定义了偏函数；将收到的消息应用于偏函数并返回其结果。可以不指定时间段（这时需要一对空的括号）， 这时使用最深层的 <a href="#testkit-within"><code>within</code></a> 块中的期限.</p>
+<p>在给定的时间段内，必须有一条消息到达，必须为这类消息定义了偏函数；将收到的消息应用于偏函数并返回其结果。可以不指定时间段（这时需要一对空的括号），这时使用最深层的 <a href="#testkit-within"><code>within</code></a> 块中的期限。</p>
 </li>
 <li><p><code>expectMsgClass[T](d: Duration, c: Class[T]): T</code></p>
-<p>在分配的时间片内必须接收到<code>Class</code>类型的对象实例；并返回该对象。 注意它的类型匹配是子类兼容的；如果需要类型是相等的，参考使用单个class参数的 <code>expectMsgAllClassOf</code> 。</p>
+<p>在分配的时间片内必须接收到<code>Class</code>类型的对象实例；并返回该对象。注意它的类型匹配是子类兼容的；如果需要类型是相等的，参考使用单个class参数的<code>expectMsgAllClassOf</code>。</p>
 </li>
 <li><p><code>expectMsgType[T: Manifest](d: Duration)</code></p>
-<p>在分配的时间片内必须收到指定类型 (擦除后)的对象实例; 并返回该对象。这个方法基本上与 <code>expectMsgClass(implicitly[ClassTag[T]].runtimeClass)</code>等价.</p>
+<p>在分配的时间片内必须收到指定类型 (擦除后)的对象实例；并返回该对象。这个方法基本上与 <code>expectMsgClass(implicitly[ClassTag[T]].runtimeClass)</code>等价。</p>
 </li>
-<li><p><code>expectMsgAnyOf[T](d: Duration, obj: T*): T</code>
-在指定的时间内必须收到一个对象，而且此对象必须与传入的多个对象引用中至少一个相等( 用 <code>==</code> 进行比较); 并返回该对象.</p>
+<li><p><code>expectMsgAnyOf[T](d: Duration, obj: T*): T</code></p>
+<p>在指定的时间内必须收到一个对象，而且此对象必须与传入的多个对象引用中至少一个相等( 用 <code>==</code> 进行比较)；并返回该对象。</p>
 </li>
 <li><p><code>expectMsgAnyClassOf[T](d: Duration, obj: Class[_ &lt;: T]*): T</code></p>
-<p>在指定的时间内必须收到一个对象，它必须指定的多个<code>Class</code> 中某一个类对象的实例; 并返回该对象.</p>
+<p>在指定的时间内必须收到一个对象，它必须指定的多个<code>Class</code>中某一个类对象的实例；并返回该对象。</p>
 </li>
 <li><p><code>expectMsgAllOf[T](d: Duration, obj: T*): Seq[T]</code></p>
-<p>在指定时间内必须收到与指定的对象数组中相等数量的对象, 对每个收到的对象，必须至少有一个数组中的对象与之相等(用<code>==</code>进行比较) . 返回收到对象的完整序列.</p>
+<p>在指定时间内必须收到与指定的对象数组中相等数量的对象，对每个收到的对象，必须至少有一个数组中的对象与之相等(用<code>==</code>进行比较) 。返回收到对象的完整序列。</p>
 </li>
 <li><p><code>expectMsgAllClassOf[T](d: Duration, c: Class[_ &lt;: T]*): Seq[T]</code></p>
-<p>在指定时间内必须收到与指定的 <code>Class</code> 数组相等数量的对象，对数组中的每一个类， 必须至少有一个对象的类与之相等(用 <code>==</code>进行比较) (这 <em>不是</em> 子类兼容的类型检查). 返回收到对象的完整序列.</p>
+<p>在指定时间内必须收到与指定的 <code>Class</code> 数组相等数量的对象，对数组中的每一个类，必须至少有一个对象的类与之相等(用 <code>==</code>进行比较) (这 <em>不是</em> 子类兼容的类型检查)。返回收到对象的完整序列。</p>
 </li>
 <li><p><code>expectMsgAllConformingOf[T](d: Duration, c: Class[_ &lt;: T]*): Seq[T]</code></p>
-<p>在指定时间内必须收到与指定的 <code>Class</code> 数组相等数量的对象，对数组中的每个类必须至少有一个对象是这个类的实例。返回收到对象的完整序列.</p>
+<p>在指定时间内必须收到与指定的 <code>Class</code>数组相等数量的对象，对数组中的每个类必须至少有一个对象是这个类的实例。返回收到对象的完整序列。</p>
 </li>
 <li><p><code>expectNoMsg(d: Duration)</code></p>
 <p>在指定时间内不能收到消息。如果在这个方法被调用之前已经收到了消息，并且没有用其它的方法将这些消息从队列中删除，这个断言也会失败。</p>
 </li>
 <li><p><code>receiveN(n: Int, d: Duration): Seq[AnyRef]</code></p>
-<p>指定的时间内必须收到<code>n</code> 条消息; 返回收到的消息.</p>
+<p>指定的时间内必须收到<code>n</code>条消息；返回收到的消息。</p>
 </li>
 <li><p><code>fishForMessage(max: Duration, hint: String)(pf: PartialFunction[Any, Boolean]): Any</code></p>
-<p>只要时间没有用完，而且偏函数匹配收到的消息并返回<code>false</code>，则一直接收消息. 返回使偏函数返回<code>true</code> 的消息或抛出异常, 异常中会提供一些提示供debug使用。</p>
+<p>只要时间没有用完，而且偏函数匹配收到的消息并返回<code>false</code>，则一直接收消息。返回使偏函数返回<code>true</code> 的消息或抛出异常，异常中会提供一些提示供debug使用。</p>
 </li>
 </ul>
-<p>除了消息接收断言，还有一些方法来对消息流提供帮助:</p>
+<p>除了消息接收断言，还有一些方法来对消息流提供帮助：</p>
 <ul>
 <li><p><code>receiveOne(d: Duration): AnyRef</code></p>
-<p>尝试等待给定的时间间隔来接收一个消息，如果失败则返回<code>null</code> . 如果给定的 Duration 是0，则调用是非阻塞的（轮询模式）.</p>
+<p>尝试等待给定的时间间隔来接收一个消息，如果失败则返回<code>null</code>。如果给定的<code>Duration</code>是0，则调用是非阻塞的（轮询模式）。</p>
 </li>
 <li><p><code>receiveWhile[T](max: Duration, idle: Duration, messages: Int)(pf: PartialFunction[Any, T]): Seq[T]</code></p>
 <p>只要满足以下条件就收集消息：</p>
@@ -1794,24 +1816,23 @@ intercept[<span class="hljs-type">IllegalArgumentException</span>] { actorRef.re
 <li>在空闲的时间内收到了下一条消息</li>
 <li>消息数量还没有到上限</li>
 </ul>
-<p>返回收集到的所有消息. 时间上限缺省值是最深层的 <a href="#testkit-within"><code>within</code></a> 块中的剩余时间，空闲时间缺省为无限 (也就是禁止空闲超时功能). 期望的消息数量缺省值为 Int.MaxValue, 也就是不作这个限制.</p>
+<p>返回收集到的所有消息。时间上限缺省值是最深层的 <a href="#testkit-within"><code>within</code></a> 块中的剩余时间，空闲时间缺省为无限 (也就是禁止空闲超时功能)。期望的消息数量缺省值为 Int.MaxValue，也就是不作这个限制。</p>
 </li>
 <li><p><code>awaitCond(p: =&gt; Boolean, max: Duration, interval: Duration)</code></p>
-<p>每经过 <code>interval</code>时间就检查一下给定的条件，直到它返回 <code>true</code> 或者 <code>max</code> 时间用完了. 时间间隔缺省为 100 ms 而最大值缺省为最深层的 <a href="#testkit-within"><code>within</code></a>  块中的剩余时间.</p>
-<ul>
-<li><code>awaitAssert(a: =&gt; Any, max: Duration, interval: Duration)</code></li>
-</ul>
+<p>每经过 <code>interval</code>时间就检查一下给定的条件，直到它返回 <code>true</code> 或者 <code>max</code> 时间用完了。时间间隔缺省为 100 ms 而最大值缺省为最深层的 <a href="#testkit-within"><code>within</code></a>  块中的剩余时间。</p>
+</li>
+<li><p><code>awaitAssert(a: =&gt; Any, max: Duration, interval: Duration)</code></p>
 <p>在每个时间间隔验证一遍给定的断言函数，直到它不抛出异常，或<code>max</code>持续时间用完。如果在超时已到则抛出最后一个异常。间隔默认为 100 ms 和最大值默认为最深层的 <a href="#testkit-within"><code>within</code></a>  块中的剩余时间。
 TODO Akka文档中的重复</p>
 </li>
 <li><p><code>ignoreMsg(pf: PartialFunction[AnyRef, Boolean])</code>
 <code>ignoreNoMsg</code></p>
-<p>内部的 <code>testActor</code> 包含一个偏函数用来忽略消息: 它只会将与偏函数不匹配或使函数返回<code>false</code>的消息放进队列。 这个函数可以用上面的方法进行设置和 重设; 每一次调用都会覆盖之前的函数，而不会迭加.</p>
+<p>内部的 <code>testActor</code> 包含一个偏函数用来忽略消息：它只会将与偏函数不匹配或使函数返回<code>false</code>的消息放进队列。 这个函数可以用上面的方法进行设置和重设；每一次调用都会覆盖之前的函数，而不会迭加。</p>
 <p>这个功能在你想忽略一般的消息而只对指定的一些消息感兴趣时（例如测试日志系统时）比较有用。</p>
 </li>
 </ul>
 <h5 id="">期望日志消息</h5>
-<p>由于集成测试不允许进入参与测试的actor内部处理流程, 无法直接确认预料中的异常. 因此为了做这件事，只能使用日志系统：将普通的事件处理器替换成 <code>TestEventListener</code>并使用一个 <code>EventFilter</code> ，从而可以对日志消息，包括由于异常产生的日志，做断言:</p>
+<p>由于集成测试不允许进入参与测试的actor内部处理流程，无法直接确认预料中的异常。因此为了做这件事，只能使用日志系统：将普通的事件处理器替换成 <code>TestEventListener</code>并使用一个 <code>EventFilter</code> ，从而可以对日志消息，包括由于异常产生的日志，做断言:</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.testkit.<span class="hljs-type">EventFilter</span>
 <span class="hljs-keyword">import</span> com.typesafe.config.<span class="hljs-type">ConfigFactory</span>
 
@@ -1827,21 +1848,21 @@ TODO Akka文档中的重复</p>
   shutdown(system)
 }
 </code></pre>
-<p>如果出现的次数是具体的——如上所示——然后<code>intercept</code>将阻塞直到收到匹配消息达到这一数字，或<code>akka.test.filter-leeway</code>配置的超时时间用完了 （在传入的代码块返回后，时间开始计数）。超时时测试失败。</p>
+<p>如果出现的次数是具体的——如上所示——然后<code>intercept</code>将阻塞直到收到匹配消息达到这一数字，或<code>akka.test.filter-leeway</code>配置的超时时间用完了（在传入的代码块返回后，时间开始计数）。超时时测试失败。</p>
 <blockquote>
 <p>注意</p>
-<p>一定要在你的 <code>application.conf</code>中 替换默认的日志记录器为<code>TestEventListener</code>，以启用此功能：</p>
-</blockquote>
+<p>一定要在你的 <code>application.conf</code>中替换默认的日志记录器为<code>TestEventListener</code>，以启用此功能：</p>
 <pre><code>akka.loggers = [akka.testkit.TestEventListener]
-</code></pre><p><span id="testkit-within"></span></p>
+</code></pre></blockquote>
+<p><span id="testkit-within"></span></p>
 <h5 id="">对定时进行断言</h5>
-<p>功能测试的另一个重要部分与定时器有关：有些事件不能立即发生（如定时器）, 另外一些需要在时间期限内发生. 因此所有的进行检查的方法 都接收一个时间上限，不论是正面还是负面的结果都应该在这个时间之前获得。时间下限需要在这个检测方法之外进行检查，因而有一个新的工具来管理时间期限:</p>
+<p>功能测试的另一个重要部分与定时器有关：有些事件不能立即发生（如定时器），另外一些需要在时间期限内发生。因此所有的进行检查的方法 都接收一个时间上限，不论是正面还是负面的结果都应该在这个时间之前获得。时间下限需要在这个检测方法之外进行检查，因而有一个新的工具来管理时间期限:</p>
 <pre><code class="lang-scala">   within([min, ]max) {
      ...
    }
 </code></pre>
-<p>传给<code>within</code>的代码块必须在一个介于 <code>min</code> 和 <code>max</code>之间的<code>Duration</code>之前完成, 其中<code>min</code>缺省值为0. 将<code>max</code> 参数与块的启动时间相加得到的时间期限在所有检查方法块内部都可以隐式获得， 如果你没有指定<code>max</code>值，它会从最深层的 <code>within</code> 块继承这个值.</p>
-<p>应注意如果代码块的最后一条接收消息断言是 <code>expectNoMsg</code> 或 <code>receiveWhile</code>, 对 <code>within</code> 的最终检查将被跳过，以避免由于唤醒延迟导致的错误的true值. 这意味着虽然其中每一个独立的断言仍然使用时间上限，整个代码块在这种情况下会有长度随机的延迟。</p>
+<p>传给<code>within</code>的代码块必须在一个介于 <code>min</code> 和 <code>max</code>之间的<code>Duration</code>之前完成，其中<code>min</code>缺省值为0。将<code>max</code> 参数与块的启动时间相加得到的时间期限在所有检查方法块内部都可以隐式获得，如果你没有指定<code>max</code>值，它会从最深层的 <code>within</code> 块继承这个值.</p>
+<p>应注意如果代码块的最后一条接收消息断言是 <code>expectNoMsg</code> 或 <code>receiveWhile</code>，对 <code>within</code> 的最终检查将被跳过，以避免由于唤醒延迟导致的错误的true值。这意味着虽然其中每一个独立的断言仍然使用时间上限，整个代码块在这种情况下会有长度随机的延迟。</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Props</span>
 <span class="hljs-keyword">import</span> scala.concurrent.duration._
 
@@ -1855,23 +1876,23 @@ within(<span class="hljs-number">200</span> millis) {
 </code></pre>
 <blockquote>
 <p>注意</p>
-<p>所有的时间都以 <code>System.nanoTime</code>为单位, 即它们描述的是墙上时间，而非CPU时间.</p>
+<p>所有的时间都以 <code>System.nanoTime</code>为单位，即它们描述的是墙上时间，而非CPU时间.</p>
 </blockquote>
-<p>Ray Roestenburg 写了一篇关于使用 TestKit 的好文: [<a href="http://roestenburg.agilesquad.com/2011/02/unit-testing-akka-actors-with-testkit_12.html" target="_blank">http://roestenburg.agilesquad.com/2011/02/unit-testing-akka-actors-with-testkit_12.html</a>]. 完整的示例也可以在<a href="09_1_testkit-example.html">这里</a>找到.</p>
-<h6 id="">#考虑很慢的测试系统</h6>
-<p>你在跑得飞快的笔记本上使用的超时设置在高负载的Jenkins（或类似的）服务器上通常都会导致虚假的测试失败。 为了考虑这种情况，所有的时间上限都在内部乘以一个系数，这个系数来自 <a href="../chapter2/09_configuration.html">配置文件</a>中的 <code>akka.test.timefactor</code>, 缺省值为 1.</p>
-<p>你也可以用<code>akka.testkit</code>包对象中的隐式转换来将同样的系数来作用于其它的时限，为 <code>Duration</code>添加扩展函数.</p>
+<p>Ray Roestenburg 写了一篇关于使用 TestKit 的<a href="http://roestenburg.agilesquad.com/2011/02/unit-testing-akka-actors-with-testkit_12.html" target="_blank">好文</a>。完整的示例也可以在<a href="09_1_testkit-example.html">这里</a>找到.</p>
+<h6 id="">考虑很慢的测试系统</h6>
+<p>你在跑得飞快的笔记本上使用的超时设置在高负载的Jenkins（或类似的）服务器上通常都会导致虚假的测试失败。 为了考虑这种情况，所有的时间上限都在内部乘以一个系数，这个系数来自<a href="../chapter2/09_configuration.html">配置文件</a>中的 <code>akka.test.timefactor</code>，缺省值为 1。</p>
+<p>你也可以用<code>akka.testkit</code>包对象中的隐式转换来将同样的系数来作用于其它的时限，为<code>Duration</code>添加扩展函数。</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">import</span> scala.concurrent.duration._
 <span class="hljs-keyword">import</span> akka.testkit._
 <span class="hljs-number">10.</span>milliseconds.dilated
 </code></pre>
 <h5 id="actorref">用隐式的ActorRef解决冲突</h5>
-<p>如果你希望在基于TestKit的测试中，消息发送者为 <code>testActor</code> 只需要在你的测试代码混入 <code>ÌmplicitSender</code> .</p>
+<p>如果你希望在基于TestKit的测试中，消息发送者为 <code>testActor</code>，只需要在你的测试代码混入 <code>ÌmplicitSender</code>。</p>
 <pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MySpec</span>(</span>_system: <span class="hljs-type">ActorSystem</span>) <span class="hljs-keyword">extends</span> <span class="hljs-type">TestKit</span>(_system) <span class="hljs-keyword">with</span> <span class="hljs-type">ImplicitSender</span>
   <span class="hljs-keyword">with</span> <span class="hljs-type">WordSpecLike</span> <span class="hljs-keyword">with</span> <span class="hljs-type">Matchers</span> <span class="hljs-keyword">with</span> <span class="hljs-type">BeforeAndAfterAll</span> {
 </code></pre>
 <h5 id="-actor">使用多个探针 Actor</h5>
-<p>如果待测的actor会发送多个消息到不同的目标，在使用<code>TestKit</code>时可能会难以分辨到达 <code>testActor</code>的消息流. 另一种方法是用它来创建简单的探针actor，将它们插入到消息流中. 为了让这种方法更加强大和方便，我们提供了一个具体实现，称为 <code>TestProbe</code>. 它的功能可以用下面的小例子说明:</p>
+<p>如果待测的actor会发送多个消息到不同的目标，在使用<code>TestKit</code>时可能会难以分辨到达 <code>testActor</code>的消息流。另一种方法是用它来创建简单的探针actor，将它们插入到消息流中。为了让这种方法更加强大和方便，我们提供了一个具体实现，称为 <code>TestProbe</code>。它的功能可以用下面的小例子说明：</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">import</span> scala.concurrent.duration._
 <span class="hljs-keyword">import</span> akka.actor._
 <span class="hljs-keyword">import</span> scala.concurrent.<span class="hljs-type">Future</span>
@@ -1888,8 +1909,8 @@ within(<span class="hljs-number">200</span> millis) {
       dest2 ! x
   }
 }
-
-<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">probe1</span> =</span> <span class="hljs-type">TestProbe</span>()
+</code></pre>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">probe1</span> =</span> <span class="hljs-type">TestProbe</span>()
 <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">probe2</span> =</span> <span class="hljs-type">TestProbe</span>()
 <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">actor</span> =</span> system.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">MyDoubleEcho</span>])
 actor ! ((probe1.ref, probe2.ref))
@@ -1897,36 +1918,8 @@ actor ! <span class="hljs-string">"hello"</span>
 probe1.expectMsg(<span class="hljs-number">500</span> millis, <span class="hljs-string">"hello"</span>)
 probe2.expectMsg(<span class="hljs-number">500</span> millis, <span class="hljs-string">"hello"</span>)
 </code></pre>
-<p>这里我们用 <code>MyDoubleEcho</code>来模拟一个待测系统, 它会将输入镜像为两个输出. 关联两个测试探针来进行（最简单）行为的确认. 还有一个例子是两个相互协作的 actor A，B， A 发送消息给 B. 为了确认这个消息流，可以插入一个 <code>TestProbe</code> 作为A的目标, 使用转发功能或下文中的自动导向功能在测试上下文中包含一个真实的B.</p>
-<p>还可以为探针配备自定义的断言来使测试代码更简洁清晰:</p>
-<h1 id="-head">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</h1>
-<pre><code class="lang-scala">ase <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Update</span>(</span>id: <span class="hljs-type">Int</span>, value: <span class="hljs-type">String</span>)
-
-<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">probe</span> =</span> <span class="hljs-keyword">new</span> <span class="hljs-type">TestProbe</span>(system) {
-  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">expectUpdate</span>(</span>x: <span class="hljs-type">Int</span>) = {
-    expectMsgPF() {
-      <span class="hljs-keyword">case</span> <span class="hljs-type">Update</span>(id, _) <span class="hljs-keyword">if</span> id == x =&gt; <span class="hljs-literal">true</span>
-    }
-    sender() ! <span class="hljs-string">"ACK"</span>
-  }
-}
-</code></pre>
-<p>这里你拥有完全的灵活性，可以将<code>TestKit</code> 提供的工具与你自己的检测代码混合和匹配，并为它取一个有意义的名字。在实际开发中你的代码很可能比上面的示例要复杂；要充分利用工具的力量！</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>refs/remotes/origin/gh-pages</p>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
+<p>这里我们用 <code>MyDoubleEcho</code>来模拟一个待测系统，它会将输入镜像为两个输出。关联两个测试探针来进行（最简单）行为的确认。还有一个例子是两个相互协作的 actor A，B， A 发送消息给 B。为了确认这个消息流，可以插入一个 <code>TestProbe</code> 作为A的目标，使用转发功能或下文中的自动导向功能在测试上下文中包含一个真实的B。</p>
+<p>还可以为探针配备自定义的断言来使测试代码更简洁清晰：</p>
 <pre><code class="lang-scala">ase <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Update</span>(</span>id: <span class="hljs-type">Int</span>, value: <span class="hljs-type">String</span>)
 
 <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">probe</span> =</span> <span class="hljs-keyword">new</span> <span class="hljs-type">TestProbe</span>(system) {
@@ -1941,9 +1934,9 @@ probe2.expectMsg(<span class="hljs-number">500</span> millis, <span class="hljs-
 <p>这里你拥有完全的灵活性，可以将<code>TestKit</code> 提供的工具与你自己的检测代码混合和匹配，并为它取一个有意义的名字。在实际开发中你的代码很可能比上面的示例要复杂；要充分利用工具的力量！</p>
 <blockquote>
 <p>警告</p>
-<p>任何从 <code>TestProbe</code>发送到  另一个运行在 <code>CallingThreadDispatcher</code>上 的actor的消息，存在死锁的可能性，如果另一个actor也可能会向此探测器发送消息。<code>TestProbe.watch</code> 和 <code>TestProbe.unwatch</code>的实现也将向将空着发送消息，这意味着尝试监视它是危险的，例如从 <code>TestProbe</code>到<code>TestActorRef</code>  发送消息。</p>
+<p>任何从 <code>TestProbe</code>发送到另一个运行在 <code>CallingThreadDispatcher</code>上的actor的消息，如果另一个actor也可能会向此探测器发送消息，则存在死锁的可能性。<code>TestProbe.watch</code>和<code>TestProbe.unwatch</code>的实现也将向监控者发送消息，这意味着尝试监视它是危险的，例如从<code>TestProbe</code>监视<code>TestActorRef</code>。</p>
 </blockquote>
-<h3 id="actor">从探针观察其它actor</h3>
+<h5 id="actor">从探针观察其它actor</h5>
 <p><code>TestProbe</code>可以将自己注册为任意其他actor的DeathWatch：</p>
 <pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">probe</span> =</span> <span class="hljs-type">TestProbe</span>()
 probe watch target
@@ -1951,7 +1944,7 @@ target ! <span class="hljs-type">PoisonPill</span>
 probe.expectTerminated(target)
 </code></pre>
 <h5 id="">对探针收到的消息进行应答</h5>
-<p>探针在可能的条件下，会记录通讯通道以便进行应答:</p>
+<p>探针在可能的条件下，会记录通讯通道以便进行应答：</p>
 <pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">probe</span> =</span> <span class="hljs-type">TestProbe</span>()
 <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">future</span> =</span> probe.ref ? <span class="hljs-string">"hello"</span>
 probe.expectMsg(<span class="hljs-number">0</span> millis, <span class="hljs-string">"hello"</span>) <span class="hljs-comment">// TestActor runs on CallingThreadDispatcher</span>
@@ -1959,7 +1952,7 @@ probe.reply(<span class="hljs-string">"world"</span>)
 assert(future.isCompleted &amp;&amp; future.value == <span class="hljs-type">Some</span>(<span class="hljs-type">Success</span>(<span class="hljs-string">"world"</span>)))
 </code></pre>
 <h5 id="">对探针收到的消息进行转发</h5>
-<p>假定一个象征性的actor网络中某目标 actor <code>dest</code> 从 actor <code>source</code>收到一条消息. 如果你安排消息使其先发往 <code>TestProbe</code> <code>probe</code> , 你可以在保持网络功能的同时对消息流的容量和时限进行断言:</p>
+<p>假定一个象征性的actor网络中某目标 actor <code>dest</code> 从 actor <code>source</code>收到一条消息。如果你安排消息使其先发往 <code>TestProbe</code> <code>probe</code>，你可以在保持网络功能的同时对消息流的容量和时限进行断言：</p>
 <pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Source</span>(</span>target: <span class="hljs-type">ActorRef</span>) <span class="hljs-keyword">extends</span> <span class="hljs-type">Actor</span> {
   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
     <span class="hljs-keyword">case</span> <span class="hljs-string">"start"</span> =&gt; target ! <span class="hljs-string">"work"</span>
@@ -1971,16 +1964,17 @@ assert(future.isCompleted &amp;&amp; future.value == <span class="hljs-type">Som
     <span class="hljs-keyword">case</span> x =&gt; <span class="hljs-comment">// Do something..</span>
   }
 }
-<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">probe</span> =</span> <span class="hljs-type">TestProbe</span>()
+</code></pre>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">probe</span> =</span> <span class="hljs-type">TestProbe</span>()
 <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">source</span> =</span> system.actorOf(<span class="hljs-type">Props</span>(classOf[<span class="hljs-type">Source</span>], probe.ref))
 <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">dest</span> =</span> system.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">Destination</span>])
 source ! <span class="hljs-string">"start"</span>
 probe.expectMsg(<span class="hljs-string">"work"</span>)
 probe.forward(dest)
 </code></pre>
-<p>目标<code>dest</code> actor 将先收到同样的消息，就象没有插入探针一样.</p>
+<p>目标<code>dest</code> actor 将收到同样的消息，就象没有插入探针一样。</p>
 <h5 id="">自动导向</h5>
-<p>将收到的消息放进队列以便以后处理，这种方法不错，但要保持测试运行并对其运行过程进行跟踪，你也可以为参与测试的探针(事实上是任何 <code>TestKit</code>)安装一个 <code>AutoPilot</code>（自动导向）。 自动导向在消息进入检查队列之前启动. 以下代码可以用来转发消息, 例如 <code>A --&gt; Probe --&gt; B</code>, 只要满足一定的协议.</p>
+<p>将收到的消息放进队列以便以后处理，这种方法不错，但要保持测试运行并对其运行过程进行跟踪，你也可以为参与测试的探针（事实上是任何 <code>TestKit</code>）安装一个 <code>AutoPilot</code>（自动导向）。自动导向在消息进入检查队列之前启动。以下代码可以用来转发消息，例如 <code>A --&gt; Probe --&gt; B</code>，只要满足一定的协议。</p>
 <pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">probe</span> =</span> <span class="hljs-type">TestProbe</span>()
 probe.setAutoPilot(<span class="hljs-keyword">new</span> <span class="hljs-type">TestActor</span>.<span class="hljs-type">AutoPilot</span> {
   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">run</span>(</span>sender: <span class="hljs-type">ActorRef</span>, msg: <span class="hljs-type">Any</span>): <span class="hljs-type">Option</span>[<span class="hljs-type">TestActor</span>.<span class="hljs-type">AutoPilot</span>] =
@@ -1990,66 +1984,67 @@ probe.setAutoPilot(<span class="hljs-keyword">new</span> <span class="hljs-type"
     }
 })
 </code></pre>
-<p><code>run</code> 方法必须返回<code>auto-pilot</code>供下一条消息使用, 它可以是<code>KeepRunning</code>来保存当前值，或者是<code>NoAutoPilot</code>来终止自动导向.</p>
+<p><code>run</code> 方法必须返回<code>auto-pilot</code>供下一条消息使用，它可以是<code>KeepRunning</code>来保存当前值，或者是<code>NoAutoPilot</code>来终止自动导向。</p>
 <h5 id="">小心定时器断言</h5>
-<p>在使用测试探针时，<code>within</code>块的行为可能会不那么直观：你需要记住 <a href="#TestKit.within">上文</a> 所描述的nicely scoped期限仅对每一个探针的局部作用域有效。因此，探针 不会响应别的探针的期限，也不响应包含它的<code>TestKit</code>实例的期限:</p>
+<p>在使用测试探针时，<code>within</code>块的行为可能会不那么直观：你需要记住<a href="#testkit-within">上文</a> 所描述的nicely scoped期限仅对每一个探针的局部作用域有效。因此，探针不会响应别的探针的期限，也不响应包含它的<code>TestKit</code>实例的期限：</p>
 <pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">probe</span> =</span> <span class="hljs-type">TestProbe</span>()
 within(<span class="hljs-number">1</span> second) {
   probe.expectMsg(<span class="hljs-string">"hello"</span>)
 }
 </code></pre>
-<p>这里<code>expectMsg</code>调用将使用默认超时.</p>
+<p>这里<code>expectMsg</code>调用将使用默认超时。</p>
+<p><span id="scala-callingthreaddispatcher"></span></p>
 <h3 id="callingthreaddispatcher">CallingThreadDispatcher</h3>
-<p>如上文所述， <code>CallingThreadDispatcher</code>在单元测试中非常重要, 但最初它出现是为了在出错的时候能够生成连续的stacktrace. 由于这个特殊的派发器一般地将任何消息直接运行在当前线程中，所以只要所有的actor都是在这个派发器上运行，消息处理的完整历史信息在调用堆栈上就 有记录。</p>
+<p>如上文所述，<code>CallingThreadDispatcher</code>在单元测试中非常重要，但最初它出现是为了在出错的时候能够生成连续的stacktrace。由于这个特殊的派发器一般地将任何消息直接运行在当前线程中，所以只要所有的actor都是在这个派发器上运行，消息处理的完整历史信息在调用堆栈上就有记录。</p>
 <h5 id="">如何使用它</h5>
-<p>只要象平常一样设置派发器:</p>
+<p>只要象平常一样设置派发器：</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.testkit.<span class="hljs-type">CallingThreadDispatcher</span>
 <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">ref</span> =</span> system.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">MyActor</span>].withDispatcher(<span class="hljs-type">CallingThreadDispatcher</span>.<span class="hljs-type">Id</span>))
 </code></pre>
 <h5 id="">它是如何运作的</h5>
-<p>在被调用时, <code>CallingThreadDispatcher</code> 会检查接收消息的actor是否已经在当前线程中了. 这种情况的最简单的例子是actor向自己发送消息. 这时，不能马上对它进行处理，因为这违背了actor模型, 于是这个消息被放进队列，直到actor的当前消息被处理完毕；因此，新消息会在调用的线程上被处理，只是在actor完成其先前的工作之后. 在别的情况下，消息会在当前线程中立即得到处理. 通过这个派发器规划的Future也会立即执行.</p>
-<p>这种工作方式使 <code>CallingThreadDispatcher</code> 象一个为永远不会因为外部事件而阻塞的actor所设计的通用派发器.</p>
-<p>在有多个线程的情况下，有可能同时存在两个使用这个派发器的actor在不同线程中收到消息。此时，它们会立即在自己的线程中被执行，并竞争actor锁，竞争失败的那个必须等待。 这样我们保持了actor模型，但由于使用了受限的调度我们损失了一些并发性。从这个意义上说，它等同于使用传统的基于互斥的并发.</p>
-<p>另一个困难是正确地处理挂起和继续: 当actor被挂起时，后续的消息将被放进一个thread-local的队列中（和正常情况下使用的队列是同一个). 但是对 <code>resume</code>的调用, 是由一个特定的线程执行的，系统中所有其它的线程 很可能不会运行这个特定的actor，这会导致thread-local队列无法被它们的本地线程清空。于是，调用 <code>resume</code> 的线程会从所有线程收集所有当前在队列中的消息到自己的队列中，然后处理它们.</p>
+<p>在被调用时，<code>CallingThreadDispatcher</code> 会检查接收消息的actor是否已经在当前线程中了。这种情况的最简单的例子是actor向自己发送消息。这时，不能马上对它进行处理，因为这违背了actor模型，于是这个消息被放进队列，直到actor的当前消息被处理完毕；因此，新消息会在调用的线程上被处理，只是在actor完成其先前的工作之后。在别的情况下，消息会在当前线程中立即得到处理。通过这个派发器规划的Future也会立即执行。</p>
+<p>这种工作方式使 <code>CallingThreadDispatcher</code> 象一个为永远不会因为外部事件而阻塞的actor所设计的通用派发器。</p>
+<p>在有多个线程的情况下，有可能同时存在两个使用这个派发器的actor在不同线程中收到消息。此时，它们会立即在自己的线程中被执行，并竞争actor锁，竞争失败的那个必须等待。 这样我们保持了actor模型，但由于使用了受限的调度我们损失了一些并发性。从这个意义上说，它等同于使用传统的基于互斥的并发。</p>
+<p>另一个困难是正确地处理挂起和继续：当actor被挂起时，后续的消息将被放进一个thread-local的队列中（和正常情况下使用的队列是同一个)。但是对 <code>resume</code>的调用，是由一个特定的线程执行的，系统中所有其它的线程很可能不会运行这个特定的actor，这会导致thread-local队列无法被它们的本地线程清空。于是，调用 <code>resume</code> 的线程会从所有线程收集所有当前在队列中的消息到自己的队列中，然后处理它们。</p>
 <h5 id="">局限性</h5>
 <blockquote>
 <p>警告</p>
 <p>在<code>CallingThreadDispatcher</code>被用作顶级actor，但没有通过<code>TestActorRef</code>的情况下，则存在一个时间窗，在此期间actor会等待user 守护者actor的构造。在此期间发送到这个actor的消息会被加入队列，然后在守护者的线程，而不是调用者的线程上执行。要避免此问题，请使用 <code>TestActorRef</code>。</p>
 </blockquote>
-<p>如果一个actor发送完消息后由于某种原因（通常是被发完消息后的调用actor所影响）阻塞了, 此时若使用这个派发器，显然将导致死锁。 这在使用 基于 <code>CountDownLatch</code> 同步actor测试中是很常见的情景:</p>
+<p>如果一个actor发送完消息后由于某种原因（通常是被发完消息后的调用actor所影响）阻塞了，此时若使用这个派发器，显然将导致死锁。 这在使用基于 <code>CountDownLatch</code> 同步actor测试中是很常见的情景：</p>
 <pre><code class="lang-scala">   <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">latch</span> =</span> <span class="hljs-keyword">new</span> <span class="hljs-type">CountDownLatch</span>(<span class="hljs-number">1</span>)
    actor ! startWorkAfter(latch)   <span class="hljs-comment">// actor will call latch.await() before proceeding</span>
    doSomeSetupStuff()
    latch.countDown()
 </code></pre>
-<p>这个例子将无限挂起，消息处理到达第二行而永远到不了第四行，而只有在第四行才能在一个普通的派发器上取消它的阻塞.</p>
-<p>所以要记住 <code>CallingThreadDispatcher</code>并不是普通派发器的 通用替代品. 而另一方面在它上面运行你的actor网络测试会非常有用, 因为如果它在机率特别高的条件下都能不死锁，那么在生产环境中也不会.</p>
+<p>这个例子将无限挂起，消息处理到达第二行而永远到不了第四行，而只有在第四行才能在一个普通的派发器上取消它的阻塞。</p>
+<p>所以要记住 <code>CallingThreadDispatcher</code>并不是普通派发器的通用替代品。而另一方面在它上面运行你的actor网络测试会非常有用，因为如果它在机率特别高的条件下都能不死锁，那么在生产环境中也不会。</p>
 <blockquote>
 <p>警告</p>
-<p>上面这句话很遗憾并不是一个有力的保证，因为你的代码运行在不同的派发器上时可能直接或间接地改变它的行为。 如果你想要寻找帮助你debug死锁的工具, <code>CallingThreadDispatcher</code> 在有些错误场合下 可能会有用，但要记住它既可能给出错误的正面结果也可能给出错误的负面结果.</p>
+<p>上面这句话很遗憾并不是一个有力的保证，因为你的代码运行在不同的派发器上时可能直接或间接地改变它的行为。 如果你想要寻找帮助你debug死锁的工具，<code>CallingThreadDispatcher</code> 在有些错误场合下可能会有用，但要记住它既可能给出错误的正面结果也可能给出错误的负面结果。</p>
 </blockquote>
 <h5 id="">线程中断</h5>
-<p>如果 <code>CallingThreadDispatcher</code>看到当前线程在消息处理返回时已设置其 <code>isInterrupted()</code> 标志，它将在完成所有其处理 （即，如上文所述的需要处理的所有消息，都会在这种情况发生之前处理） 后抛出<code>InterruptedException</code>异常。正如<code>tell</code>由于其契约不能抛出异常，该异常将然后被捕获并记录日志，并且在该线程中断状态将再次设置。</p>
-<p>如果在消息处理过程中抛出<code>InterruptedException</code>异常，则它将被<code>CallingThreadDispatcher</code> 的消息处理循环捕获，然后将设置该线程<code>interrupted</code>标志,并且处理将继续正常进行。</p>
+<p>如果 <code>CallingThreadDispatcher</code>看到当前线程在消息处理返回时已设置其 <code>isInterrupted()</code> 标志，它将在完成所有其处理（即，如上文所述的需要处理的所有消息，都会在这种情况发生之前处理）后抛出<code>InterruptedException</code>异常。正如<code>tell</code>由于其契约不能抛出异常，该异常将然后被捕获并记录日志，并且在该线程中断状态将再次设置。</p>
+<p>如果在消息处理过程中抛出<code>InterruptedException</code>异常，则它将被<code>CallingThreadDispatcher</code> 的消息处理循环捕获，然后将设置该线程<code>interrupted</code>标志，并且处理将继续正常进行。</p>
 <blockquote>
 <p>注意</p>
+<p>这两个段落的总结是，如果当前线程在<code>CallingThreadDispatcher</code>下工作时中断，则将导致当消息发送返回时 <code>isInterrupted</code>标志被置为<code>true</code>，并不抛出<code>InterruptedException</code>异常。</p>
 </blockquote>
-<p>这两个段落的总结是，如果当前线程在<code>CallingThreadDispatcher</code>下工作时中断，则将导致当消息发送返回时 <code>isInterrupted</code>标志被置为<code>true</code>,，并不抛出<code>InterruptedException</code>异常。</p>
 <h5 id="">好处</h5>
-<p>综上所述，以下是 <code>CallingThreadDispatcher</code>能够提供的特性:</p>
+<p>综上所述，以下是 <code>CallingThreadDispatcher</code>能够提供的特性：</p>
 <ul>
 <li>确定地执行单线程测试，同时保持几乎所有的actor语义</li>
 <li>在异常stacktrace中记录从失败点开始的完整的消息处理历史</li>
 <li>排除某些类型的死锁场景</li>
 </ul>
-<h3 id="actor">跟踪Actor调用</h3>
-<p>到目前为止所有的测试工具都针对系统的行为构造断言. 如果测试失败，通常是由你来查找原因，进行修改并进行下一轮验证测试。这个过程既有debugger支持，又有日志支持，这里Akka工具箱提供以下选项:</p>
+<h3 id="a-nameactor-logging-scalaaactor"><a name="actor-logging-scala"></a>跟踪Actor调用</h3>
+<p>到目前为止所有的测试工具都针对系统的行为构造断言。如果测试失败，通常是由你来查找原因，进行修改并进行下一轮验证测试。这个过程既有debugger支持，又有日志支持，这里Akka工具箱提供以下选项:</p>
 <ul>
 <li><p><em>对Actor实例中抛出的异常记录日志</em></p>
 <p>相比其它的日志机制，这一条是永远打开的；它的日志级别是 <code>ERROR</code>.</p>
 </li>
 <li><p><em>对某些actor的消息调用记录日志</em></p>
-<p>这是通过在<a href="../configuration.html">配置文件</a>里添加设置项来打开 — 即 <code>akka.actor.debug.receive</code> — 它使得 <code>loggable</code>语句被应用在actor的 <code>receive</code> 函数上:</p>
+<p>这是通过在<a href="../chapter2/09_configuration.html">配置文件</a>里添加设置项来打开 — 即 <code>akka.actor.debug.receive</code> — 它使得 <code>loggable</code>语句被应用在actor的 <code>receive</code> 函数上:</p>
 </li>
 </ul>
 <pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.event.<span class="hljs-type">LoggingReceive</span>
@@ -2060,18 +2055,17 @@ within(<span class="hljs-number">1</span> second) {
   <span class="hljs-keyword">case</span> msg =&gt; <span class="hljs-comment">// Do something else ...</span>
 }
 </code></pre>
-<p>。
-如果在<a href="../configuration.html">配置文件</a>中没有上面给出的配置, 这个方法将直接移交给给定的未被修改的 <code>Receive</code> 函数, 也就是说如果不打开，就没有运行时开销.</p>
-<p>这个日志功能是与指定的局部标记绑定的，因为将其一致地应用于所有的actor一般不是你所需要的， 如果被用于事件主线日志监听器，它还可能导致无限循环.</p>
+<p>如果在<a href="../chapter2/09_configuration.html">配置文件</a>中没有上面给出的配置，这个方法将直接移交给给定的未被修改的 <code>Receive</code> 函数，也就是说如果不打开，就没有运行时开销。</p>
+<p>这个日志功能是与指定的局部标记绑定的，因为将其一致地应用于所有的actor一般不是你所需要的，如果被用于事件主线日志监听器，它还可能导致无限循环。</p>
 <ul>
 <li><em>对特殊的消息记录日志</em></li>
 </ul>
-<p>Actor会自动处理某些特殊消息,例如<code>Kill</code>, <code>PoisonPill</code> 等等. 打开对这些消息的跟踪只需要设置 <code>akka.actor.debug.autoreceive</code>, 这对所有actor都有效.</p>
+<p>Actor会自动处理某些特殊消息,例如<code>Kill</code>，<code>PoisonPill</code> 等等。打开对这些消息的跟踪只需要设置 <code>akka.actor.debug.autoreceive</code>，这对所有actor都有效。</p>
 <ul>
 <li><em>对actor生命周期记录日志</em></li>
 </ul>
-<p>Actor的创建、启动、重启、开始监控、停止监控和终止可以通过打开 <code>akka.actor.debug.lifecycle</code> 来跟踪; 这也是对所有 actor都有效的.</p>
-<p>所有这些日志消息都记录在 <code>DEBUG</code> 级别. 总结一下, 你可以用以下配置片段打开actor活动的完整日志:</p>
+<p>Actor的创建、启动、重启、开始监控、停止监控和终止可以通过打开 <code>akka.actor.debug.lifecycle</code> 来跟踪；这也是对所有actor都有效的。</p>
+<p>所有这些日志消息都记录在 <code>DEBUG</code> 级别。总结一下，你可以用以下配置片段打开actor活动的完整日志：</p>
 <pre><code>akka {
   loglevel = DEBUG
   actor {
@@ -2083,8 +2077,8 @@ within(<span class="hljs-number">1</span> second) {
   }
 }
 </code></pre><h3 id="">不同的测试框架</h3>
-<p>Akka的测试套件是使用<a href="http://scalatest.org" target="_blank"><code>ScalaTest</code></a>，并参照文档中的示例编写的。然而，TestKit和其工具包并不依赖于这一框架，实际上你可以使用最适合你开发风格的测试框架。</p>
-<p>本节包含使用其他框架时的已知陷阱，这不是详尽的，并不意味着需要认证或或使用特殊支持。</p>
+<p>Akka的测试套件是使用<a href="http://scalatest.org" target="_blank">ScalaTest</a>，并参照文档中的示例编写的。然而，TestKit和其工具包并不依赖于这一框架，实际上你可以使用最适合你开发风格的测试框架。</p>
+<p>本节包含使用其他框架时的已知陷阱，这不是详尽的，并不意味着需要认证或使用特殊支持。</p>
 <h5 id="">当你需要它是一个特质</h5>
 <p>如果由于某种原因是，<code>TestKit</code>是一个具体的类，而不是特质，因此测试工具无法继承它，还有<code>TestKitBase</code>：</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.testkit.<span class="hljs-type">TestKitBase</span>
@@ -2103,20 +2097,21 @@ within(<span class="hljs-number">1</span> second) {
 <p>不提倡使用这个特质，由于在未来二进制向后兼容性可能会成为问题，所以使用它须自行承担风险。</p>
 </blockquote>
 <h5 id="specs2">Specs2</h5>
-<p>一些 <a href="http://specs2.org" target="_blank"><code>Specs2</code> </a>用户贡献了如何变通解决可能出现的一些冲突的示例：</p>
+<p>一些 <a href="http://specs2.org" target="_blank"><code>Specs2</code></a>用户贡献了如何变通解决可能出现的一些冲突的示例：</p>
 <ul>
-<li><p>在TestKit中混入 <code>org.specs2.mutable.Specification</code> 将导致涉及 <code>end</code> 方法的名称冲突 （它在TestKit中是私有变量，而在Specification中是抽象方法） ；如果第一次混入测试工具包，代码可以编译，但可能在运行时失败。变通方法——实际上也有利于第三点—— 是将<code>org.specs2.specification.Scope</code>和TestKit一起应用 。</p>
+<li><p>在TestKit中混入 <code>org.specs2.mutable.Specification</code> 将导致涉及 <code>end</code> 方法的名称冲突 （它在TestKit中是私有变量，而在Specification中是抽象方法）；如果第一次混入测试工具包，代码可以编译，但可能在运行时失败。变通方法——实际上也有利于第三点—— 是将<code>org.specs2.specification.Scope</code>和TestKit一起应用。</p>
 </li>
-<li><p>Specification特质提供了一个<code>Duration</code> DSL 的部分使用与<code>scala.concurrent.duration.Duration</code>具有相同名称的方法，如果引入<code>scala.concurrent.duration._</code>会 导致含糊不清的隐式值。有两个变通：</p>
+<li><p>Specification特质提供了一个<code>Duration</code> DSL 的部分，使用了与<code>scala.concurrent.duration.Duration</code>具有相同名称的方法，如果引入<code>scala.concurrent.duration._</code>会导致含糊不清的隐式值。有两个变通：</p>
 <ul>
-<li>要么使用Specification的Duration变体，供应到Akka Duration的隐式转换。这种转换不有Akka提供，因为这将意味着我们的 JAR 文件将依赖于 Specs2，为实现这养一个小特性不合理。</li>
+<li>要么使用Specification的Duration变体，提供到Akka Duration的隐式转换。这种转换不由Akka提供，因为这将意味着我们的 JAR 文件将依赖于 Specs2，为实现这样一个小特性不合理。</li>
 <li>或混入<code>org.specs2.time.NoTimeConversions</code>到Specification中。</li>
 </ul>
 </li>
+<li><p>Specifications默认是并发执行的，因此执行写入测试或者<code>sequential</code>关键字时需要谨慎一些。</p>
+</li>
 </ul>
-<p>*Specifications默认是并发执行的，因此执行写入测试或者<code>sequential</code>关键字时需要谨慎一些。</p>
 <h3 id="">配置</h3>
-<p>TestKit模块的几个配置属性，请参阅<a href="../chap2/.md">配置参考</a>。</p>
+<p>TestKit模块的几个配置属性，请参阅<a href="../chapter2/09_configuration.html">配置参考</a>。</p>
 
                     
                     </section>
@@ -2130,7 +2125,7 @@ within(<span class="hljs-number">1</span> second) {
         <a href="../chapter3/08_persistence.html" class="navigation navigation-prev " aria-label="Previous page: 持久化"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../chapter3/10_actor_dsl.html" class="navigation navigation-next " aria-label="Next page: Actor DSL"><i class="fa fa-angle-right"></i></a>
+        <a href="../chapter3/09_1_testkit-example.html" class="navigation navigation-next " aria-label="Next page: TestKit实例"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

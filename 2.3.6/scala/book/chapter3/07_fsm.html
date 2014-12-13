@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="3.7" data-basepath=".." data-revision="1418396877209">
+    <div class="book"  data-level="3.7" data-basepath=".." data-revision="1418482047463">
     
 
 <div class="book-summary">
@@ -528,6 +528,28 @@
                     </a>
                 
             
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="3.9.1" data-path="chapter3/09_1_testkit-example.html">
+            
+                
+                    <a href="../chapter3/09_1_testkit-example.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.9.1.</b>
+                        
+                         TestKit实例
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
             
         </li>
     
@@ -1617,7 +1639,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_27">
+                    <section class="normal" id="section-gitbook_120">
                     
                         <h1 id="fsm">有限状态机(FSM)</h1>
 <h3 id="">概述</h3>
@@ -1625,7 +1647,9 @@
 <p>一个 FSM 可以描述成一组具有如下形式的关系 :</p>
 <p>  <strong>State(S) x Event(E) -&gt; Actions (A), State(S&#39;)</strong></p>
 <p>这些关系的意思可以这样理解：</p>
-<p>  *如果我们当前处于状态S，发生了E事件，则我们应执行操作A，然后将状态转换为S’。</p>
+<blockquote>
+<p>如果我们当前处于状态S，发生了E事件，则我们应执行操作A，然后将状态转换为S’。</p>
+</blockquote>
 <h3 id="">一个简单的例子</h3>
 <p>为了演示<code>FSM</code> trait的大部分功能，考虑一个actor，它接收到一组突然爆发的消息而将其送入邮箱队列，然后在消息爆发期过后或收到flush请求时再对消息进行发送。</p>
 <p>首先，假设以下所有代码都使用这些import语句：</p>
@@ -1674,13 +1698,13 @@
   initialize()
 }
 </code></pre>
-<p>基本策略就是声明actor类, 混入<code>FSM</code> trait，并将可能的状态和数据设定为类型参数。在actor的内部使用一个DSL来声明状态机：</p>
+<p>基本策略就是声明actor类，混入<code>FSM</code> trait，并将可能的状态和数据设定为类型参数。在actor的内部使用一个DSL来声明状态机：</p>
 <ul>
 <li><code>startsWith</code>定义初始状态和初始数据</li>
 <li>然后对每一个状态有一个<code>when(&lt;state&gt;) { ... }</code>声明待处理的事件（可以是多个，传入的<code>PartialFunction</code>将用<code>orElse</code>进行连接）</li>
 <li>最后使用<code>initialize</code>来启动它，这会执行到初始状态的转换并启动定时器（如果需要的话）。</li>
 </ul>
-<p>在这个例子中，我们从<code>Idle</code>和<code>Uninitialized</code>状态开始, 这两种状态下只处理<code>SetTarget()</code>消息；<code>stay</code>准备结束这个事件的处理而不离开当前状态，而<code>using</code>使得FSM将其内部状态（这时为<code>Uninitialized</code>）替换为一个新的包含目标actor引用的<code>Todo()</code>对象。<code>Active</code>状态声明了一个状态超时，意思是如果1秒内没有收到消息，将生成一个<code>FSM.StateTimeout</code>消息。在本例中这与收到<code>Flush</code>指令消息具有相同的效果，即转回<code>Idle</code>状态并将内部队列重置为空vector。但消息是如何进入队列的？由于在两种状态下都要做这件事， 我们利用了任何<code>when()</code>块未处理的消息被发送到<code>whenUnhandled()</code>块这个事实：</p>
+<p>在这个例子中，我们从<code>Idle</code>和<code>Uninitialized</code>状态开始，这两种状态下只处理<code>SetTarget()</code>消息；<code>stay</code>准备结束这个事件的处理而不离开当前状态，而<code>using</code>使得FSM将其内部状态（这时为<code>Uninitialized</code>）替换为一个新的包含目标actor引用的<code>Todo()</code>对象。<code>Active</code>状态声明了一个状态超时，意思是如果1秒内没有收到消息，将生成一个<code>FSM.StateTimeout</code>消息。在本例中这与收到<code>Flush</code>指令消息具有相同的效果，即转回<code>Idle</code>状态并将内部队列重置为空vector。但消息是如何进入队列的？由于在两种状态下都要做这件事，我们利用了任何<code>when()</code>块未处理的消息被发送到<code>whenUnhandled()</code>块这个事实：</p>
 <pre><code class="lang-scala">whenUnhandled {
   <span class="hljs-comment">// common code for both states</span>
   <span class="hljs-keyword">case</span> <span class="hljs-type">Event</span>(<span class="hljs-type">Queue</span>(obj), t @ <span class="hljs-type">Todo</span>(_, v)) =&gt;
@@ -1701,7 +1725,7 @@
 }
 </code></pre>
 <p>状态转换回调是一个偏函数，它以一对状态作为输入的——当前状态和下一个状态。FSM trait为此提供了一个方便的箭头形式的提取器，非常贴心地提醒你所匹配到的状态转换的方向。在状态转换过程中，如示例所示旧状态数据可以通过<code>stateData</code>获得，新状态数据可以通过<code>nextStateData</code>获得。</p>
-<p>要确认这个buncher真实可用, 可以很简单地利用<a href="09_testing_actor_systems.html">测试Actor系统(Scala)</a>中的工具写一个测试，它方便地将ScalaTest trait融入<code>AkkaSpec</code>中：</p>
+<p>要确认这个buncher真实可用，可以很简单地利用<a href="09_testing_actor_systems.html">测试Actor系统(Scala)</a>中的工具写一个测试，它方便地将ScalaTest trait融入<code>AkkaSpec</code>中：</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Props</span>
 <span class="hljs-keyword">import</span> scala.collection.immutable
 
@@ -1741,7 +1765,7 @@
 </code></pre>
 <h3 id="">参考</h3>
 <h5 id="fsm-trait--fsm-object">FSM Trait 及 FSM Object</h5>
-<p><code>FSM</code> trait只能被混入到<code>Actor</code>子类中。这里选择了 使用self类型的写法而不是继承<code>Actor</code>，这样是为了标明事实上创建的是一个actor。</p>
+<p><code>FSM</code> trait只能被混入到<code>Actor</code>子类中。这里选择了 使用self类型的写法而不是继承<code>Actor</code>，这样是为了标明事实上创建的是一个actor。//TODO这里代码有误？</p>
 <pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Buncher</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> <span class="hljs-title">FSM</span>[</span><span class="hljs-type">State</span>, <span class="hljs-type">Data</span>] {
 
   <span class="hljs-comment">// fsm body ...</span>
@@ -1751,22 +1775,24 @@
 </code></pre>
 <blockquote>
 <p>注意</p>
-<p>FSM特质定义<code>receive</code>方法处理内部消息，并将其它一切通过FSM逻辑传递（根据当前状态）。当重写<code>receive</code>方法，请牢记例如状态超时处理取决于实际通过FSM逻辑传递的消息。</p>
+<p>FSM特质定义<code>receive</code>方法处理内部消息，并将其它一切通过FSM逻辑传递（根据当前状态）。当重写<code>receive</code>方法，请牢记例如超时状态处理取决于实际通过FSM逻辑传递的消息。</p>
 </blockquote>
 <p><code>FSM</code> trait 有两个类型参数 :</p>
 <ol>
 <li>所有状态名称的父类型，通常是一个sealed trait，状态名称作为case object来继承它</li>
 <li>状态数据的类型，由<code>FSM</code>模块自己跟踪。</li>
 </ol>
+<p><a name="fsm-philosophy"></a></p>
 <blockquote>
 <p>注意</p>
 <p>状态数据与状态名称一起描述了状态机的内部状态；如果你坚持这种模式，不向FSM类中加入可变量成员，你就可以充分享受在一些周知的位置改变所有内部状态的好处.</p>
 </blockquote>
 <h5 id="">定义状态</h5>
 <p>状态的定义是通过一次或多次调用</p>
-<pre><code>`when(&lt;name&gt;[, stateTimeout = &lt;timeout&gt;])(stateFunction)`方法。
-</code></pre><p>给定的名称对象必须与为<code>FSM</code> trait指定的第一个参数类型相匹配. 这个对象将被用作一个hash表的键, 所以你必须确保它正确地实现了<code>equals</code> <code>hashCode</code>方法；特别是它不能是可变变量。满足这些条件的最简单的就是 case objects。</p>
-<p>如果给定了<code>stateTimeout</code>参数，那么所有到这个状态的转换，包括停留, 缺省都会收到这个超时。初始化转换时显式指定一个超时可以用来覆盖这个缺省行为, 更多信息见<a href="#initiating-transitions">发起状态转换</a>。在操作执行的过程中可以通过使用<code>setStateTimeout(state, duration)</code>方法来修改任何状态的超时时间。这使得运行时配置（例如通过外部消息）成为可能。</p>
+<pre><code>when(&lt;name&gt;[, stateTimeout = &lt;timeout&gt;])(stateFunction)
+</code></pre><p>方法。</p>
+<p>给定的名称对象必须与为<code>FSM</code> trait指定的第一个参数类型相匹配。这个对象将被用作一个hash表的键，所以你必须确保它正确地实现了<code>equals</code> <code>hashCode</code>方法；特别是它不能为可变变量。满足这些条件的最简单的就是 case objects。</p>
+<p>如果给定了<code>stateTimeout</code>参数，那么所有到这个状态的转换，包括停留，缺省都会收到这个超时。初始化转换时显式指定一个超时可以用来覆盖这个缺省行为，更多信息见<a href="#initiating-transitions">发起状态转换</a>。在操作执行的过程中可以通过使用<code>setStateTimeout(state, duration)</code>方法来修改任何状态的超时时间。这使得运行时配置（例如通过外部消息）成为可能。</p>
 <p>参数<code>stateFunction</code>是一个<code>PartialFunction[Event, State]</code>，可以很方便地用偏函数的语法来指定，见下例：</p>
 <pre><code class="lang-scala">when(<span class="hljs-type">Idle</span>) {
   <span class="hljs-keyword">case</span> <span class="hljs-type">Event</span>(<span class="hljs-type">SetTarget</span>(ref), <span class="hljs-type">Uninitialized</span>) =&gt;
@@ -1792,8 +1818,7 @@ when(<span class="hljs-type">Active</span>, stateTimeout = <span class="hljs-num
 </code></pre>
 <p>其中可选的超时参数将覆盖所有为期望的初始状态所指定的值。如果你想要取消缺省的超时，使用<code>Duration.Inf</code>。</p>
 <h5 id="">未处理事件</h5>
-<p>如果一个状态未能处理一个收到的事件，日志中将记录一条警告。这种情况下如果你想做点其它的事，你可以使用
-:func:<code>whenUnhandled(stateFunction)</code>来指定：</p>
+<p>如果一个状态未能处理一个收到的事件，日志中将记录一条警告。这种情况下如果你想做点其它的事，你可以使用<code>whenUnhandled(stateFunction)</code>来指定：</p>
 <pre><code class="lang-scala">whenUnhandled {
   <span class="hljs-keyword">case</span> <span class="hljs-type">Event</span>(x: <span class="hljs-type">X</span>, data) =&gt;
     log.info(<span class="hljs-string">"Received unhandled event: "</span> + x)
@@ -1805,8 +1830,8 @@ when(<span class="hljs-type">Active</span>, stateTimeout = <span class="hljs-num
 </code></pre>
 <p>在此处理程序中可以使用<code>stateName</code>方法查询FSM的状态。</p>
 <p><strong>重要</strong>：这个处理器不会入栈叠加，这意味着<code>whenUnhandled</code>的每一次调用都会覆盖先前指定的处理程序。</p>
-<h3 id="">发起状态转换</h3>
-<p>任何<code>stateFunction</code>的结果都必须是下一个状态的定义，除非是终止FSM， 这种情况在<a href="#termination-from-inside">从内部终止中</a>介绍。状态定义可以是当前状态，由<code>stay</code>指令描述，或由<code>goto(state)</code>指定的另一个状态。结果对象可以通过下面列出的修饰器作进一步的限制：</p>
+<h3 id="a-nameinitiating-transitionsa"><a name="initiating-transitions"></a>发起状态转换</h3>
+<p>任何<code>stateFunction</code>的结果都必须是下一个状态的定义，除非是终止FSM，这种情况在<a href="#termination-from-inside">从内部终止</a>中介绍。状态定义可以是当前状态，由<code>stay</code>指令描述，或由<code>goto(state)</code>指定的另一个状态。结果对象可以通过下面列出的修饰器作进一步的限制：</p>
 <ul>
 <li><p><code>forMax(duration)</code></p>
 <p>这个修饰器为新状态指定了一个状态超时。这意味着将启动一个定时器，它过期时将向FSM发送一个<code>StateTimeout</code>消息。其间接收到任何其它消息，定时器都将被取消；你可以确定的事实是<code>StateTimeout</code>消息不会在任何一个中间消息之后被处理。</p>
@@ -1815,7 +1840,7 @@ when(<span class="hljs-type">Active</span>, stateTimeout = <span class="hljs-num
 <li><p><code>using(data)</code></p>
 <p>这个修饰器用给定的新数据替换旧的状态数据。如果你遵循<a href="#fsm-philosophy">上面的建议</a>，这是内部状态数据被修改的唯一位置。</p>
 </li>
-<li><p>replying(msg)</p>
+<li><p><code>replying(msg)</code></p>
 <p>这个修饰器为当前处理完的消息发送一个应答，不同的是它不会改变状态转换。</p>
 </li>
 </ul>
@@ -1834,8 +1859,8 @@ when(<span class="hljs-type">Active</span>, stateTimeout = <span class="hljs-num
 <p>在概念上，转换发生在“两个状态之间”，也就是在你放在事件处理代码块执行的任何操作之后；这是显然的，因为只有在事件处理逻辑返回了值以后，才能确定下一个状态。相对于设置内部状态变量，你不需要担心操作顺序的细节，因为FSM actor中的所有代码都是在一个线程中运行的。</p>
 <h6 id="">内部监控</h6>
 <p>到目前为止，FSM DSL都围绕着状态和事件。另外一种视角是将其描述成一系列的状态转换。是通过这个方法实现的</p>
-<p>  onTransition(handler)</p>
-<p>它将操作与状态转换联系起来，而不是联系状态与事件。这个处理器是一个偏函数，它以一对状态作为输入；不需要结果状态，因为不可能改变正在进行的状态转换。</p>
+<pre><code>onTransition(handler)
+</code></pre><p>它将操作与状态转换联系起来，而不是联系状态与事件。这个处理器是一个偏函数，它以一对状态作为输入；不需要结果状态，因为不可能改变正在进行的状态转换。</p>
 <pre><code class="lang-scala">onTransition {
   <span class="hljs-keyword">case</span> <span class="hljs-type">Idle</span> -&gt; <span class="hljs-type">Active</span> =&gt; setTimer(<span class="hljs-string">"timeout"</span>, <span class="hljs-type">Tick</span>, <span class="hljs-number">1</span> second, <span class="hljs-literal">true</span>)
   <span class="hljs-keyword">case</span> <span class="hljs-type">Active</span> -&gt; _    =&gt; cancelTimer(<span class="hljs-string">"timeout"</span>)
@@ -1856,9 +1881,8 @@ when(<span class="hljs-type">Active</span>, stateTimeout = <span class="hljs-num
 <p>这种内部监控可以用于通过状态转换来构建你的FSM，这样在添加新的目标状态时，不会忘记例如在离开某个状态时，取消定时器这种操作。</p>
 </blockquote>
 <h6 id="">外部监控</h6>
-<p>可以通过发送一个<code>SubscribeTransitionCallBack(actorRef)</code>消息注册外部actor，来接收状态转换的通知。这个被命名的actor将立即收到<code>CurrentState(self, stateName)</code>消息，并在之后每次进入新状态时收到<code>Transition(actorRef, oldState, newState)</code>消息. 可以通过向FSM actor发送<code>UnsubscribeTransitionCallBack(actorRef)</code>来注销外部监控actor。</p>
-<p>注册一个未运行的监听actor将生成一个警告，并优雅地失败。
-停止一个监听器，而不注销，将不会从注册列表中移除它；需要在停止监听器前使用<code>UnsubscribeTransitionCallback</code>。</p>
+<p>可以通过发送一个<code>SubscribeTransitionCallBack(actorRef)</code>消息注册外部actor，来接收状态转换的通知。这个被命名的actor将立即收到<code>CurrentState(self, stateName)</code>消息，并在之后每次进入新状态时收到<code>Transition(actorRef, oldState, newState)</code>消息。可以通过向FSM actor发送<code>UnsubscribeTransitionCallBack(actorRef)</code>来注销外部监控actor。</p>
+<p>停止一个监听器，而不注销，将不会从注册列表中移除它；需要在停止监听器前使用<code>UnsubscribeTransitionCallback</code>。</p>
 <h5 id="">转换状态</h5>
 <p>给<code>when()</code>传递的偏函数参数，可以使用Scala充分的函数式编程工具来转换。为了保留类型推断，还有一个辅助函数，它可以在通用处理逻辑中使用，并被应用到不同子句：</p>
 <pre><code class="lang-scala">when(<span class="hljs-type">SomeState</span>)(transform {
@@ -1880,20 +1904,20 @@ when(<span class="hljs-type">SomeState</span>)(transform {
 </code></pre>
 <h5 id="">定时器</h5>
 <p>除了状态超时，FSM还管理以<code>String</code>类型名称为标识的定时器。你可以用下面代码设置定时器</p>
-<p>  setTimer(name, msg, interval, repeat)</p>
-<p>其中<code>msg</code>是经过<code>interval</code>时间以后发送的消息对象。 如果<code>repeat</code>设成<code>true</code>，定时器将以<code>interval</code>参数指定的时间段重复规划。添加新的计时器之前，具有相同名称的任何现有计时器将被自动取消。</p>
+<pre><code>setTimer(name, msg, interval, repeat)
+</code></pre><p>其中<code>msg</code>是经过<code>interval</code>时间以后发送的消息对象。 如果<code>repeat</code>设成<code>true</code>，定时器将以<code>interval</code>参数指定的时间段重复规划。添加新的计时器之前，具有相同名称的任何现有计时器将被自动取消。</p>
 <p>可以用下面代码取消定时器</p>
-<p>  cancelTimer(name)</p>
-<p>取消操作确保立即执行，这意味着在这个调用之后，定时器已经规划的消息将不会执行，即使定时器已经发起并入队该消息。任何定时器的状态可以用下面的代码进行查询</p>
-<p>  isTimerActive(name)</p>
-<p>这些具名定时器是对状态超时的补充，因为它们不受中间收到的其它消息的影响。</p>
-<h5 id="a-nametermination_from_insidea"><a name="Termination_from_Inside"></a>从内部终止</h5>
+<pre><code>cancelTimer(name)
+</code></pre><p>取消操作确保立即执行，这意味着在这个调用之后，定时器已经规划的消息将不会执行，即使定时器已经发起并入队该消息。任何定时器的状态可以用下面的代码进行查询</p>
+<pre><code>isTimerActive(name)
+</code></pre><p>这些具名定时器是对状态超时的补充，因为它们不受中间收到的其它消息的影响。</p>
+<h5 id="a-nametermination-from-insidea"><a name="termination-from-inside"></a>从内部终止</h5>
 <p>可以像下面这样指定结果状态来终止FSM</p>
-<p>  stop([reason[, data]])</p>
-<p>其中的<code>reason</code>必须是<code>Normal</code>（默认值）、<code>Shutdown</code>或<code>Failure(reason)</code>之一，可以提供第二个参数来改变状态数据，在终止处理器中可以使用该数据。</p>
+<pre><code>stop([reason[, data]])
+</code></pre><p>其中的<code>reason</code>必须是<code>Normal</code>（默认值）、<code>Shutdown</code>或<code>Failure(reason)</code>之一，可以提供第二个参数来改变状态数据，在终止处理器中可以使用该数据。</p>
 <blockquote>
 <p>注意</p>
-<p>必须注意<code>stop</code>并不会中止当前的操作并立即停止FSM。<code>stop</code>操作必须象状态转换一样从事件处理器中返回（但要注意<code>return</code>语句不能用在<code>when</code>代码块中）。</p>
+<p>必须注意<code>stop</code>并不会中止当前的操作并立即停止FSM。<code>stop</code>操作必须像状态转换一样从事件处理器中返回（但要注意<code>return</code>语句不能用在<code>when</code>代码块中）。</p>
 </blockquote>
 <pre><code class="lang-scala">when(<span class="hljs-type">Error</span>) {
   <span class="hljs-keyword">case</span> <span class="hljs-type">Event</span>(<span class="hljs-string">"stop"</span>, _) =&gt;
@@ -1916,7 +1940,7 @@ when(<span class="hljs-type">SomeState</span>)(transform {
 <p>如果你重写<code>postStop</code>并而希望你的<code>onTermination</code>处理器被调用，不要忘记调用<code>super.postStop</code>。</p>
 </blockquote>
 <h3 id="">测试和调试有限状态机</h3>
-<p>在开发和调试过程中，FSM和其它actor一样需要照顾。<a href="http://doc.akka.io/docs/akka/2.3.6/scala/testing.html#testfsmref" target="_blank">测试有限状态机 TODO</a>以及下文中介绍了一些专门的工具。</p>
+<p>在开发和调试过程中，FSM和其它actor一样需要照顾。<a href="09_testing_actor_systems.html#testfsmref">测试有限状态机</a>以及下文中介绍了一些专门的工具。</p>
 <h5 id="">事件跟踪</h5>
 <p><a href="../chapter2/09_configuration.html">配置文件</a>中的<code>akka.actor.debug.fsm</code>打开用<code>LoggingFSM</code>实例完成的事件跟踪日志：</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">LoggingFSM</span>
@@ -1930,9 +1954,9 @@ when(<span class="hljs-type">SomeState</span>)(transform {
 <li>所有具名定时器的设置和取消</li>
 <li>所有的状态转换</li>
 </ul>
-<p>生命周期变化及特殊消息可以如<a href="http://doc.akka.io/docs/akka/2.3.6/scala/testing.html#actor-logging-scala" target="_blank">Actor TODO</a>中所述进行日志记录。</p>
+<p>生命周期变化及特殊消息可以如<a href="09_testing_actor_systems.html#actor-logging-scala">Actor</a>中所述进行日志记录。</p>
 <h5 id="">滚动事件日志</h5>
-<p><code>LoggingFSM</code>特质为FSM添加了一个新的特性：一个滚动的事件日志，它可以在debugging中使用（跟踪为什么FSM会进入某个失败的状态）或其它的什么新用法：</p>
+<p><code>LoggingFSM</code>特质为FSM添加了一个新的特性：一个滚动的事件日志，它可以在debugging中使用（跟踪为什么FSM会进入某个失败的状态）或其它的新用法：</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">LoggingFSM</span>
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyFSM</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> <span class="hljs-title">LoggingFSM</span>[</span><span class="hljs-type">StateType</span>, <span class="hljs-type">Data</span>] {
   <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">logDepth</span> =</span> <span class="hljs-number">12</span>
@@ -1952,7 +1976,7 @@ when(<span class="hljs-type">SomeState</span>)(transform {
 </blockquote>
 <p>事件日志的内容可以用<code>getLog</code>方法获取，它返回一个<code>IndexedSeq[LogEntry]</code>，其中最老的条目下标为0。</p>
 <h3 id="">示例</h3>
-<p>在<code>Typesafe Activator &lt;http://www.typesafe.com/platform/getstarted&gt;</code>的模板工程<code>Akka FSM in Scala &lt;http://www.typesafe.com/activator/template/akka-sample-fsm-scala&gt;</code>中，可以找到一个比Actor’s <code>become/unbecome</code>更大的FSM示例。</p>
+<p>在<a href="http://www.typesafe.com/platform/getstarted" target="_blank">Typesafe Activator</a>的模板工程<a href="http://www.typesafe.com/activator/template/akka-sample-fsm-scala" target="_blank">Akka FSM in Scala</a>中，可以找到一个比Actor’s <code>become/unbecome</code>更大的FSM示例。</p>
 
                     
                     </section>

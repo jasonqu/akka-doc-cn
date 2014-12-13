@@ -9,7 +9,7 @@ FSM (有限状态机) 可以mixin到akka Actor中，其概念在[Erlang 设计�
 
 这些关系的意思可以这样理解：
 
-  *如果我们当前处于状态S，发生了E事件，则我们应执行操作A，然后将状态转换为S’。
+> 如果我们当前处于状态S，发生了E事件，则我们应执行操作A，然后将状态转换为S’。
 
 ###一个简单的例子
 为了演示`FSM` trait的大部分功能，考虑一个actor，它接收到一组突然爆发的消息而将其送入邮箱队列，然后在消息爆发期过后或收到flush请求时再对消息进行发送。
@@ -73,13 +73,13 @@ class Buncher extends Actor with FSM[State, Data] {
 }
 ```
 
-基本策略就是声明actor类, 混入`FSM` trait，并将可能的状态和数据设定为类型参数。在actor的内部使用一个DSL来声明状态机：
+基本策略就是声明actor类，混入`FSM` trait，并将可能的状态和数据设定为类型参数。在actor的内部使用一个DSL来声明状态机：
 
 * `startsWith`定义初始状态和初始数据
 * 然后对每一个状态有一个`when(<state>) { ... }`声明待处理的事件（可以是多个，传入的`PartialFunction`将用`orElse`进行连接）
 * 最后使用`initialize`来启动它，这会执行到初始状态的转换并启动定时器（如果需要的话）。
 
-在这个例子中，我们从``Idle``和``Uninitialized``状态开始, 这两种状态下只处理``SetTarget()``消息；``stay``准备结束这个事件的处理而不离开当前状态，而``using``使得FSM将其内部状态（这时为``Uninitialized``）替换为一个新的包含目标actor引用的``Todo()``对象。``Active``状态声明了一个状态超时，意思是如果1秒内没有收到消息，将生成一个``FSM.StateTimeout``消息。在本例中这与收到``Flush``指令消息具有相同的效果，即转回``Idle``状态并将内部队列重置为空vector。但消息是如何进入队列的？由于在两种状态下都要做这件事， 我们利用了任何``when()``块未处理的消息被发送到``whenUnhandled()``块这个事实：
+在这个例子中，我们从``Idle``和``Uninitialized``状态开始，这两种状态下只处理``SetTarget()``消息；``stay``准备结束这个事件的处理而不离开当前状态，而``using``使得FSM将其内部状态（这时为``Uninitialized``）替换为一个新的包含目标actor引用的``Todo()``对象。``Active``状态声明了一个状态超时，意思是如果1秒内没有收到消息，将生成一个``FSM.StateTimeout``消息。在本例中这与收到``Flush``指令消息具有相同的效果，即转回``Idle``状态并将内部队列重置为空vector。但消息是如何进入队列的？由于在两种状态下都要做这件事，我们利用了任何``when()``块未处理的消息被发送到``whenUnhandled()``块这个事实：
 
 ```scala
 whenUnhandled {
@@ -108,7 +108,7 @@ onTransition {
 
 状态转换回调是一个偏函数，它以一对状态作为输入的——当前状态和下一个状态。FSM trait为此提供了一个方便的箭头形式的提取器，非常贴心地提醒你所匹配到的状态转换的方向。在状态转换过程中，如示例所示旧状态数据可以通过``stateData``获得，新状态数据可以通过``nextStateData``获得。
 
-要确认这个buncher真实可用, 可以很简单地利用[测试Actor系统(Scala)](09_testing_actor_systems.md)中的工具写一个测试，它方便地将ScalaTest trait融入``AkkaSpec``中：
+要确认这个buncher真实可用，可以很简单地利用[测试Actor系统(Scala)](09_testing_actor_systems.md)中的工具写一个测试，它方便地将ScalaTest trait融入``AkkaSpec``中：
 
 ```scala
 import akka.actor.Props
@@ -151,7 +151,7 @@ class FSMDocSpec extends MyFavoriteTestFrameWorkPlusAkkaTestKit {
 
 ###参考
 #####FSM Trait 及 FSM Object
-`FSM` trait只能被混入到`Actor`子类中。这里选择了 使用self类型的写法而不是继承`Actor`，这样是为了标明事实上创建的是一个actor。
+`FSM` trait只能被混入到`Actor`子类中。这里选择了 使用self类型的写法而不是继承`Actor`，这样是为了标明事实上创建的是一个actor。//TODO这里代码有误？
 
 ```scala
 class Buncher extends Actor with FSM[State, Data] {
@@ -164,12 +164,13 @@ class Buncher extends Actor with FSM[State, Data] {
 
 > 注意
 
-> FSM特质定义``receive``方法处理内部消息，并将其它一切通过FSM逻辑传递（根据当前状态）。当重写``receive``方法，请牢记例如状态超时处理取决于实际通过FSM逻辑传递的消息。
+> FSM特质定义``receive``方法处理内部消息，并将其它一切通过FSM逻辑传递（根据当前状态）。当重写``receive``方法，请牢记例如超时状态处理取决于实际通过FSM逻辑传递的消息。
 
 `FSM` trait 有两个类型参数 :
 1. 所有状态名称的父类型，通常是一个sealed trait，状态名称作为case object来继承它
 2. 状态数据的类型，由`FSM`模块自己跟踪。
 
+<a name="fsm-philosophy"></a>
 > 注意
 
 > 状态数据与状态名称一起描述了状态机的内部状态；如果你坚持这种模式，不向FSM类中加入可变量成员，你就可以充分享受在一些周知的位置改变所有内部状态的好处.
@@ -177,11 +178,13 @@ class Buncher extends Actor with FSM[State, Data] {
 #####定义状态
 状态的定义是通过一次或多次调用
 
-	`when(<name>[, stateTimeout = <timeout>])(stateFunction)`方法。
+	when(<name>[, stateTimeout = <timeout>])(stateFunction)
 
-给定的名称对象必须与为`FSM` trait指定的第一个参数类型相匹配. 这个对象将被用作一个hash表的键, 所以你必须确保它正确地实现了`equals` `hashCode`方法；特别是它不能是可变变量。满足这些条件的最简单的就是 case objects。
+方法。
 
-如果给定了`stateTimeout`参数，那么所有到这个状态的转换，包括停留, 缺省都会收到这个超时。初始化转换时显式指定一个超时可以用来覆盖这个缺省行为, 更多信息见[发起状态转换](#initiating-transitions)。在操作执行的过程中可以通过使用`setStateTimeout(state, duration)`方法来修改任何状态的超时时间。这使得运行时配置（例如通过外部消息）成为可能。
+给定的名称对象必须与为`FSM` trait指定的第一个参数类型相匹配。这个对象将被用作一个hash表的键，所以你必须确保它正确地实现了`equals` `hashCode`方法；特别是它不能为可变变量。满足这些条件的最简单的就是 case objects。
+
+如果给定了`stateTimeout`参数，那么所有到这个状态的转换，包括停留，缺省都会收到这个超时。初始化转换时显式指定一个超时可以用来覆盖这个缺省行为，更多信息见[发起状态转换](#initiating-transitions)。在操作执行的过程中可以通过使用`setStateTimeout(state, duration)`方法来修改任何状态的超时时间。这使得运行时配置（例如通过外部消息）成为可能。
 
 参数`stateFunction`是一个`PartialFunction[Event, State]`，可以很方便地用偏函数的语法来指定，见下例：
 
@@ -219,8 +222,7 @@ startWith(state, data[, timeout])
 其中可选的超时参数将覆盖所有为期望的初始状态所指定的值。如果你想要取消缺省的超时，使用`Duration.Inf`。
 
 #####未处理事件
-如果一个状态未能处理一个收到的事件，日志中将记录一条警告。这种情况下如果你想做点其它的事，你可以使用
-:func:`whenUnhandled(stateFunction)`来指定：
+如果一个状态未能处理一个收到的事件，日志中将记录一条警告。这种情况下如果你想做点其它的事，你可以使用`whenUnhandled(stateFunction)`来指定：
 
 ```scala
 whenUnhandled {
@@ -237,8 +239,8 @@ whenUnhandled {
 
 **重要**：这个处理器不会入栈叠加，这意味着`whenUnhandled`的每一次调用都会覆盖先前指定的处理程序。
 
-###发起状态转换
-任何`stateFunction`的结果都必须是下一个状态的定义，除非是终止FSM， 这种情况在[从内部终止中](#termination-from-inside)介绍。状态定义可以是当前状态，由`stay`指令描述，或由`goto(state)`指定的另一个状态。结果对象可以通过下面列出的修饰器作进一步的限制：
+###<a name="initiating-transitions"></a>发起状态转换
+任何`stateFunction`的结果都必须是下一个状态的定义，除非是终止FSM，这种情况在[从内部终止](#termination-from-inside)中介绍。状态定义可以是当前状态，由`stay`指令描述，或由`goto(state)`指定的另一个状态。结果对象可以通过下面列出的修饰器作进一步的限制：
 
 * `forMax(duration)`
 
@@ -250,7 +252,7 @@ whenUnhandled {
 
   这个修饰器用给定的新数据替换旧的状态数据。如果你遵循[上面的建议](#fsm-philosophy)，这是内部状态数据被修改的唯一位置。
 
-* replying(msg)
+* `replying(msg)`
 
   这个修饰器为当前处理完的消息发送一个应答，不同的是它不会改变状态转换。
 
@@ -275,7 +277,7 @@ when(SomeState) {
 ######内部监控
 到目前为止，FSM DSL都围绕着状态和事件。另外一种视角是将其描述成一系列的状态转换。是通过这个方法实现的
 
-  onTransition(handler)
+    onTransition(handler)
 
 它将操作与状态转换联系起来，而不是联系状态与事件。这个处理器是一个偏函数，它以一对状态作为输入；不需要结果状态，因为不可能改变正在进行的状态转换。
 
@@ -306,9 +308,8 @@ def handler(from: StateType, to: StateType) {
 > 这种内部监控可以用于通过状态转换来构建你的FSM，这样在添加新的目标状态时，不会忘记例如在离开某个状态时，取消定时器这种操作。
 
 ######外部监控
-可以通过发送一个`SubscribeTransitionCallBack(actorRef)`消息注册外部actor，来接收状态转换的通知。这个被命名的actor将立即收到`CurrentState(self, stateName)`消息，并在之后每次进入新状态时收到`Transition(actorRef, oldState, newState)`消息. 可以通过向FSM actor发送`UnsubscribeTransitionCallBack(actorRef)`来注销外部监控actor。
+可以通过发送一个`SubscribeTransitionCallBack(actorRef)`消息注册外部actor，来接收状态转换的通知。这个被命名的actor将立即收到`CurrentState(self, stateName)`消息，并在之后每次进入新状态时收到`Transition(actorRef, oldState, newState)`消息。可以通过向FSM actor发送`UnsubscribeTransitionCallBack(actorRef)`来注销外部监控actor。
 
-注册一个未运行的监听actor将生成一个警告，并优雅地失败。
 停止一个监听器，而不注销，将不会从注册列表中移除它；需要在停止监听器前使用`UnsubscribeTransitionCallback`。
 
 #####转换状态
@@ -339,7 +340,7 @@ when(SomeState)(transform {
 #####定时器
 除了状态超时，FSM还管理以`String`类型名称为标识的定时器。你可以用下面代码设置定时器
 
-  setTimer(name, msg, interval, repeat)
+    setTimer(name, msg, interval, repeat)
 
 
 其中`msg`是经过`interval`时间以后发送的消息对象。 如果`repeat`设成`true`，定时器将以`interval`参数指定的时间段重复规划。添加新的计时器之前，具有相同名称的任何现有计时器将被自动取消。
@@ -347,24 +348,24 @@ when(SomeState)(transform {
 
 可以用下面代码取消定时器
 
-  cancelTimer(name)
+    cancelTimer(name)
 
 取消操作确保立即执行，这意味着在这个调用之后，定时器已经规划的消息将不会执行，即使定时器已经发起并入队该消息。任何定时器的状态可以用下面的代码进行查询
 
-  isTimerActive(name)
+    isTimerActive(name)
 
 这些具名定时器是对状态超时的补充，因为它们不受中间收到的其它消息的影响。
 
-#####<a name="Termination_from_Inside"></a>从内部终止
+#####<a name="termination-from-inside"></a>从内部终止
 可以像下面这样指定结果状态来终止FSM
 
-  stop([reason[, data]])
+    stop([reason[, data]])
 
 其中的`reason`必须是`Normal`（默认值）、`Shutdown`或`Failure(reason)`之一，可以提供第二个参数来改变状态数据，在终止处理器中可以使用该数据。
 
 > 注意
 
-> 必须注意`stop`并不会中止当前的操作并立即停止FSM。`stop`操作必须象状态转换一样从事件处理器中返回（但要注意``return``语句不能用在`when`代码块中）。
+> 必须注意`stop`并不会中止当前的操作并立即停止FSM。`stop`操作必须像状态转换一样从事件处理器中返回（但要注意``return``语句不能用在`when`代码块中）。
 
 ```scala
 when(Error) {
@@ -394,7 +395,7 @@ onTermination {
 > 如果你重写`postStop`并而希望你的`onTermination `处理器被调用，不要忘记调用``super.postStop``。
 
 ###测试和调试有限状态机
-在开发和调试过程中，FSM和其它actor一样需要照顾。[测试有限状态机 TODO](http://doc.akka.io/docs/akka/2.3.6/scala/testing.html#testfsmref)以及下文中介绍了一些专门的工具。
+在开发和调试过程中，FSM和其它actor一样需要照顾。[测试有限状态机](09_testing_actor_systems.md#testfsmref)以及下文中介绍了一些专门的工具。
 
 #####事件跟踪
 [配置文件](../chapter2/09_configuration.md)中的``akka.actor.debug.fsm``打开用`LoggingFSM`实例完成的事件跟踪日志：
@@ -412,10 +413,10 @@ class MyFSM extends Actor with LoggingFSM[StateType, Data] {
   * 所有具名定时器的设置和取消
   * 所有的状态转换
 
-生命周期变化及特殊消息可以如[Actor TODO](http://doc.akka.io/docs/akka/2.3.6/scala/testing.html#actor-logging-scala)中所述进行日志记录。
+生命周期变化及特殊消息可以如[Actor](09_testing_actor_systems.md#actor-logging-scala)中所述进行日志记录。
 
 #####滚动事件日志
-`LoggingFSM`特质为FSM添加了一个新的特性：一个滚动的事件日志，它可以在debugging中使用（跟踪为什么FSM会进入某个失败的状态）或其它的什么新用法：
+`LoggingFSM`特质为FSM添加了一个新的特性：一个滚动的事件日志，它可以在debugging中使用（跟踪为什么FSM会进入某个失败的状态）或其它的新用法：
 
 ```scala
 import akka.actor.LoggingFSM
@@ -440,6 +441,6 @@ class MyFSM extends Actor with LoggingFSM[StateType, Data] {
 事件日志的内容可以用`getLog`方法获取，它返回一个`IndexedSeq[LogEntry]`，其中最老的条目下标为0。
 
 ###示例
-在`Typesafe Activator <http://www.typesafe.com/platform/getstarted>`的模板工程`Akka FSM in Scala <http://www.typesafe.com/activator/template/akka-sample-fsm-scala>`中，可以找到一个比Actor’s `become/unbecome`更大的FSM示例。
+在[Typesafe Activator](http://www.typesafe.com/platform/getstarted)的模板工程[Akka FSM in Scala](http://www.typesafe.com/activator/template/akka-sample-fsm-scala)中，可以找到一个比Actor’s `become/unbecome`更大的FSM示例。
 
 

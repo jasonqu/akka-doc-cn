@@ -39,14 +39,14 @@ class Master extends Actor {
 Akka自带的路由逻辑如下：
 
 * ``akka.routing.RoundRobinRoutingLogic``
-* ``akka.routing.RandomRoutingLogic```
+* ``akka.routing.RandomRoutingLogic``
 * ``akka.routing.SmallestMailboxRoutingLogic``
 * ``akka.routing.BroadcastRoutingLogic``
 * ``akka.routing.ScatterGatherFirstCompletedRoutingLogic``
 * ``akka.routing.TailChoppingRoutingLogic``
 * ``akka.routing.ConsistentHashingRoutingLogic``
 
-我们像在``ActorRefRoutee``包装下创建普通子actor一样创建routee。我们监控routee从而能够在它们被终止的请款下取代他们。
+我们像在``ActorRefRoutee``包装下创建普通子actor一样创建routee。我们监控routee从而能够在它们被终止的情况下取代他们。
 
 通过路由器发送消息是用``route``方法完成的，像上面例子中的``Work``消息一样。
 
@@ -61,7 +61,7 @@ Akka自带的路由逻辑如下：
 
 这种类型的路由actor有两种不同的模式：
 
-* 池——路由器创建routee作为子actor，并在其终止时将它从路由器中移除。
+* 池——路由器创建routee作为子actor，并在该子actor终止时将它从路由器中移除。
 * 群组——routee actor在路由器外部创建，而路由器将通过使用actor选择将消息发送到指定路径，而不监控其终止。
 
 路由actor可以通过在配置中或以编程方式被定义。虽然路由actor可以在配置文件中定义，但仍然必须以编程方式创建，即你不能只通过外部配置创建路由器。如果你在配置文件中定义路由actor，则实际将使用这些设置，而不是以编程方式提供的参数。
@@ -116,7 +116,7 @@ val routerRemote = system.actorOf(
 sender() ! x // replies will go to this actor
 ```
 
-然而，通常为routee将*路由器*设置为发送者更有用。例如，你可能想要将路由器设置为发件人，如果你想要隐藏在路由器后面routee的 细节。下面的代码片段演示如何设置父路由器作为发送者。
+然而，通常为routee将*路由器*设置为发送者更有用。例如，你可能想要将路由器设置为发件人，如果你想要隐藏在路由器后面routee的细节。下面的代码片段演示如何设置父路由器作为发送者。
 
 ```scala
 sender().tell("reply", context.parent) // replies will go back to parent
@@ -128,11 +128,11 @@ sender().!("reply")(context.parent) // alternative syntax (beware of the parens!
 
 可以用该池的``supervisorStrategy``属性配置路由器actor的监管策略。如果没有提供配置，路由器的默认策略是"总是上溯"。这意味着错误都会向上传递给路由器的监管者进行处理。路由器的监管者将决定对任何错误该做什么。
 
-请注意路由器的监管者将把错误视为路由器本身的错误。因此一个指令，用于停止或重新启动将导致路由器*本身*以停止或重新启动。此路由器，反过来，将导致它的孩子停止并重新启动。
+请注意路由器的监管者将把错误视为路由器本身的错误。因此一个指令，用于停止或重新启动将导致路由器*本身*以停止或重新启动。此路由器，相应地，将导致它的孩子停止并重新启动。
 
 应该提到的是路由器重新启动行为已被重写，以便重新启动时，仍重新创建这些孩子，并会在池中保留相同数量的actor。
 
-这意味着如果你还没有指定路由器或其父节点中的`supervisorStrategy`，routee的失败会升级到路由器，并将在默认情况下重新启动路由器，从而将重新启动所有的routee（它使用升级。并在重新启动过程中不停止routee）。原因是为了使类似在子actor定义中添加`.withRouter`这样的默认行为，不会更改应用于子actor的监管策略。你可以在定义路由器时指定策略来避免低效。
+这意味着如果你还没有指定路由器或其父节点中的`supervisorStrategy`，routee的失败会上升到路由器，并将在默认情况下重新启动路由器，从而将重新启动所有的routee（它使用上升，并在重新启动过程中不停止routee）。原因是为了使类似在子actor定义中添加`.withRouter`这样的默认行为，不会更改应用于子actor的监管策略。你可以在定义路由器时指定策略来避免低效。
 
 设置策略是很容易完成的：
 
@@ -144,10 +144,10 @@ val router = system.actorOf(RoundRobinPool(1, supervisorStrategy = escalator).pr
   routeeProps = Props[TestActor]))
 ```
 
-<p class="first admonition-title">Note</p>
+<a name="note-router-terminated-children-scala"></a>
 > 注意
 
-> 如果路由器池的子actor终止，池路由器不会自动产生一个新的actor。在所有池路由器所有儿童都终止的事件中，路由器将终止本身除非它是一个动态的路由器，例如使用了大小调整。
+> 如果路由器池的子actor终止，池路由器不会自动产生一个新的actor。在池路由器所有子actor都终止的事件中，路由器将终止本身，除非它是一个动态的路由器，例如使用了大小调整。
 
 #####群组
 有时候，相比于由路由actor创建其routee，我们更希望单独创建 routee，并提供路由器供其使用。你可以通过将 routee路径传递给路由器的配置来实现。消息将通过``ActorSelection``发送到这些路径。
@@ -303,7 +303,7 @@ val router8: ActorRef =
 
 <span id="balancing-pool-scala"></span>
 #####BalancingPool
-将尝试重新从繁忙routee分配分配任务到空闲routee的路由器。所有routee都共享同一个邮箱。
+将尝试重新从繁忙routee分配任务到空闲routee的路由器。所有routee都共享同一个邮箱。
 
 在配置中定义的BalancingPool：
 
@@ -347,7 +347,7 @@ akka.actor.deployment {
 #####SmallestMailboxPool
 试图向邮箱中有最少消息的非暂停子routee发送消息的路由器。按此顺序进行选择：
 
-* 挑选有空邮箱的空闲routee（不处理消息）
+* 挑选有空邮箱的空闲routee（即没有处理消息）
 * 选择任一空邮箱routee
 * 选择邮箱中有最少挂起消息的routee
 * 选择任一远程routee，远程actor考虑优先级最低，因为其邮箱大小未知
@@ -432,7 +432,7 @@ val router16: ActorRef =
 > Broadcast路由器总是向其routee广播*每一条*消息。如果你不想播出每条消息，则你可以使用非广播路由器并使用所需的[广播消息](#broadcast-messages-scala)。
 
 #####ScatterGatherFirstCompletedPool 和 ScatterGatherFirstCompletedGroup
-ScatterGatherFirstCompletedRouter将会把消息发送到它所有的routee。然后它等待知道收到的第一个答复。该结果将发送回原始发送者。其他的答复将被丢弃。
+ScatterGatherFirstCompletedRouter将会把消息发送到它所有的routee。然后它等待直到收到第一个答复。该结果将发送回原始发送者。其他的答复将被丢弃。
 
 在配置的时间内，它期待至少一个答复，否则它将回复一个包含``akka.pattern.AskTimeoutException``的``akka.actor.Status.Failure``。
 
@@ -552,7 +552,7 @@ ConsistentHashingPool基于已发送的消息使用[一致性哈希(consistent h
 
 有三种方式来定义使用哪些数据作为一致的散列键。
 
-* 您可以定义路由的``hashMapping``，将传入的消息映射到它们一致散列键。这使决策对发送者透明。
+* 你可以定义路由的``hashMapping``，将传入的消息映射到它们一致散列键。这使决策对发送者透明。
 * 这些消息可能会实现``akka.routing.ConsistentHashingRouter.ConsistentHashable``。键是消息的一部分，并很方便地与消息定义一起定义。
 * 消息可以被包装在一个``akka.routing.ConsistentHashingRouter.ConsistentHashableEnvelope``中，来定义哪些数据可以用来做一致性哈希。发送者知道要使用的键。
 
@@ -665,7 +665,7 @@ val router28: ActorRef =
   context.actorOf(ConsistentHashingGroup(paths).props(), "router28")
 ```
 
-``virtual-nodes-factor``(虚拟节点因子)是每个routee的虚拟节点数，用来在在一致性哈希节点环中使用，使分布更加均匀。
+``virtual-nodes-factor``(虚拟节点因子)是每个routee的虚拟节点数，用来在一致性哈希节点环中使用，使分布更加均匀。
 
 <span id="router-special-messages-scala"></span>
 ###特殊处理的消息
@@ -694,11 +694,11 @@ import akka.actor.PoisonPill
 router ! PoisonPill
 ```
 
-对于路由器，通常将消息传递给routee，需要认识到的很重要一点是``PoisonPill``消息只被路由器处理。发送到路由器的``PoisonPill``消息将*不会*发送到routee。
+路由器通常将消息传递给routee，但对于``PoisonPill``消息，需要认识到的很重要一点是它只被路由器处理。发送到路由器的``PoisonPill``消息将*不会*发送到routee。
 
-然而，发送到路由器的``PoisonPill``消息可能仍会影响其routee，因为路由器停止时它也会停止其子actor。停止子actor是普通的actor行为。路由器将会停止它作为子actor创建的routee。每个孩子将处理其当前的消息，然后停止。这可能会导致一些消息未被处理。停止actor的详细信息，请参阅[文档](01_actors.md#stopping-actors-scala)。
+然而，发送到路由器的``PoisonPill``消息可能仍会影响其routee，因为路由器停止时它也会停止其子actor。停止子actor是普通的actor行为。路由器将会停止其作为子actor创建的各个routee。每个孩子将处理其当前的消息，然后停止。这可能会导致一些消息未被处理。停止actor的详细信息，请参阅[文档](01_actors.md#stopping-actors-scala)。
 
-如果你希望停止路由器极其routee，但你希望routee在停止前先处理目前在其邮箱中的所有消息，则你不应该发送``PoisonPill``消息。相反，你应该将``PoisonPill``包装在一个``Broadcast``，以便每个routee都能收到``PoisonPill``消息。请注意这将停止所有的routee，即使routee不是路由器的孩子，即即使是通过编程方式提供给router的routee。
+如果你希望停止路由器及其routee，但你希望routee在停止前先处理目前在其邮箱中的所有消息，则你不应该发送``PoisonPill``消息。相反，你应该将``PoisonPill``包装在一个``Broadcast``，以便每个routee都能收到``PoisonPill``消息。请注意这将停止所有的routee，即使routee不是路由器的孩子，也就是即使是通过编程方式提供给router的routee。
 
 ```scala
 import akka.actor.PoisonPill
@@ -706,7 +706,7 @@ import akka.routing.Broadcast
 router ! Broadcast(PoisonPill)
 ```
 
-如上代码所示，每个routee将收到一个``PoisonPill`消息。每个routee会继续如常处理其邮件，最终处理``PoisonPill``。这将导致routee停止。所有routee后，路由器将[自动停止](#note-router-terminated-children-scala)自己，除非它是一个动态的路由器，例如尺寸调整器。
+如上代码所示，每个routee将收到一个``PoisonPill``消息。每个routee会继续如常处理其邮件，最终处理``PoisonPill``。这将导致routee停止。所有routee停止后，路由器将[自动停止](#note-router-terminated-children-scala)自己，除非它是一个动态的路由器，例如尺寸调整器。
 
 > 注意
 
@@ -724,7 +724,7 @@ import akka.actor.Kill
 router ! Kill
 ```
 
-相比于``PoisonPill``消息，杀死一个路由器，间接杀死其子（即那些routee），和直接杀死routee（其中有些未必是起孩子）之间是有明显区别的。要直接杀死routee，路由器应发送包裹着``Kill``消息的``Broadcast``消息。
+相比于``PoisonPill``消息，杀死一个路由器，间接杀死其子（即那些routee），和直接杀死routee（其中有些未必是其孩子）之间是有明显区别的。要直接杀死routee，路由器应发送包裹着``Kill``消息的``Broadcast``消息。
 
 ```scala
 import akka.actor.Kill
@@ -736,7 +736,7 @@ router ! Broadcast(Kill)
 * 发送``akka.routing.GetRoutees``到一个路由actor，使其回送一个包含当前使用routee的``akka.routing.Routees``消息。
 * 发送``akka.routing.AddRoutee``到一个路由actor会将那个routee添加到其routee集合中。
 * 发送``akka.routing.RemoveRoutee``到一个路由actor将从其routee集合删除该routee。
-* 发送``akka.routing.AdjustPoolSize``到一个池路由actor将从其routee结合中添加或删除该数目的routee。
+* 发送``akka.routing.AdjustPoolSize``到一个池路由actor将从其routee集合中添加或删除该数目的routee。
 
 这些管理消息可能晚于其他消息处理，所以如果你发送``AddRoutee``后立即发送普通消息，并不能保证当普通消息被路由时，routee已被更改。如果你需要知道更改何时生效，你可以发送``AddRoutee``紧跟着``GetRoutees``，当你收到``Routees``答复，你就知道前面的变化已被应用。
 
@@ -779,7 +779,7 @@ val router30: ActorRef =
 
 > 注意
 
-> 改变大小的行为是通过向actor池发送消息来触发的，但它不是完全同步的；而是向``RouterActor``的“head”发送消息来执行修改. 所以在别的actor忙碌时，你不能假设改变大小的操作会立即创建新的工作actor，因为消息会被发到忙碌actor的邮箱中排队。要解决这个问题，配置actor池使用一个平衡的派发器，更多信息见[Configuring Dispatchers](#configuring-dispatchers)。
+> 改变大小的行为是通过向actor池发送消息来触发的，但它不是完全同步的；而是向``RouterActor``的“head”发送消息来执行修改。所以在别的actor忙碌时，你不能假设改变大小的操作会立即创建新的工作actor，因为消息会被发到忙碌actor的邮箱中排队。要解决这个问题，配置actor池使用一个平衡的派发器，更多信息见[Configuring Dispatchers](#configuring-dispatchers)。
 
 <span id="router-design-scala"></span>
 ###Akka中的路由是如何设计的
@@ -793,7 +793,7 @@ val router30: ActorRef =
 ###自定义路由actor
 如果觉得Akka自带的路由actor都不合用，你也可以创建自己的路由actor。要创建自己的路由，你需要满足本节中所列出的条件。
 
-在创建您自己的路由器之前，您应该考虑一个拥有类似路由器行为的普通actor是否能完成一个成熟路由器的功能。正如[上文](#router-design-scala)解释，路由器相比于普通actor主要好处是他们拥有更高的性能。但相比普通actor他们的代码也更为复杂。因此，如果在你的应用程序中较低的最大吞吐量是可以接受的，则不妨继续使用传统的actor。不过这一节假定你想要获得最大性能，并因而演示如何创建你自己的路由器。
+在创建你自己的路由器之前，你应该考虑一个拥有类似路由器行为的普通actor是否能完成一个成熟路由器的功能。正如[上文](#router-design-scala)解释，路由器相比于普通actor主要好处是他们拥有更高的性能。但相比普通actor他们的代码也更为复杂。因此，如果在你的应用程序中较低的最大吞吐量是可以接受的，则不妨继续使用传统的actor。不过这一节假定你想要获得最大性能，并因而演示如何创建你自己的路由器。
 
 在此示例中创建的路由器将把每个消息复制到几个目的地。
 
@@ -870,7 +870,7 @@ case class RedundancyGroup(override val paths: immutable.Iterable[String], nbrCo
 }
 ```
 
-这可以像Akka提供的路由actor完全一样使用。
+这样就可以像Akka提供的路由actor完全一样使用。
 
 ```scala
 for (n <- 1 to 10) system.actorOf(Props[Storage], "s" + n)
@@ -902,8 +902,8 @@ val redundancy2: ActorRef = system.actorOf(FromConfig.props(),
 redundancy2 ! "very important"
 ```
 
-###配置调度器
-为池的创建孩子的调度器将取自``Props``，如[调度器](04_dispatchers.md)中所述。
+###<a name="configuring-dispatchers"></a>配置调度器
+创建子actor池的调度器将取自``Props``，如[调度器](04_dispatchers.md)中所述。
 
 为了可以很容易地定义池routee的调度器，你可以在配置的部署一节中定义内联调度器。
 
@@ -938,5 +938,5 @@ val router: ActorRef = system.actorOf(
 
 > 注意
 
-> 不允许配置``routerDispatcher``为`akka.dispatch.BalancingDispatcherConfigurator`，因为用于特殊路由actor的消息不能被其他任意actor处理。
+> 不允许配置``routerDispatcher``为`akka.dispatch.BalancingDispatcherConfigurator`，因为用于特殊路由actor的消息不能被任意其他actor处理。
 

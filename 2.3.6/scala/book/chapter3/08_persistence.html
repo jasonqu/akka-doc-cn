@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="8.1" data-basepath=".." data-revision="1418396877209">
+    <div class="book"  data-level="8.1" data-basepath=".." data-revision="1418482047463">
     
 
 <div class="book-summary">
@@ -528,6 +528,28 @@
                     </a>
                 
             
+            
+            <ul class="articles">
+                
+    
+        
+        <li class="chapter " data-level="3.9.1" data-path="chapter3/09_1_testkit-example.html">
+            
+                
+                    <a href="../chapter3/09_1_testkit-example.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.9.1.</b>
+                        
+                         TestKit实例
+                    </a>
+                
+            
+            
+        </li>
+    
+
+            </ul>
             
         </li>
     
@@ -1617,24 +1639,24 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_28">
+                    <section class="normal" id="section-gitbook_122">
                     
                         <h1 id="">持久化</h1>
-<p>Akka持久化使有状态的actor能留存其内部状态，以便在因JVM崩溃、监管者引起，或在集群中迁移导致的actor启动、重启时恢复它。Akka持久化背后的关键概念是持久化的只是一个actor的内部状态的的变化，而不是直接持久化其当前状态 （除了可选快照）。这些更改永远只能被附加到存储，没什么是可变的，这使得高事务处理率和高效复制成为可能。有状态actor通过重放保存的变化来恢复，从而使它们可以重建其内部状态。重放的可以是完整历史记录，或着从某一个快照开始从而可以大大减少恢复时间。Akka持久化也提供了“至少一次消息传递语义”的点对点通信。</p>
+<p>Akka持久化使有状态的actor能留存其内部状态，以便在因JVM崩溃、监管者引起，或在集群中迁移导致的actor启动、重启时恢复它。Akka持久化背后的关键概念是持久化的只是一个actor的内部状态的的变化，而不是直接持久化其当前状态 （除了可选的快照）。这些更改永远只能被附加到存储，没什么是可变的，这使得高事务处理率和高效复制成为可能。有状态actor通过重放保存的变化来恢复，从而使它们可以重建其内部状态。重放的可以是完整历史记录，或着从某一个快照开始从而可以大大减少恢复时间。Akka持久化也提供了“至少一次消息传递语义”的点对点通信。</p>
 <blockquote>
 <p>注意</p>
 <p>本模块被标记为<strong>“experimental”</strong>直到Akka 2.3.0引入它。我们将基于用户的反馈继续改善此API，这就意味着我们对维护版本的二进制不兼容性降到最低的保证不适用于<code>akka.persistence</code>包的内容。</p>
 </blockquote>
-<p>Akka持久化受<a href="https://github.com/eligosource/eventsourced" target="_blank">eventsourced</a>启发，并且是其正式的替代者。它遵循<a href="https://github.com/eligosource/eventsourced" target="_blank">eventsourced</a>相同的概念和体系结构，但在API和实现层上则显著不同。又见<a href="http://doc.akka.io/docs/akka/2.3.6/project/migration-guide-eventsourced-2.3.x.html#migration-eventsourced-2-3" target="_blank">《迁移指南：从Eventsourced到Akka Persistence 2.3》</a>。 TODO</p>
+<p>Akka持久化受<a href="https://github.com/eligosource/eventsourced" target="_blank">eventsourced</a>启发，并且是其正式的替代者。它遵循<a href="https://github.com/eligosource/eventsourced" target="_blank">eventsourced</a>相同的概念和体系结构，但在API和实现层上则显著不同。又见<a href="http://doc.akka.io/docs/akka/2.3.6/project/migration-guide-eventsourced-2.3.x.html#migration-eventsourced-2-3" target="_blank">《迁移指南：从Eventsourced到Akka Persistence 2.3》</a>。</p>
 <h3 id="akka-234">Akka 2.3.4的变化</h3>
-<p>在Akka 2.3.4中，较早版本中的几个概念被推倒和简化。大体上讲 ；<code>Processor</code>和<code>EventsourcedProcessor</code>被替换为<code>PersistentActor</code>。<code>Channel</code>和<code>PersistentChannel</code>被替换为<code>AtLeastOnceDelivery</code>。<code>View</code>被替换为<code>PersistentView</code>。</p>
+<p>在Akka 2.3.4中，较早版本中的几个概念被推倒和简化。大体上讲；<code>Processor</code>和<code>EventsourcedProcessor</code>被替换为<code>PersistentActor</code>。<code>Channel</code>和<code>PersistentChannel</code>被替换为<code>AtLeastOnceDelivery</code>。<code>View</code>被替换为<code>PersistentView</code>。</p>
 <p>更改的全部细节请参阅<a href="http://doc.akka.io/docs/akka/2.3.6/project/migration-guide-persistence-experimental-2.3.x-2.4.x.html#migration-guide-persistence-experimental-2-3-x-2-4-x" target="_blank">《迁移指南：从Akka Persistence (experimental) 2.3.3到Akka Persistence 2.3.4 (和2.4.x)》</a>。老的类在一段时间内仍被包含并标记为废弃，以便用户顺利过渡。如果你需要的旧的文档，可以参考<a href="http://doc.akka.io/docs/akka/2.3.3/scala/persistence.html" target="_blank">这里</a>。</p>
 <h3 id="">依赖</h3>
 <p>Akka持久化是一个单独的jar文件。请确保你的项目中有以下依赖关系：</p>
 <pre><code>&quot;com.typesafe.akka&quot; %% &quot;akka-persistence-experimental&quot; % &quot;2.3.6&quot;
 </code></pre><h3 id="">体系结构</h3>
 <ul>
-<li><em>PersistentActor</em>：是一个持久的、有状态的actor。它能够持久化消息到一个日志，并以线程安全的方式对它们作出响应。它可被用于执行<em>命令[command]</em>和<em>事件来源[event sourced]</em>的actor。当一个持久化的actor被启动或重新启动时，该actor会被重播日志消息，从而可以从这些消息恢复内部状态。</li>
+<li><em>PersistentActor</em>：是一个持久的、有状态的actor。它能够持久化消息到一个日志，并以线程安全的方式对它们作出响应。它是可被用于执行<em>命令[command]</em>和<em>事件来源[event sourced]</em>的actor。当一个持久化的actor被启动或重新启动时，该actor会被重播日志消息，从而可以从这些消息恢复内部状态。</li>
 <li><em>PersistentView</em>：一个视图是一个持久的、有状态的actor，来接收已经由另一个持久化actor写下的日志消息。视图本身并没有新的日志消息，相反，它只能从一个持久化actor复制消息流来更新内部状态。</li>
 <li><em>AtLeastOnceDelivery</em>：使用至少一次的传递语义将消息发送到目的地，以防发送者和接收者 JVM崩溃。</li>
 <li><em>Journal</em>：日志存储发送到一个持久化actor的消息序列。应用程序可以控制actor接收的消息中，哪些需要在日记中记录，哪些不需要。日志的存储后端是可插拔的。默认日志存储插件是写入本地文件系统，复制日志在<a href="http://akka.io/community/" target="_blank">社区插件</a>中可以获得。</li>
@@ -1685,22 +1707,22 @@
 }
 </code></pre>
 <p>该示例定义了两种数据类型，<code>Cmd</code> 和 <code>Evt</code> 分别代表命令和事件。<code>ExamplePersistentActor</code>的<code>state</code> 包含在 <code>ExampleState</code>中的持久化的事件数据的列表。</p>
-<p>持久化actor的<code>receiveRecover</code>方法定义如何通过在恢复过程中处理 <code>Evt</code> 和 S<code>napshotOffer</code> 消息来更新<code>state</code>。持久化actor的<code>receiveCommand</code> 方法是一个命令处理程序。在此示例中，命令处理是通过生成两个事件，然后被持久化和处理的。事件通过调用<code>persist</code>方法持久化，该方法第一个参数是事件（或一系列事件），第二个参数是事件处理程序。</p>
+<p>持久化actor的<code>receiveRecover</code>方法定义如何通过在恢复过程中处理 <code>Evt</code> 和 <code>SnapshotOffer</code> 消息来更新<code>state</code>。持久化actor的<code>receiveCommand</code> 方法是一个命令处理程序。在此示例中，命令处理是通过生成两个事件，然后被持久化和处理的。事件通过调用<code>persist</code>方法持久化，该方法第一个参数是事件（或一系列事件），第二个参数是事件处理程序。</p>
 <p><code>persist</code>方法以异步方式持久化事件，而事件处理程序对成功持久化的事件进行处理。成功持久化的事件在内部作为独立消息发送回给持久化actor，来触发事件处理执行。事件处理程序可能会包含持久化actor的状态并修改它。持久化事件的发送者也是相应命令的发送者。这使事件处理程序可以回复命令的发送者（未显示）。</p>
 <p>事件处理程序的主要任务是：使用事件数据更改持久化actor状态，并通过发布事件通知其他人成功的状态变化。</p>
 <p>当使用<code>persist</code>持久化事件的时候，可以保证持久化actor在<code>persist</code>调用和相应的事件处理程序的（多次）执行之间不会进一步收到命令。这在单个命令的上下文中多次调用<code>persist</code>的情况下也成立。</p>
 <p>运行该示例最简单的方法是下载<a href="http://www.typesafe.com/platform/getstarted" target="_blank">Typesafe Activator</a>，并打开<a href="http://www.typesafe.com/activator/template/akka-sample-persistence-scala" target="_blank">Akka Persistence Samples with Scala</a>这个教程。它包含如何运行<code>PersistentActorExample</code>的说明。</p>
 <blockquote>
-<p>注</p>
-<p>还有可能在正常处理过程中使用不同的命令处理程序，并使用<code>context.become()</code>和<code>context.unbecome()</code>来恢复。恢复后使actor进入相同的状态，你需要采取特别谨慎地使用<code>receiveRecover</code>方法中的<code>become</code>和<code>unbecome</code>进行相同的状态转换，就像你会在命令处理程序中做的一样。</p>
+<p>注意</p>
+<p>还有可能在正常处理过程中使用不同的命令处理程序，并使用<code>context.become()</code>和<code>context.unbecome()</code>来恢复。恢复后使actor进入相同的状态，你需要特别谨慎地使用<code>receiveRecover</code>方法中的<code>become</code>和<code>unbecome</code>进行相同的状态转换，就像你会在命令处理程序中做的一样。</p>
 </blockquote>
 <h5 id="">标识符</h5>
 <p>一个持久化actor必须具有跨不同actor化身而不改变的标识符。必须使用<code>persistenceId</code>方法定义该标识符。</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">persistenceId</span> =</span> <span class="hljs-string">"my-stable-persistence-id"</span>
 </code></pre>
 <h5 id="a-namerecovery"><a name="recovery"/>恢复</h5>
-<p>默认情况下，一个持久化actor通过在启动和重启时重放日志消息实现自动恢复的。恢复过程中发送给持久化actor的新消息不会干扰重放消息。新消息只会在持久化actor恢复完成后被收到。</p>
-<h6 id="">#自定义恢复</h6>
+<p>默认情况下，一个持久化actor通过在启动和重启时重放日志消息实现自动恢复。恢复过程中发送给持久化actor的新消息不会干扰重放消息。新消息只会在持久化actor恢复完成后被收到。</p>
+<h6 id="">自定义恢复</h6>
 <p>通过使用空实现重写<code>preStart</code>，可以禁用启动时的自动恢复。</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">preStart</span>(</span>) = ()
 </code></pre>
@@ -1715,7 +1737,7 @@
 <p>序列号范围上界可以用来恢复持久化actor到过去的某个状态，而不是当前状态。通过使用空实现重写<code>preRestart</code>，可以禁用重新启动时的自动恢复。</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">preRestart</span>(</span>reason: <span class="hljs-type">Throwable</span>, message: <span class="hljs-type">Option</span>[<span class="hljs-type">Any</span>]) = ()
 </code></pre>
-<h6 id="">#恢复状态</h6>
+<h6 id="">恢复状态</h6>
 <p>一个持久化actor可以通过以下方法查询自身的恢复状态</p>
 <pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">recoveryRunning</span>:</span> <span class="hljs-type">Boolean</span>
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">recoveryFinished</span>:</span> <span class="hljs-type">Boolean</span>
@@ -1737,7 +1759,7 @@
 }
 </code></pre>
 <h5 id="">放宽的局部一致性要求和高吞吐量的用例</h5>
-<p>如果面临放宽的局部一致性要求和高吞吐量有时要求<code>PersistentActor</code>及其<code>persist</code>在处理大量涌入的命令时可能会不够，因为它必须等待知道给定命令相关的所有事件的都处理完成后，才开始处理下一条命令。虽然这种抽象在大多数的情况下非常有用，有时您可能会放宽一致性要求——例如你可能想要尽可能快速地处理命令，假设事件最终会持久化并在后台恰当处理，并在需要时追溯性地回应持久性故障。</p>
+<p>如果面临放宽的局部一致性要求和高吞吐量，有时<code>PersistentActor</code>及其<code>persist</code>在处理大量涌入的命令时可能会不够，因为它必须等待知道给定命令相关的所有事件都处理完成后，才开始处理下一条命令。虽然这种抽象在大多数的情况下非常有用，有时你可能会放宽一致性要求——例如你会想要尽可能快速地处理命令，假设事件最终会持久化并在后台恰当处理，并在需要时追溯性地回应持久性故障。</p>
 <p><code>persistAsync</code>方法提供了一个工具，用于实现高吞吐量的持久化actor。在日志仍在致力于持久化和（或） 执行用户事件回调代码时，它<em>不</em>会贮藏传入的命令。</p>
 <p>在下面的示例中，事件回调可能在&quot;任何时候&quot;被调用，甚至在处理下一条命令之后。两个事件之间的顺序仍能得到保证（&quot;evt-b-1&quot;将在&quot;evt-a-2&quot;后发送，而它又在&quot;evt-a-1&quot;后发送，以此类推）。</p>
 <pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyPersistentActor</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">PersistentActor</span> {</span>
@@ -1813,17 +1835,17 @@ processor ! <span class="hljs-string">"b"</span>
 </code></pre>
 <blockquote>
 <p>警告</p>
-<p>如果该actor在调用<code>defer</code>和日志处理和确认所有写入之间的回调，将不会在actor重启（或停止）时调用。</p>
+<p>如果该actor在调用<code>defer</code>和日志处理与确认所有写入之间的回调，将不会在actor重启（或停止）时调用。</p>
 </blockquote>
 <h5 id="">批处理写操作</h5>
-<p>为了优化吞吐量，一个持久化actor在高负荷下，会内部将一批事件先储存，然后再（作为一个批处理）写到日志中。批处理大小可以调整，从低和中等载荷作用下的1，动态增长到高负荷下可配置的最大大小到（默认为<code>200</code>）。在使用<code>persistAsync</code>时，这极大地增加了最大吞吐量。</p>
+<p>为了优化吞吐量，一个持久化actor在高负荷下，会内部将一批事件先储存，然后再（作为一个批处理）写到日志中。批处理大小可以调整，从低和中等载荷作用下的1，动态增长到高负荷下可配置的最大大小（默认为<code>200</code>）。在使用<code>persistAsync</code>时，这极大地增加了最大吞吐量。</p>
 <pre><code>akka.persistence.journal.max-message-batch-size = 200
 </code></pre><p>只要一个batch达到最大大小或日志完成前一批写操作，就会立即触发持久化actor新的批处理写操作。批处理写操作永远不会是基于计时器的，从而将延迟保持在最低限度。</p>
-<p>批处理还在内部使用确保事件写操作的原子性。在单个命令的上下文中的所有事件将作为单个批处理写入到日志中（即使在一个命令中多次调用<code>persist</code>）。因此，<code>PersistentActor</code>的恢复将永远不会部分完成 （只持久化单个命令中事件的一个子集）。</p>
+<p>批处理也在内部使用确保事件写操作的原子性。在单个命令上下文中的所有事件将作为单个批处理写入到日志中（即使在一个命令中多次调用<code>persist</code>）。因此，<code>PersistentActor</code>的恢复将永远不会部分完成 （只持久化单个命令中事件的一个子集）。</p>
 <h5 id="">删除邮件</h5>
 <p>若要删除所有消息（由一个持久化actor记录) 到指定的序列号，持久化actor可以调用<code>deleteMessages</code>方法。</p>
 <p>一个可选的<code>permanent</code>参数指定是否应从日志中永久删除消息，或仅标记为已删除。在这两种情况下，消息都不会重播。Akka持久化以后的扩展将允许重播标记为已删除的消息，例如可用于调试。</p>
-<h3 id="">持续化视图</h3>
+<h3 id="">持久化视图</h3>
 <p>持久化视图可以通过扩展<code>PersistentView</code>特质以及实现<code>receive</code>和<code>persistenceId</code>方法实现。</p>
 <pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyView</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">PersistentView</span> {</span>
   <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">persistenceId</span>:</span> <span class="hljs-type">String</span> = <span class="hljs-string">"some-persistence-id"</span>
@@ -1851,9 +1873,9 @@ view ! <span class="hljs-type">Update</span>(await = <span class="hljs-literal">
 <pre><code>akka.persistence.view.auto-update = off
 </code></pre><p>实现类可以通过重载<code>autoUpdate</code>方法重写配置的默认值。若要限制的每个更新请求的重播消息数量，应用程序可以配置自定义的<code>akka.persistence.view.auto-update-replay-max</code>值或重载<code>autoUpdateReplayMax</code>方法。手动更新的重播消息数目可以通过<code>Update</code>消息的<code>replayMax</code>参数进行限制。</p>
 <h5 id="">恢复</h5>
-<p>持久化视图的初始化回复过程和持久化actor的工作方式相同（即通过发送一个<code>Recover</code>消息到自己）。初始化恢复的最大重放消息数由<code>autoUpdateReplayMax</code>确定。关于自定义初始化恢复更多的可能性参见<a href="#recovery">恢复</a>一节。</p>
+<p>持久化视图的初始化恢复过程和持久化actor的工作方式相同（即通过发送一个<code>Recover</code>消息到自己）。初始化恢复的最大重放消息数由<code>autoUpdateReplayMax</code>确定。关于自定义初始化恢复更多的可能性参见<a href="#recovery">恢复</a>一节。</p>
 <h5 id="">标识符</h5>
-<p>一个持久化视图必须具有跨不同演员化身而不改变的标识符。必须使用<code>viewId</code>方法定义该标识符。</p>
+<p>一个持久化视图必须具有跨不同actor化身而不改变的标识符。必须使用<code>viewId</code>方法定义该标识符。</p>
 <p><code>ViewId</code>必须不同于引用的<code>persistenceId</code>，除非<a href="#snapshots">快照</a>视图和其持久化actor是共享的（即应用程序通常不需要做的东西）。</p>
 <h3 id="a-namesnapshots"><a name="snapshots"/>快照</h3>
 <p>快照可以大幅减少持久化actor和视图的恢复时间。下面讨论的快照内容是基于持久化actor的上下文，但这也同样适用于持久化视图。</p>
@@ -1894,9 +1916,9 @@ view ! <span class="hljs-type">Update</span>(await = <span class="hljs-literal">
 <h5 id="">快照删除</h5>
 <p>一个持久化actor可以通过调用<code>deleteSnapshot</code>方法并指定快照的序列号与的时间戳作为参数，来删除单个快照。要批量删除匹配<code>SnapshotSelectionCriteria</code>的快照，持久化actor应该使用<code>deleteSnapshots</code>方法。</p>
 <h3 id="">至少一次投递</h3>
-<p>要在至少一次投递语义下发送消息到目的地，你可以在发送端的<code>PersistentActor</code>混入<code>AtLeastOnceDelivery</code>特质。如果他们还在可配置的超时时间内未得到确认，它负责重新发送消息。</p>
+<p>要在至少一次投递语义下发送消息到目的地，你可以在发送端的<code>PersistentActor</code>混入<code>AtLeastOnceDelivery</code>特质。如果他们在可配置的超时时间内未得到确认，它负责重新发送消息。</p>
 <blockquote>
-<p>注</p>
+<p>注意</p>
 <p>至少一次投递意味着原始消息发送顺序并不总是保留的，以及目的地可能接收重复的消息。这意味着语义不匹配那些正常的<code>ActorRef</code>发送操作：</p>
 <ul>
 <li>它不是在最多一次投递</li>
@@ -1966,7 +1988,7 @@ view ! <span class="hljs-type">Update</span>(await = <span class="hljs-literal">
 <span class="hljs-keyword">import</span> scala.concurrent.duration._
 </code></pre>
 <h5 id="api">日志插件API</h5>
-<p>日志插件或者扩展<code>SyncWriteJournal</code>或<code>AsyncWriteJournal</code>。<code>SyncWriteJournal</code>是一个actor，当存储后端的API只支持同步、阻塞写入时应扩展它。在这种情况下，要实现的方法是：</p>
+<p>日志插件要扩展<code>SyncWriteJournal</code>或<code>AsyncWriteJournal</code>。<code>SyncWriteJournal</code>是一个actor，当存储后端的API只支持同步、阻塞写入时应扩展它。在这种情况下，要实现的方法是：</p>
 <pre><code class="lang-scala"><span class="hljs-comment">/**
  * Plugin API: synchronously writes a batch of persistent messages to the journal.
  * The batch write must be atomic i.e. either all persistent messages in the batch
@@ -2061,7 +2083,7 @@ view ! <span class="hljs-type">Update</span>(await = <span class="hljs-literal">
  */</span>
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">asyncReadHighestSequenceNr</span>(</span>persistenceId: <span class="hljs-type">String</span>, fromSequenceNr: <span class="hljs-type">Long</span>): <span class="hljs-type">Future</span>[<span class="hljs-type">Long</span>]
 </code></pre>
-<p>日志插件可以在以下最低配置下激活：</p>
+<p>日志插件可以以下最小配置下激活：</p>
 <pre><code class="lang-scala"># <span class="hljs-type">Path</span> to the journal plugin to be used
 akka.persistence.journal.plugin = <span class="hljs-string">"my-journal"</span>
 
@@ -2073,9 +2095,9 @@ my-journal {
   plugin-dispatcher = <span class="hljs-string">"akka.actor.default-dispatcher"</span>
 }
 </code></pre>
-<p>指定的插件<code>class</code>必须具有一个无参数构造函数。<code>plugin-dispatcher</code>是用于插件actor的调度程序。如果未指定，则默认为对`SyncWriteJournal<code>插件的</code>akka.persistence.dispatchers.default-plugin-dispatcher<code>和对</code>AsyncWriteJournal<code>插件的</code>akka.actor.default-dispatcher``。</p>
+<p>指定的插件<code>class</code>必须具有一个无参数构造函数。<code>plugin-dispatcher</code>是用于插件actor的调度程序。如果未指定，则默认是对<code>SyncWriteJournal</code>插件的<code>akka.persistence.dispatchers.default-plugin-dispatcher</code>和对<code>AsyncWriteJournal</code>插件的<code>akka.actor.default-dispatcher</code>。</p>
 <h5 id="api">快照存储插件API</h5>
-<p>一个快照存储插件必须扩展<code>SnapshotStore</code>actor并实现的以下方法：</p>
+<p>一个快照存储插件必须扩展<code>SnapshotStore</code>actor并实现以下方法：</p>
 <pre><code class="lang-scala"><span class="hljs-comment">/**
  * Plugin API: asynchronously loads a snapshot.
  *
@@ -2115,7 +2137,7 @@ my-journal {
  */</span>
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">delete</span>(</span>persistenceId: <span class="hljs-type">String</span>, criteria: <span class="hljs-type">SnapshotSelectionCriteria</span>)
 </code></pre>
-<p>可通过以下最低配置激活快照存储插件：</p>
+<p>可通过以下最小配置激活快照存储插件：</p>
 <pre><code class="lang-scala"># <span class="hljs-type">Path</span> to the snapshot store plugin to be used
 akka.persistence.snapshot-store.plugin = <span class="hljs-string">"my-snapshot-store"</span>
 
@@ -2127,7 +2149,7 @@ my-snapshot-store {
   plugin-dispatcher = <span class="hljs-string">"akka.persistence.dispatchers.default-plugin-dispatcher"</span>
 }
 </code></pre>
-<p>指定的插件<code>class</code>必须具有一个无参数构造函数。`plugin-dispatcher<code>是用于插件actor的调度程序。如果未指定，则默认为</code>akka.persistence.dispatchers.default-plugin-dispatcher``。</p>
+<p>指定的插件<code>class</code>必须具有一个无参数构造函数。<code>plugin-dispatcher</code>是用于插件actor的调度程序。如果未指定，则默认为<code>akka.persistence.dispatchers.default-plugin-dispatcher</code>。</p>
 <h5 id="tck">插件TCK</h5>
 <p>为了帮助开发人员构建正确和高质量存储插件，我们提供技术兼容性工具包 (简称<a href="http://en.wikipedia.org/wiki/Technology_Compatibility_Kit" target="_blank">TCK</a>）。</p>
 <p>TCK可用于Java或Scala项目中，对Scala你需要引入<code>akka-persistence-tck-experimental</code>依赖关系：</p>
@@ -2140,7 +2162,7 @@ my-snapshot-store {
     """</span>.stripMargin)
 }
 </code></pre>
-<p>我们还提供一个简单的基准测试类<code>JournalPerfSpec</code>，包括所有<code>JournalSpec</code>有的测试，还会执行日志上的一些长操作，并打印性能统计数据。虽然它<strong>不</strong>旨在提供一个适当的基准测试环境，它可以用于对典型的应用场景下你的日志表现进行粗略的感受。</p>
+<p>我们还提供一个简单的基准测试类<code>JournalPerfSpec</code>，包括所有<code>JournalSpec</code>有的测试，还会执行日志上的一些长操作，并打印性能统计数据。虽然它并<strong>不</strong>旨在提供一个适当的基准测试环境，它仍可以被用于对典型的应用场景下你的日志表现进行粗略的感受。</p>
 <p>要在你的测试套件中包括<code>SnapshotStore</code> TCK测试，只需要扩展<code>SnapshotStoreSpec</code>：</p>
 <pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MySnapshotStoreSpec</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">SnapshotStoreSpec</span> {</span>
   <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">config</span> =</span> <span class="hljs-type">ConfigFactory</span>.parseString(
@@ -2178,7 +2200,7 @@ my-snapshot-store {
 <p>默认日志插件是<code>akka.persistence.journal.leveldb</code>，它将消息写入到本地的LevelDB实例。LevelDB文件的默认位置是当前工作目录中一个名为<code>journal</code>的目录。此位置可以由配置中指定的相对或绝对的路径更改：</p>
 <pre><code class="lang-scala">akka.persistence.journal.leveldb.dir = <span class="hljs-string">"target/journal"</span>
 </code></pre>
-<p>用这个插件，每个演actor系统运行其自己私有的LevelDB实例。</p>
+<p>用这个插件，每个actor系统可运行其自己私有的LevelDB实例。</p>
 <h5 id="leveldb">共享LevelDB日志</h5>
 <p>一个LevelDB实例还可以由多个actor系统（在相同或不同节点上）共享。它，例如，允许持久化actor进行故障转移到备份节点，并从备份节点继续使用共享的日志实例。</p>
 <blockquote>
@@ -2261,7 +2283,7 @@ my-snapshot-store {
 <pre><code>akka.persistence.journal.leveldb-shared.store.dir = &quot;target/shared&quot;
 </code></pre><p>使用共享的LevelDB存储的actor系统必须激活<code>akka.persistence.journal.leveldb-shared</code>插件。</p>
 <pre><code>akka.persistence.journal.plugin = &quot;akka.persistence.journal.leveldb-shared&quot;
-</code></pre><p>这个插件必须由注射（远程）的<code>SharedLeveldbStore</code> actor引用进行初始化。注入是通过以actor引用作为参数调用<code>SharedLeveldbJournal.setStore</code>方法完成的。</p>
+</code></pre><p>这个插件必须由注入（远程的）<code>SharedLeveldbStore</code> actor引用来进行初始化。注入是通过以actor引用作为参数调用<code>SharedLeveldbJournal.setStore</code>方法完成的。</p>
 <pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">trait</span> <span class="hljs-title">SharedStoreUsage</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
   <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">preStart</span>(</span>): <span class="hljs-type">Unit</span> = {
     context.actorSelection(<span class="hljs-string">"akka.tcp://example@127.0.0.1:2552/user/store"</span>) ! <span class="hljs-type">Identify</span>(<span class="hljs-number">1</span>)
@@ -2273,12 +2295,12 @@ my-snapshot-store {
   }
 }
 </code></pre>
-<p>内部日志命令（由持久化actor发送的）会缓冲直到注入完成。注射是幂等的，即只有第一次的注入被使用。</p>
+<p>内部日志命令（由持久化actor发送的）会缓冲直到注入完成。注入是幂等的，即只有第一次的注入被使用。</p>
 <h5 id="a-namelocal-snapshot-store-"><a name="local-snapshot-store" />本地快照存储区</h5>
 <p>默认快照存储插件是<code>akka.persistence.snapshot-store.local</code>。它将快照文件写入本地文件系统。默认的存储位置是当前工作目录中一个名为<code>snapshots</code> 的目录。这可以通过配置中指定的相对或绝对的路径来更改：</p>
 <pre><code>akka.persistence.snapshot-store.local.dir = &quot;target/snapshots&quot;
 </code></pre><h3 id="">自定义序列化</h3>
-<p>快照序列化的和<code>Persistent</code>消息的有效载荷是可以通过Akka<a href="serialization.html">序列化</a>基础架构配置的。例如，如果应用程序想要序列化</p>
+<p>快照序列化和<code>Persistent</code>消息的有效载荷是可以通过Akka<a href="serialization.html">序列化</a>基础架构配置的。例如，如果应用程序想要序列化</p>
 <ul>
 <li>有效载荷的<code>MyPayload</code>类型与自定义的<code>MyPayloadSerializer</code>和</li>
 <li>快照的类型<code>MySnapshot</code>与自定义的<code>MySnapshotSerializer</code></li>

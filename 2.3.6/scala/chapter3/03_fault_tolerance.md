@@ -29,7 +29,7 @@ override val supervisorStrategy =
   }
 ```
 
-我选择了一些非常著名的异常类型来演示[监管与监控](../chapter2/04_supervision_and_monitoring.md)中描述的错误处理方式。首先，它是一对一策略，意思是每一个子actor会被单独处理（多对一的策略与之相似，唯一的区别在于任何决策都应用于监管者的所有子actor，而不仅仅是出错的那一个）。这里我们对重启的频率作了限制，即每分钟最多进行10次重启；所有这样的设置都可以被空着，也就是说，相应的限制并不被采用, 留下了设置重启频率的绝对上限或让重启无限进行的可能性。如果超出上限则子actor将被终止。
+我选择了一些非常著名的异常类型来演示[监管与监控](../chapter2/04_supervision_and_monitoring.md)中描述的错误处理方式。首先，它是一对一策略，意思是每一个子actor会被单独处理（多对一的策略与之相似，唯一的区别在于任何决策都应用于监管者的所有子actor，而不仅仅是出错的那一个）。这里我们对重启的频率作了限制，即每分钟最多进行10次重启；所有这样的设置都可以被空着，也就是说，相应的限制并不被采用，留下了设置重启频率的绝对上限或让重启无限进行的可能性。如果超出上限则子actor将被终止。
 
 构成主体的match语句的类型是``Decider``，它是一个``PartialFunction[Throwable, Directive]``。该部分将把子actor的失败类型映射到相应的指令上。
 
@@ -173,7 +173,7 @@ class FaultHandlingDocSpec extends AkkaSpec with ImplicitSender {
 }
 ```
 
-//TODO 代码贴多了？
+//TODO 原文这里代码贴多了？
 
 该监管者将被用来创建一个可以做试验的子actor：
 
@@ -214,7 +214,7 @@ class FaultHandlingDocSpec extends AkkaSpec with ImplicitSender {
 val supervisor = system.actorOf(Props[Supervisor], "supervisor")
  
 supervisor ! Props[Child]
-val child = expectMsgType[ActorRef] // 从TestKit的 testActor 中获取答案
+val child = expectMsgType[ActorRef] // 从 TestKit 的 testActor 中获取回应
 ```
 
 第一个测试是为了演示``Resume``指令，我们试着将actor设为非初始状态然后让它出错：
@@ -224,7 +224,7 @@ child ! 42 // 将状态设为 42
 child ! "get"
 expectMsg(42)
  
-child ! new ArithmeticException // 让它崩溃
+child ! new ArithmeticException // crash it
 child ! "get"
 expectMsg(42)
 ```
@@ -232,7 +232,7 @@ expectMsg(42)
 可以看到错误处理指令完后仍能得到42的值。现在如果我们将错误换成更严重的``NullPointerException``，情况就不同了:
 
 ```scala
-child ! new NullPointerException // 更严重的崩溃
+child ! new NullPointerException // crash it harder
 child ! "get"
 expectMsg(0)
 ```
@@ -245,7 +245,7 @@ child ! new IllegalArgumentException // break it
 expectMsgPF() { case Terminated(`child`) => () }
 ```
 
-到目前为止监管者完全没有被子actor的错误所影响, 因为指令集确实处理了这些错误。而对于``Exception``，就不是这么回事了，监管者会将失败上溯传递。
+到目前为止监管者完全没有被子actor的错误所影响，因为指令集确实处理了这些错误。而对于``Exception``，就不是这么回事了，监管者会将失败上溯传递。
 
 ```scala
 supervisor ! Props[Child] // create new child
