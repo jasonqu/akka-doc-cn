@@ -1,5 +1,5 @@
 # 邮箱
-一个Akka ``Mailbox``保存发往某个Actor的消息。通常每个Actor都拥有自己的邮箱，但也有例外，例如使用``BalancingPool``的所有路由共享同一个邮箱实例。
+一个Akka ``Mailbox``保存发往某个Actor的消息。通常每个Actor都拥有自己的邮箱，但也有例外，例如使用``BalancingPool``的所有路由子(routee)共享同一个邮箱实例。
 
 ###邮箱选择
 #####为actor指定一个消息队列类型
@@ -13,7 +13,7 @@ class MyBoundedActor extends MyActor
   with RequiresMessageQueue[BoundedMessageQueueSemantics]
 ```
 
-`RequiresMessageQueue`特征的类型参数需要映射到配置中的邮箱，像这样：
+`RequiresMessageQueue`特质的类型参数需要映射到配置中的邮箱，像这样：
 
 ```
 bounded-mailbox {
@@ -27,14 +27,14 @@ akka.actor.mailbox.requirements {
 }
 ```
 
-现在每当你创建一个类型为`MyBoundedActor`的actor时，它会尝试得到一个有界的邮箱。如果actor在部署中具有一个不同的邮箱配置——或者直接地，或是通过一个指定的邮箱类型的调度器——那么它将覆盖此映射。
+现在每当你创建一个类型为`MyBoundedActor`的actor时，它会尝试得到一个有界的邮箱。如果actor在部署中具有一个不同的邮箱配置——直接地，或是通过一个指定的邮箱类型的调度器——那么它将覆盖此映射。
 
 > 注意
 
 > 为actor创建的邮箱队列类型，会和特质中要求的类型进行检查，如果队列没有实现要求的类型，则actor创建会失败。
 
 #####为调度器指定一个消息队列类型
-调度器也可能对actor使用的邮箱类型进行限制。一个例子是 BalancingDispatcher，它要求消息队列对多个并发的消费者是线程安全的。像这样的约束是在配置的调度器节中像这样设定：
+调度器也可能对actor使用的邮箱类型进行限制。一个例子是 BalancingDispatcher，它要求消息队列对多个并发的消费者是线程安全的。该约束是在配置的调度器一节中像下面这样设定：
 
 ```
   my-dispatcher {
@@ -42,20 +42,20 @@ akka.actor.mailbox.requirements {
   }
 ```
 
-给定的约束是要求指定的类或者借口，必须是消息队列的实现的超类。如果出现冲突——例如如果actor要求的邮箱类型不能满足要求——则actor创建会失败。
+给定的约束是要求指定的类或者接口，必须是消息队列的实现的超类。如果出现冲突——例如如果actor要求的邮箱类型不能满足要求——则actor创建会失败。
 
 #####如何选择邮箱类型
 当一个actor创建时，`ActorRefProvider`首先确定将执行它的调度器。然后，邮箱确定如下：
 
 1. 如果actor的部署配置节包含``mailbox``键，则其描述邮箱类型将被使用。
-2. 如果actor的``Props``包含邮箱选择—即它调用了``withMailbox``——则其描述邮箱类型将被使用。
+2. 如果actor的``Props``包含邮箱选择——即它调用了``withMailbox``——则其描述邮箱类型将被使用。
 3. 如果调度器的配置节包含``mailbox-type``键，则该节内容将用于配置邮箱类型。
-4. 如果这actor需要邮箱类型，如上文所述，然后该约束的映射将用于确定使用的邮箱类型；如果不能满足调度器的约束——如果有的话——将继续替换尝试。
+4. 如果该actor需要邮箱类型，如上文所述，然后该约束的映射将用于确定使用的邮箱类型；如果不能满足调度器的约束——如果有的话——将继续替换尝试。
 5. 如果调度器需要一个邮箱类型，如上文所述，则该约束的映射将被用来确定要使用的邮箱类型。
 6. 将使用默认邮箱``akka.actor.default-mailbox``。
 
 #####默认邮箱
-当未如上所述，指定邮箱使用时，将使用默认邮箱。默认情况它是无界的邮箱，由``java.util.concurrent.ConcurrentLinkedQueue``实现。
+当未如上所述，指定使用邮箱时，将使用默认邮箱。默认情况它是无界的邮箱，由``java.util.concurrent.ConcurrentLinkedQueue``实现。
 
 ``SingleConsumerOnlyUnboundedMailbox``是一个更有效率的邮箱，而且它也可以用作默认邮箱，但它不能与 BalancingDispatcher一起使用。
 
@@ -90,7 +90,7 @@ Akka自带有一些内置的邮箱实现：
   * 底层是一个``java.util.concurrent.LinkedBlockingQueue``
   * 阻塞: 是
   * 有界: 是
-  * 配置名称："unbounded" 或 "akka.dispatch.BoundedMailbox"
+  * 配置名称："bounded" 或 "akka.dispatch.BoundedMailbox"
 
 * UnboundedPriorityMailbox
   * 底层是一个``java.util.concurrent.PriorityBlockingQueue``
@@ -262,13 +262,13 @@ class MyUnboundedMailbox extends MailboxType
 }
 ```
 
-然后在派发器配置中，或邮箱配置中以你定义的邮箱类型的全称作为“mailbox-type”的值.
+然后在派发器配置中，或邮箱配置中以你定义的邮箱类型的全称作为“mailbox-type”的值。
 
 > 注意
 
-> 一定要定义一个以``akka.actor.ActorSystem.Settings``和``com.typesafe.config.Config``为参数的构造函数，该构造函数用来以反射的方式被调用来创建你的邮箱类型。第二个传入的配置参数是配置文件中使用这个邮箱类型的派发器或邮箱的描述；该邮箱类型会为每一个使用它的派发器或邮箱创建一个实例。
+> 一定要定义一个以``akka.actor.ActorSystem.Settings``和``com.typesafe.config.Config``为参数的构造函数，该构造函数将以反射的方式被调用来创建你的邮箱类型。第二个传入的配置参数是配置文件中使用这个邮箱类型的派发器或邮箱的描述；该邮箱类型会为每一个使用它的派发器或邮箱创建一个实例。
 
-此外可以作为调度器的约束这样使用邮箱：
+此外可以作为派发器的约束这样使用邮箱：
 
 ```
 custom-dispatcher {

@@ -23,7 +23,7 @@ val a = actor(new Act {
 在这里，`actor`方法，根据其调用的上下文，取代了``system.actorOf``或
 ``context.actorOf``： 它需要一个隐式的 `ActorRefFactory`，其中在actor内可以通过以下方式获取``implicit val context: ActorContext``。在actor外，你不得不要声明隐式的`ActorSystem`，或者你可以显式地提供工厂（具体参见下文）。
 
-两种发起``context.become``（更换或添加新的行为） 的可能方式是单独提供的，从而支持了使一个不凌乱的嵌套接收标记：
+两种发起``context.become``（更换或添加新的行为)的可能方式是单独提供的，从而支持了使一个不凌乱的嵌套接收标记：
 
 ```scala
 val a = actor(new Act {
@@ -81,9 +81,9 @@ val a = actor(system, "fred")(new Act {
 
 > 注意
 
-> 在某些情况下必须显式传递`ActorRefFactory`给`actor()`方法 （当编译器告诉你出现了模糊蕴涵(implicits)时，你会发现的） ActorRefFactory。
+> 在某些情况下必须显式传递`ActorRefFactory`给`actor()`方法 （当编译器告诉你出现了模糊蕴涵(implicits)时，你会发现的)ActorRefFactory。
 
-孙子actor会被子actor监管；此外这类关系的监管策略也可以使用 DSL 元素进行配置（监管指令是`Act`特质的一部分）：
+孙子actor会被子actor监管；此外这类关系的监管策略也可以使用 DSL 元素进行配置（监管指令是`Act`特质的一部分)：
 
 ```scala
 superviseWith(OneForOneStrategy() {
@@ -94,7 +94,7 @@ superviseWith(OneForOneStrategy() {
 
 #####有`Stash`的actor
 
-最后并且很重要的一点是：还有一点像魔法一样方便的内置，可以检测静态给定的actor子类型的运行时类，是不是通过`Stash`特质扩展 `RequiresMessageQueue `特质（这是一个复杂表述，即``new Act with Stash``不能工作，因为它的运行时类型被擦除为``Act``的匿名子类型）。目的是为自动根据`Stash`的需要使用适当的基于deque的邮箱类型。如果你想要使用这个魔法，只需扩展 `ActWithStash`：
+最后并且很重要的一点是：还有一点像魔法一样方便的内置，可以检测静态给定的actor子类型的运行时类，是不是通过`Stash`特质扩展 `RequiresMessageQueue `特质（这是一个复杂表述，即``new Act with Stash``不能工作，因为它的运行时类型被擦除为``Act``的匿名子类型)。目的是为自动根据`Stash`的需要使用适当的基于deque的邮箱类型。如果你想要使用这个魔法，只需扩展 `ActWithStash`：
 
 ```scala
 val a = actor(new ActWithStash {
