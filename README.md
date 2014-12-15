@@ -51,14 +51,14 @@ akka文档中文翻译
    * [x] 测试Actor系统
    * [x] Actor DSL
 * [ ] Futures与Agents
-   * [ ] Futures
-   * [ ] Agents
+   * [ ] Futures (翻译完成，待校验)
+   * [ ] Agents (翻译完成，待校验)
 * [ ] 网络
    * [ ] 集群规格
    * [ ] 集群用法
-   * [ ] 远程
-   * [ ] 序列化
-   * [ ] I/O
+   * [ ] 远程 (翻译完成，待校验)
+   * [ ] 序列化 (翻译完成，待校验)
+   * [ ] I/O (翻译完成，待校验)
    * [ ] 使用TCP
    * [ ] 使用UDP
    * [ ] ZeroMQ
