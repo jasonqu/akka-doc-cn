@@ -4,7 +4,7 @@
     <head>
         
         <meta charset="UTF-8">
-        <title>Akka与Java内存模型 | AKKA 2.3.6 Scala 文档</title>
+        <title>序列化 | AKKA 2.3.6 Scala 文档</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 1.0.3">
@@ -18,10 +18,10 @@
     
     
     
-    <link rel="next" href="../chapter2/08_message_delivery_reliability.html" />
+    <link rel="next" href="../chapter5/05_io.html" />
     
     
-    <link rel="prev" href="../chapter2/06_location_transparency.html" />
+    <link rel="prev" href="../chapter5/03_remoting.html" />
     
 
         
@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.7" data-basepath=".." data-revision="1418735449756">
+    <div class="book"  data-level="5.4" data-basepath=".." data-revision="1418735449756">
     
 
 <div class="book-summary">
@@ -296,7 +296,7 @@
         </li>
     
         
-        <li class="chapter active" data-level="2.7" data-path="chapter2/07_akka_and_the_java_memory_model.html">
+        <li class="chapter " data-level="2.7" data-path="chapter2/07_akka_and_the_java_memory_model.html">
             
                 
                     <a href="../chapter2/07_akka_and_the_java_memory_model.html">
@@ -694,7 +694,7 @@
         </li>
     
         
-        <li class="chapter " data-level="5.4" data-path="chapter5/04_serialization.html">
+        <li class="chapter active" data-level="5.4" data-path="chapter5/04_serialization.html">
             
                 
                     <a href="../chapter5/04_serialization.html">
@@ -1639,87 +1639,184 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_2">
+                    <section class="normal" id="section-gitbook_37">
                     
-                        <h1 id="akkajava">Akka与Java内存模型</h1>
-<p>使用包含Scala和Akka在内的Typesafe平台的主要好处是它简化了并发软件的编写过程。本文将讨论Typesafe平台，尤其是Akka是如何在并发应用中访问共享内存的。</p>
-<h3 id="java">Java内存模型</h3>
-<p>在Java 5之前，Java内存模型（JMM）定义是有问题的。当多个线程访问共享内存时很可能得到各种奇怪的结果，例如：</p>
-<ul>
-<li>一个线程看不到其它线程所写入的值：可见性问题</li>
-<li>由于指令没有按期望的顺序执行，一个线程观察到其它线程的 ‘不可能’ 行为：指令重排序问题</li>
-</ul>
-<p>随着Java 5中JSR 133的实现，很多这种问题都被解决了。 JMM是一组基于 “发生在先” 关系的规则, 限制了一个内存访问行为何时必须在另一个内存访问行为之前发生，以及反过来，它们何时能够不按顺序发生。这些规则的两个例子包括：</p>
-<ul>
-<li><strong>监视器锁规则：</strong> 对一个锁的释放先于所有后续对同一个锁的获取</li>
-<li><strong>volatile变量规则:</strong> 对一个volatile变量的写操作先于所有对同一volatile变量的后续读操作</li>
-</ul>
-<p>虽然JMM看起来很复杂，但是其规范试图在易用性和编写高性能、可扩展的并发数据结构的能力之间寻找一个平衡。</p>
-<h3 id="actorsjava">Actors与Java内存模型</h3>
-<p>使用Akka中的Actor实现，有两种方法让多个线程对共享的内存进行操作：</p>
-<ul>
-<li>如果一条消息被（例如，从另一个actor）发送到一个actor，大多数情况下消息是不可变的，但是如果这条消息不是一个正确创建的不可变对象，如果没有 “发生先于” 规则, 有可能接收方会看到部分初始化的数据，甚至可能看到无中生有的数据（long/double）。</li>
-<li>如果一个actor在处理某条消息时改变了自己的内部状态，而之后又在处理其它消息时又访问了这个状态。一条很重要的需要了解的规则是，在使用actor模型时你无法保证，同一个线程会在处理不同的消息时使用同一个actor。</li>
-</ul>
-<p>为了避免actor中的可见性和重排序问题，Akka保证以下两条 “发生在先” 规则:</p>
-<ul>
-<li><strong>actor发送规则 : </strong>一条消息的发送动作先于同一个actor对同一条消息的接收。</li>
-<li><strong>actor后续处理规则: </strong>一条消息的处理先于同一个actor的下一条消息处理</li>
-</ul>
-<blockquote>
-<p>注意</p>
-<p>通俗地说，这意味着当这个actor处理下一个消息的时候，对actor的内部字段的改变是可见的。因此，在你的actor中的域不需要是volitale或是同等可见性的。</p>
+                        <h1 id="">序列化</h1>
+<p>Akka 提供了内置的支持序列化的扩展, 你可以使用内置的序列化功能，也可以自己写一个.</p>
+<p>内置的序列化功能被Akka内部用来序列化消息，你也可以用它做其它的序列化工作。</p>
+<h3 id="">用法</h3>
+<h5 id="">配置</h5>
+<p>为了让 Akka 知道对什么任务使用哪个<code>Serializer</code>, 你需要编辑你的 <a href="../chapter2/09_configuration.html">配置文件</a>, 在 “akka.actor.serializers”一节将名称绑定为<code>akka.serialization.Serializer</code>的实现，像这样:</p>
+<pre><code>akka {
+  actor {
+    serializers {
+      java = &quot;akka.serialization.JavaSerializer&quot;
+      proto = &quot;akka.remote.serialization.ProtobufSerializer&quot;
+      myown = &quot;docs.serialization.MyOwnSerializer&quot;
+    }
+  }
+}
+</code></pre><p>在将名称与<code>Serializer</code>的不同实现绑定后，你需要指定哪些类的序列化使用哪种<code>Serializer</code>, 这部分配置写在“akka.actor.serialization-bindings”一节中:</p>
+<pre><code>akka {
+  actor {
+    serializers {
+      java = &quot;akka.serialization.JavaSerializer&quot;
+      proto = &quot;akka.remote.serialization.ProtobufSerializer&quot;
+      myown = &quot;docs.serialization.MyOwnSerializer&quot;
+    }
+
+    serialization-bindings {
+      &quot;java.lang.String&quot; = java
+      &quot;docs.serialization.Customer&quot; = java
+      &quot;com.google.protobuf.Message&quot; = proto
+      &quot;docs.serialization.MyOwnSerializable&quot; = myown
+      &quot;java.lang.Boolean&quot; = myown
+    }
+  }
+}
+</code></pre><p>你只需要指定消息的接口或抽象基类. 当消息实现了配置中多个类时，为避免歧义, 将使用最具体的类, 即对其它所有配置指定类，它都是子类的那一个. 如果这个条件不满足, 例如因为同时配置<code>java.io.Serializable</code>和<code>MyOwnSerializable</code>，而彼此都不是对方的子类型，将生成一个警告。</p>
+<p>Akka 缺省提供使用 <code>java.io.Serializable</code>和 <a href="http://code.google.com/p/protobuf/" target="_blank">protobuf</a> <code>com.google.protobuf.GeneratedMessage</code> 的序列化工具 (后者仅当定义了对akka-remote模块的依赖时才有), 所以通常你不需要添加这两种配置; 由于 <code>com.google.protobuf.GeneratedMessage</code> 实现了 <code>java.io.Serializable</code>, 在不特别指定的情况下，protobuf 消息将总是使用 protobuf 协议来做序列化. 要禁止缺省的序列化工具，将其对应的类型设为 “none”:</p>
+<pre><code>akka.actor.serialization-bindings {
+  &quot;java.io.Serializable&quot; = none
+}
+</code></pre><h3 id="">确认</h3>
+<p>如果你希望确认你的消息是可以被序列化的，你可以打开这个配置项:</p>
+<pre><code>akka {
+  actor {
+    serialize-messages = on
+  }
+}
+</code></pre><blockquote>
+<p>警告</p>
+<p>我们推荐只在运行测试代码的时候才打开这个选项. 在其它的场景打开它完全没有道理.</p>
 </blockquote>
-<p>这两条规则都只应用于同一个actor实例，对不同的actor则无效。</p>
-<h3 id="futurejava">Future与Java内存模型</h3>
-<p>一个Future的完成 “先于” 任何注册到它的回调函数(译者注：闭包)的执行。</p>
-<p>我们建议不要在回调中捕捉（close over）非final的值 (Java中称final，Scala中称val), 如果你<strong>一定</strong>要捕捉非final的域，则它们必须被标记为<em>volatile</em>来让它的当前值对回调代码可见。</p>
-<p>如果你捕捉一个引用，你还必须保证它所指代的实例是线程安全的。我们强烈建议远离使用锁的对象，因为它们会引入性能问题，甚至最坏可能造成死锁。</p>
-<p>这些是使用synchronized的风险。</p>
-<h3 id="stmjava">STM与Java内存模型</h3>
-<p>Akka中的软件事务性内存 (STM) 也提供了一条 “发生在先” 规则:</p>
-<ul>
-<li><strong>事务性引用规则:</strong> 对一个事务性引用，在提交过程中一次成功的写操作，先于所有对同一事务性引用的后续读操作发生。</li>
-</ul>
-<p>这条规则非常象JMM中的 ‘volatile 变量’ 规则。目前Akka STM只支持延迟写，所以对共享内存的实际写操作会被延迟到事务提交之时。在事务中发生的写操作会被存放在一个本地缓冲区内 (事务的写操作集) ，并且对其它事务是不可见的。这就是为什么脏读是不可能的。</p>
-<p>这些规则在Akka中的实现会随时间而变化，精确的细节甚至可能依赖于所使用的配置。但是它们是建立在其它JMM规则之上的，如监视器锁规则、volatile变量规则。 这意味着Akka用户不需要操心为了提供“发生先于”关系而增加同步，因为这是Akka的工作。这样你可以腾出手来处理业务逻辑，让Akka框架来保证这些规则的满足。</p>
-<h3 id="a-namejmm-shared-stateaactor"><a name="jmm-shared-state"></a>Actor与共享的可变状态</h3>
-<p>因为Akka运行在JVM上，所以还有一些其它的规则需要遵守。</p>
-<ul>
-<li>捕捉Actor内部状态并暴露给其它线程</li>
-</ul>
-<pre><code class="lang-scala">
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyActor</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
-  <span class="hljs-keyword">var</span> state = ...
-  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
-    <span class="hljs-keyword">case</span> _ =&gt;
-      <span class="hljs-comment">// 错误的做法</span>
+<p>如果你希望确认你的 Props 可以被序列化, 你可以打开这个配置项:</p>
+<pre><code>akka {
+  actor {
+    serialize-creators = on
+  }
+}
+</code></pre><blockquote>
+<p>警告</p>
+<p>我们推荐只在运行测试代码的时候才打开这个选项. 在其它的场景打开它完全没有道理.</p>
+</blockquote>
+<h5 id="">通过代码</h5>
+<p>如果你希望通过代码使用 Akka Serialization来进行序列化/反序列化, 以下是一些例子:</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.{ <span class="hljs-type">ActorRef</span>, <span class="hljs-type">ActorSystem</span> }
+<span class="hljs-keyword">import</span> akka.serialization._
+<span class="hljs-keyword">import</span> com.typesafe.config.<span class="hljs-type">ConfigFactory</span>
 
-      <span class="hljs-comment">// 非常错误，共享可变状态，</span>
-      <span class="hljs-comment">// 会让应用莫名其妙地崩溃</span>
-      <span class="hljs-type">Future</span> { state = <span class="hljs-type">NewState</span> }
-      anotherActor ? message onSuccess { r =&gt; state = r }
+    <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">system</span> =</span> <span class="hljs-type">ActorSystem</span>(<span class="hljs-string">"example"</span>)
 
-      <span class="hljs-comment">// 非常错误, 共享可变状态 bug</span>
-      <span class="hljs-comment">// "发送者"是一个可变变量，随每个消息改变</span>
-      <span class="hljs-type">Future</span> { expensiveCalculation(sender) }
+    <span class="hljs-comment">// Get the Serialization Extension</span>
+    <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">serialization</span> =</span> <span class="hljs-type">SerializationExtension</span>(system)
 
-      <span class="hljs-comment">//正确的做法</span>
+    <span class="hljs-comment">// Have something to serialize</span>
+    <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">original</span> =</span> <span class="hljs-string">"woohoo"</span>
 
-      <span class="hljs-comment">// 非常安全， "self" 被闭包捕捉是安全的</span>
-      <span class="hljs-comment">// 并且它是一个Actor引用, 是线程安全的</span>
-      <span class="hljs-type">Future</span> { expensiveCalculation() } onComplete { f =&gt; self ! f.value.get }
+    <span class="hljs-comment">// Find the Serializer for it</span>
+    <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">serializer</span> =</span> serialization.findSerializerFor(original)
 
-      <span class="hljs-comment">// 非常安全，我们捕捉了一个固定值</span>
-      <span class="hljs-comment">// 并且它是一个Actor引用，是线程安全的</span>
-      <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">currentSender</span> =</span> sender
-      <span class="hljs-type">Future</span> { expensiveCalculation(currentSender) }
+    <span class="hljs-comment">// Turn it into bytes</span>
+    <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">bytes</span> =</span> serializer.toBinary(original)
+
+    <span class="hljs-comment">// Turn it back into an object</span>
+    <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">back</span> =</span> serializer.fromBinary(bytes, manifest = <span class="hljs-type">None</span>)
+
+    <span class="hljs-comment">// Voilá!</span>
+    back should be(original)
+</code></pre>
+<p>更多信息请见 <code>akka.serialization._</code> 的 <code>ScalaDoc</code></p>
+<h3 id="">自定义</h3>
+<p>如果你希望创建自己的 <code>Serializer</code>, 应该已经看到配置例子中的 <code>docs.serialization.MyOwnSerializer</code> 了吧?</p>
+<h5 id="-serializer">创建新的 Serializer</h5>
+<p>首先你需要为你的 <code>Serializer</code> 写一个类定义，像这样:</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.{ <span class="hljs-type">ActorRef</span>, <span class="hljs-type">ActorSystem</span> }
+<span class="hljs-keyword">import</span> akka.serialization._
+<span class="hljs-keyword">import</span> com.typesafe.config.<span class="hljs-type">ConfigFactory</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyOwnSerializer</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Serializer</span> {</span>
+
+  <span class="hljs-comment">// This is whether "fromBinary" requires a "clazz" or not</span>
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">includeManifest</span>:</span> <span class="hljs-type">Boolean</span> = <span class="hljs-literal">false</span>
+
+  <span class="hljs-comment">// Pick a unique identifier for your Serializer,</span>
+  <span class="hljs-comment">// you've got a couple of billions to choose from,</span>
+  <span class="hljs-comment">// 0 - 16 is reserved by Akka itself</span>
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">identifier</span> =</span> <span class="hljs-number">1234567</span>
+
+  <span class="hljs-comment">// "toBinary" serializes the given object to an Array of Bytes</span>
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">toBinary</span>(</span>obj: <span class="hljs-type">AnyRef</span>): <span class="hljs-type">Array</span>[<span class="hljs-type">Byte</span>] = {
+    <span class="hljs-comment">// Put the code that serializes the object here</span>
+    <span class="hljs-comment">// ... ...</span>
+  }
+
+  <span class="hljs-comment">// "fromBinary" deserializes the given array,</span>
+  <span class="hljs-comment">// using the type hint (if any, see "includeManifest" above)</span>
+  <span class="hljs-comment">// into the optionally provided classLoader.</span>
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">fromBinary</span>(</span>bytes: <span class="hljs-type">Array</span>[<span class="hljs-type">Byte</span>],
+                 clazz: <span class="hljs-type">Option</span>[<span class="hljs-type">Class</span>[_]]): <span class="hljs-type">AnyRef</span> = {
+    <span class="hljs-comment">// Put your code that deserializes here</span>
+    <span class="hljs-comment">// ... ...</span>
   }
 }
 </code></pre>
-<ul>
-<li>消息<strong>应当</strong>是不可变的, 这是为了避开共享可变状态的陷阱。</li>
-</ul>
+<p>然后你只需要做填空，在 <a href="../chapter2/09_configuration.html">配置文件</a> 中将它绑定到一个名称， 然后列出需要用它来做序列化的类即可.</p>
+<h5 id="actor">Actor引用的序列化</h5>
+<p>所有的 ActorRef 都是用 JavaSerializer进行序列化的, 但如果你写了自己的serializer， 你可能想知道如何正确对它们进行序列化和反序列化。在一般情况下，要使用的本地地址取决于作为序列化信息收件人的远程地址的类型。像这样使用<code>Serialization.serializedActorPath(actorRef)</code>：</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.{ <span class="hljs-type">ActorRef</span>, <span class="hljs-type">ActorSystem</span> }
+<span class="hljs-keyword">import</span> akka.serialization._
+<span class="hljs-keyword">import</span> com.typesafe.config.<span class="hljs-type">ConfigFactory</span>
+
+    <span class="hljs-comment">// Serialize</span>
+    <span class="hljs-comment">// (beneath toBinary)</span>
+    <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">identifier</span>:</span> <span class="hljs-type">String</span> = <span class="hljs-type">Serialization</span>.serializedActorPath(theActorRef)
+
+    <span class="hljs-comment">// Then just serialize the identifier however you like</span>
+
+    <span class="hljs-comment">// Deserialize</span>
+    <span class="hljs-comment">// (beneath fromBinary)</span>
+    <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">deserializedActorRef</span> =</span> extendedSystem.provider.resolveActorRef(identifier)
+    <span class="hljs-comment">// Then just use the ActorRef</span>
+</code></pre>
+<p>这是假定序列化发生在通过远程传输发送消息的上下文中。不过有一些序列化有其他用途，例如在actor应用程序之外存储actor引用（数据库等）。在这种情况下，需要牢记的重要一点是，actor路径的地址部分决定actor如何被通信连通。存储一个本地actor路径可能是正确的选择，如果回取发生在相同的逻辑上下文，但当在不同的网络主机上反序列化时它还不够： 为此，它将需要包括系统的远程传输地址。一个actor系统并不局限于只有一个远程运输，使得这个问题变得更有意思。当向<code>remoteAddr</code>发送消息时，要找出恰当的地址，你可以像下面这样使用<code>ActorRefProvider.getExternalAddressFor(remoteAddr)</code>：</p>
+<pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">ExternalAddress</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">ExtensionKey</span>[</span><span class="hljs-type">ExternalAddressExt</span>]
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ExternalAddressExt</span>(</span>system: <span class="hljs-type">ExtendedActorSystem</span>) <span class="hljs-keyword">extends</span> <span class="hljs-type">Extension</span> {
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">addressFor</span>(</span>remoteAddr: <span class="hljs-type">Address</span>): <span class="hljs-type">Address</span> =
+    system.provider.getExternalAddressFor(remoteAddr) getOrElse
+      (<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-type">UnsupportedOperationException</span>(<span class="hljs-string">"cannot send to "</span> + remoteAddr))
+}
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">serializeTo</span>(</span>ref: <span class="hljs-type">ActorRef</span>, remote: <span class="hljs-type">Address</span>): <span class="hljs-type">String</span> =
+  ref.path.toSerializationFormatWithAddress(<span class="hljs-type">ExternalAddress</span>(extendedSystem).
+    addressFor(remote))
+</code></pre>
+<blockquote>
+<p>注意</p>
+<p>如果地址并没有<code>host</code>和<code>port</code>组件时<code>ActorPath.toSerializationFormatWithAddress</code>不同于<code>toString</code>，即它只为本地地址插入地址信息。</p>
+<p><code>toSerializationFormatWithAddress</code> 还为actor添加了唯一 id，当actor终止，然后又按照相同名称重新创建时，该id将改变。将消息发送到指向那个老actor的引用，将不会传递给新的actor。如果你不想要这种行为，例如在长期存储引用的情况下，你可以使用不包括的唯一id的 <code>toStringWithAddress</code>。</p>
+</blockquote>
+<p>这就要求你至少知道哪种类型的地址将被反序列化生成的actor引用的系统支持；如果你手头没有具体的地址，你可以创建一个虚拟使用正确协议的地址 <code>Address(protocol, &quot;&quot;, &quot;&quot;, 0)</code>（假定所用的实际传输与Akka的<code>RemoteActorRefProvider</code>是相兼容的）。</p>
+<p>也有一个用来支持集群的默认远程地址（并且典型系统只有这一个）；你可以像这样获取它：</p>
+<pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">ExternalAddress</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">ExtensionKey</span>[</span><span class="hljs-type">ExternalAddressExt</span>]
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ExternalAddressExt</span>(</span>system: <span class="hljs-type">ExtendedActorSystem</span>) <span class="hljs-keyword">extends</span> <span class="hljs-type">Extension</span> {
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">addressForAkka</span>:</span> <span class="hljs-type">Address</span> = system.provider.getDefaultAddress
+}
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">serializeAkkaDefault</span>(</span>ref: <span class="hljs-type">ActorRef</span>): <span class="hljs-type">String</span> =
+  ref.path.toSerializationFormatWithAddress(<span class="hljs-type">ExternalAddress</span>(theActorSystem).
+    addressForAkka)
+</code></pre>
+<h5 id="actor">Actor的深度序列化</h5>
+<p>做内部actor状态深度序列化，推荐的方法是使用<a href="../chapter3/08_persistence.html">Akka持久化</a>。</p>
+<h3 id="-java-">关于 Java 序列化</h3>
+<p>如果在做Java序列化时没有使用<code>JavaSerializer</code>, 你必须保证在动态变量<code>JavaSerializer.currentSystem</code>中提供一个有效的 <code>ExtendedActorSystem</code> . 它用在读取<code>ActorRef</code>表示时将其字符串表示转换成实际的引用. 动态变量<code>DynamicVariable</code> 是一个 thread-local变量，所以在反序列化任何可能包含actor引用的数据时要保证这个变量有值.</p>
+<h3 id="-akka-serializers">外部 Akka Serializers</h3>
+<p><a href="https://github.com/romix/akka-protostuff-serialization" target="_blank">Akka-protostuff by Roman Levenstein</a></p>
+<p><a href="https://github.com/romix/akka-quickser-serialization" target="_blank">Akka-quickser by Roman Levenstein</a></p>
+<p><a href="https://github.com/romix/akka-kryo-serialization" target="_blank">Akka-kryo by Roman Levenstein</a></p>
 
                     
                     </section>
@@ -1730,10 +1827,10 @@
         </div>
 
         
-        <a href="../chapter2/06_location_transparency.html" class="navigation navigation-prev " aria-label="Previous page: 位置透明性"><i class="fa fa-angle-left"></i></a>
+        <a href="../chapter5/03_remoting.html" class="navigation navigation-prev " aria-label="Previous page: 远程"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../chapter2/08_message_delivery_reliability.html" class="navigation navigation-next " aria-label="Next page: 消息发送语义"><i class="fa fa-angle-right"></i></a>
+        <a href="../chapter5/05_io.html" class="navigation navigation-next " aria-label="Next page: I/O"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

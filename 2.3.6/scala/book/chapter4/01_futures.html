@@ -4,7 +4,7 @@
     <head>
         
         <meta charset="UTF-8">
-        <title>Akka与Java内存模型 | AKKA 2.3.6 Scala 文档</title>
+        <title>Futures | AKKA 2.3.6 Scala 文档</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 1.0.3">
@@ -18,10 +18,10 @@
     
     
     
-    <link rel="next" href="../chapter2/08_message_delivery_reliability.html" />
+    <link rel="next" href="../chapter4/02_agents.html" />
     
     
-    <link rel="prev" href="../chapter2/06_location_transparency.html" />
+    <link rel="prev" href="../chapter4/futures_and_agents.html" />
     
 
         
@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.7" data-basepath=".." data-revision="1418735449756">
+    <div class="book"  data-level="4.1" data-basepath=".." data-revision="1418736434681">
     
 
 <div class="book-summary">
@@ -296,7 +296,7 @@
         </li>
     
         
-        <li class="chapter active" data-level="2.7" data-path="chapter2/07_akka_and_the_java_memory_model.html">
+        <li class="chapter " data-level="2.7" data-path="chapter2/07_akka_and_the_java_memory_model.html">
             
                 
                     <a href="../chapter2/07_akka_and_the_java_memory_model.html">
@@ -592,7 +592,7 @@
                 
     
         
-        <li class="chapter " data-level="4.1" data-path="chapter4/01_futures.html">
+        <li class="chapter active" data-level="4.1" data-path="chapter4/01_futures.html">
             
                 
                     <a href="../chapter4/01_futures.html">
@@ -1639,87 +1639,276 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_2">
+                    <section class="normal" id="section-gitbook_45">
                     
-                        <h1 id="akkajava">Akka与Java内存模型</h1>
-<p>使用包含Scala和Akka在内的Typesafe平台的主要好处是它简化了并发软件的编写过程。本文将讨论Typesafe平台，尤其是Akka是如何在并发应用中访问共享内存的。</p>
-<h3 id="java">Java内存模型</h3>
-<p>在Java 5之前，Java内存模型（JMM）定义是有问题的。当多个线程访问共享内存时很可能得到各种奇怪的结果，例如：</p>
-<ul>
-<li>一个线程看不到其它线程所写入的值：可见性问题</li>
-<li>由于指令没有按期望的顺序执行，一个线程观察到其它线程的 ‘不可能’ 行为：指令重排序问题</li>
-</ul>
-<p>随着Java 5中JSR 133的实现，很多这种问题都被解决了。 JMM是一组基于 “发生在先” 关系的规则, 限制了一个内存访问行为何时必须在另一个内存访问行为之前发生，以及反过来，它们何时能够不按顺序发生。这些规则的两个例子包括：</p>
-<ul>
-<li><strong>监视器锁规则：</strong> 对一个锁的释放先于所有后续对同一个锁的获取</li>
-<li><strong>volatile变量规则:</strong> 对一个volatile变量的写操作先于所有对同一volatile变量的后续读操作</li>
-</ul>
-<p>虽然JMM看起来很复杂，但是其规范试图在易用性和编写高性能、可扩展的并发数据结构的能力之间寻找一个平衡。</p>
-<h3 id="actorsjava">Actors与Java内存模型</h3>
-<p>使用Akka中的Actor实现，有两种方法让多个线程对共享的内存进行操作：</p>
-<ul>
-<li>如果一条消息被（例如，从另一个actor）发送到一个actor，大多数情况下消息是不可变的，但是如果这条消息不是一个正确创建的不可变对象，如果没有 “发生先于” 规则, 有可能接收方会看到部分初始化的数据，甚至可能看到无中生有的数据（long/double）。</li>
-<li>如果一个actor在处理某条消息时改变了自己的内部状态，而之后又在处理其它消息时又访问了这个状态。一条很重要的需要了解的规则是，在使用actor模型时你无法保证，同一个线程会在处理不同的消息时使用同一个actor。</li>
-</ul>
-<p>为了避免actor中的可见性和重排序问题，Akka保证以下两条 “发生在先” 规则:</p>
-<ul>
-<li><strong>actor发送规则 : </strong>一条消息的发送动作先于同一个actor对同一条消息的接收。</li>
-<li><strong>actor后续处理规则: </strong>一条消息的处理先于同一个actor的下一条消息处理</li>
-</ul>
-<blockquote>
-<p>注意</p>
-<p>通俗地说，这意味着当这个actor处理下一个消息的时候，对actor的内部字段的改变是可见的。因此，在你的actor中的域不需要是volitale或是同等可见性的。</p>
-</blockquote>
-<p>这两条规则都只应用于同一个actor实例，对不同的actor则无效。</p>
-<h3 id="futurejava">Future与Java内存模型</h3>
-<p>一个Future的完成 “先于” 任何注册到它的回调函数(译者注：闭包)的执行。</p>
-<p>我们建议不要在回调中捕捉（close over）非final的值 (Java中称final，Scala中称val), 如果你<strong>一定</strong>要捕捉非final的域，则它们必须被标记为<em>volatile</em>来让它的当前值对回调代码可见。</p>
-<p>如果你捕捉一个引用，你还必须保证它所指代的实例是线程安全的。我们强烈建议远离使用锁的对象，因为它们会引入性能问题，甚至最坏可能造成死锁。</p>
-<p>这些是使用synchronized的风险。</p>
-<h3 id="stmjava">STM与Java内存模型</h3>
-<p>Akka中的软件事务性内存 (STM) 也提供了一条 “发生在先” 规则:</p>
-<ul>
-<li><strong>事务性引用规则:</strong> 对一个事务性引用，在提交过程中一次成功的写操作，先于所有对同一事务性引用的后续读操作发生。</li>
-</ul>
-<p>这条规则非常象JMM中的 ‘volatile 变量’ 规则。目前Akka STM只支持延迟写，所以对共享内存的实际写操作会被延迟到事务提交之时。在事务中发生的写操作会被存放在一个本地缓冲区内 (事务的写操作集) ，并且对其它事务是不可见的。这就是为什么脏读是不可能的。</p>
-<p>这些规则在Akka中的实现会随时间而变化，精确的细节甚至可能依赖于所使用的配置。但是它们是建立在其它JMM规则之上的，如监视器锁规则、volatile变量规则。 这意味着Akka用户不需要操心为了提供“发生先于”关系而增加同步，因为这是Akka的工作。这样你可以腾出手来处理业务逻辑，让Akka框架来保证这些规则的满足。</p>
-<h3 id="a-namejmm-shared-stateaactor"><a name="jmm-shared-state"></a>Actor与共享的可变状态</h3>
-<p>因为Akka运行在JVM上，所以还有一些其它的规则需要遵守。</p>
-<ul>
-<li>捕捉Actor内部状态并暴露给其它线程</li>
-</ul>
-<pre><code class="lang-scala">
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyActor</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
-  <span class="hljs-keyword">var</span> state = ...
+                        <h1 id="futures">Futures</h1>
+<h3 id="">简介</h3>
+<p>在 Akka 中, 一个 <a href="http://en.wikipedia.org/wiki/Futures_and_promises" target="_blank">Future</a>是用来获取某个并发操作结果的数据结构。这个结果可以以同步（阻塞）或异步（非阻塞）的方式访问。</p>
+<h3 id="">执行上下文</h3>
+<p>为了运行回调和操作, Futures 需要有一个<code>ExecutionContext</code>, 它与 <code>java.util.concurrent.Executor</code> 很相像. 如果你在作用域内有一个 <code>ActorSystem</code>, 它会把自己的派发器用作 <code>ExecutionContext</code>, 或者你也可以用 <code>ExecutionContext</code> 伴生对象提供的工厂方法 来将 <code>Executors</code> 和 <code>ExecutorServices</code> 进行包装, 或者甚至创建自己的实例.</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> scala.concurrent.{ <span class="hljs-type">ExecutionContext</span>, <span class="hljs-type">Promise</span> }
+
+<span class="hljs-keyword">implicit</span> <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">ec</span> =</span> <span class="hljs-type">ExecutionContext</span>.fromExecutorService(yourExecutorServiceGoesHere)
+
+<span class="hljs-comment">// Do stuff with your brand new shiny ExecutionContext</span>
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f</span> =</span> <span class="hljs-type">Promise</span>.successful(<span class="hljs-string">"foo"</span>)
+
+<span class="hljs-comment">// Then shut your ExecutionContext down at some</span>
+<span class="hljs-comment">// appropriate place in your program/application</span>
+ec.shutdown()
+</code></pre>
+<h3 id="actor">在Actor中</h3>
+<p>每个actor都被配置为在 <code>MessageDispatcher</code> 上运行，且该调度器又被用作为 <code>ExecutionContext</code>。如果被actor调用的Future的性质匹配或兼容与那个actor的活动（例如，全CPU绑定，也没有延迟要求），那么它可能是最容易重用派发器，只需要通过导入 <code>context.dispatcher</code> 来运行Futures。</p>
+<pre><code class="lang-scala"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">A</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
+  <span class="hljs-keyword">import</span> context.dispatcher
+  <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f</span> =</span> <span class="hljs-type">Future</span>(<span class="hljs-string">"hello"</span>)
   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
-    <span class="hljs-keyword">case</span> _ =&gt;
-      <span class="hljs-comment">// 错误的做法</span>
-
-      <span class="hljs-comment">// 非常错误，共享可变状态，</span>
-      <span class="hljs-comment">// 会让应用莫名其妙地崩溃</span>
-      <span class="hljs-type">Future</span> { state = <span class="hljs-type">NewState</span> }
-      anotherActor ? message onSuccess { r =&gt; state = r }
-
-      <span class="hljs-comment">// 非常错误, 共享可变状态 bug</span>
-      <span class="hljs-comment">// "发送者"是一个可变变量，随每个消息改变</span>
-      <span class="hljs-type">Future</span> { expensiveCalculation(sender) }
-
-      <span class="hljs-comment">//正确的做法</span>
-
-      <span class="hljs-comment">// 非常安全， "self" 被闭包捕捉是安全的</span>
-      <span class="hljs-comment">// 并且它是一个Actor引用, 是线程安全的</span>
-      <span class="hljs-type">Future</span> { expensiveCalculation() } onComplete { f =&gt; self ! f.value.get }
-
-      <span class="hljs-comment">// 非常安全，我们捕捉了一个固定值</span>
-      <span class="hljs-comment">// 并且它是一个Actor引用，是线程安全的</span>
-      <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">currentSender</span> =</span> sender
-      <span class="hljs-type">Future</span> { expensiveCalculation(currentSender) }
+    <span class="hljs-comment">// receive omitted ...</span>
   }
 }
 </code></pre>
-<ul>
-<li>消息<strong>应当</strong>是不可变的, 这是为了避开共享可变状态的陷阱。</li>
-</ul>
+<h3 id="-actor">用于 Actor</h3>
+<p>通常有两种方法来从一个 <code>Actor</code> 获取回应: 第一种是发送一个消息 (<code>actor ! msg</code>, 这种方法只在发送者是一个<code>Actor</code>时有效)，第二种是通过一个 <code>Future</code>.</p>
+<p>使用 <code>Actor</code> 的 <code>?</code> 方法来发送消息会返回一个 <code>Future</code>. 要等待并获取结果的最简单方法是:</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> scala.concurrent.<span class="hljs-type">Await</span>
+<span class="hljs-keyword">import</span> akka.pattern.ask
+<span class="hljs-keyword">import</span> akka.util.<span class="hljs-type">Timeout</span>
+<span class="hljs-keyword">import</span> scala.concurrent.duration._
+
+<span class="hljs-keyword">implicit</span> <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">timeout</span> =</span> <span class="hljs-type">Timeout</span>(<span class="hljs-number">5</span> seconds)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">future</span> =</span> actor ? msg <span class="hljs-comment">// enabled by the “ask” import</span>
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">result</span> =</span> <span class="hljs-type">Await</span>.result(future, timeout.duration).asInstanceOf[<span class="hljs-type">String</span>]
+</code></pre>
+<p>这会导致当前线程阻塞，并等待 <code>Actor</code> 通过它的应答来 ‘完成’ <code>Future</code> 。 但是阻塞会导致性能问题，所以是不推荐的. 导致阻塞的操作位于 <code>Await.result</code> 和 <code>Await.ready</code> 中，这样就方便定位阻塞的位置. 对阻塞方式的替代方法会在本文档中进一步讨论。 还要注意 <code>Actor</code> 返回的 <code>Future</code> 的类型 是 <code>Future[Any]</code> ，这是因为 <code>Actor</code> 是动态的. 这也是为什么上例中使用了 <code>asInstanceOf</code> 。 在使用非阻塞方式时，最好使用 <code>mapTo</code> 方法来将 <code>Future</code> 转换到期望的类型:</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> scala.concurrent.<span class="hljs-type">Future</span>
+<span class="hljs-keyword">import</span> akka.pattern.ask
+
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">future</span>:</span> <span class="hljs-type">Future</span>[<span class="hljs-type">String</span>] = ask(actor, msg).mapTo[<span class="hljs-type">String</span>]
+</code></pre>
+<p>如果转换成功， <code>mapTo</code> 方法会返回一个包含结果的新的 <code>Future</code>, 如果不成功，则返回 <code>ClassCastException</code> . 对<code>Exception</code>的处理将在本文档进一步讨论。</p>
+<p>要把<code>Future</code>的结果发送给一个<code>Actor</code>, 你可以使用<code>pipe</code>构建:</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.pattern.pipe
+future pipeTo actor
+</code></pre>
+<h3 id="">直接使用</h3>
+<p>Akka中的一个常见用例是在不需要额外使用<code>Actor</code>工具的情况下并发地执行计算. 如果你发现你只是为了并行地执行一个计算而创建了一堆<code>Actor</code>, 下面是一种更好（也更快）的方法:</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> scala.concurrent.<span class="hljs-type">Await</span>
+<span class="hljs-keyword">import</span> scala.concurrent.<span class="hljs-type">Future</span>
+<span class="hljs-keyword">import</span> scala.concurrent.duration._
+
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">future</span> =</span> <span class="hljs-type">Future</span> {
+  <span class="hljs-string">"Hello"</span> + <span class="hljs-string">"World"</span>
+}
+future foreach println
+</code></pre>
+<p>在上面的代码中，被传递给 <code>Future</code> 的代码块会被缺省的 <code>Dispatcher</code> 执行, 代码块的返回结果会被用来完成 <code>Future</code> (在这个例子中，结果是一个字符串: “HelloWorld”). 与从<code>Actor</code>返回的 <code>Future</code> 不同，这个 <code>Future</code> 拥有合适的类型, 我们还避免了管理 <code>Actor</code> 的开销。</p>
+<p>你还可以用 <code>Future</code> 伴生对象创建一个已经完成的 <code>Future</code>, 它可以是成功的:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">future</span> =</span> <span class="hljs-type">Future</span>.successful(<span class="hljs-string">"Yay!"</span>)
+</code></pre>
+<p>或是失败的:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">otherFuture</span> =</span> <span class="hljs-type">Future</span>.failed[<span class="hljs-type">String</span>](<span class="hljs-keyword">new</span> <span class="hljs-type">IllegalArgumentException</span>(<span class="hljs-string">"Bang!"</span>))
+</code></pre>
+<p>也可以创建一个空的<code>Promise</code>，以后填充它，并包含一个相应的<code>Future</code>：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">promise</span> =</span> <span class="hljs-type">Promise</span>[<span class="hljs-type">String</span>]()
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">theFuture</span> =</span> promise.future
+promise.success(<span class="hljs-string">"hello"</span>)
+</code></pre>
+<h3 id="-future">函数式 Future</h3>
+<p>Scala 的 <code>Future</code> 有一些 monadic 方法，与Scala集合所使用的方法非常相似. 这使你可以构造出可以传递结果的 ‘管道’ 或 ‘数据流’ .</p>
+<h5 id="future--monad">Future 是 Monad</h5>
+<p>让<code>Future</code>以函数式风格工作的第一个方法是 <code>map</code>. 它需要一个<code>Function</code>来对<code>Future</code>的结果进行处理, 返回一个新的结果。 <code>map</code> 方法的返回值是包含新结果的另一个 <code>Future</code>:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f1</span> =</span> <span class="hljs-type">Future</span> {
+  <span class="hljs-string">"Hello"</span> + <span class="hljs-string">"World"</span>
+}
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f2</span> =</span> f1 map { x =&gt;
+  x.length
+}
+f2 foreach println
+</code></pre>
+<p>这个例子中我们在 <code>Future</code> 内部连接两个字符串。我们没有等待这个<code>Future</code>结束，而是使用 <code>map</code> 方法来将计算字符串长度的函数应用于它. 现在我们有了第二个 <code>Future</code> ，它的最终结果是一个 <code>Int</code>. 当先前的 <code>Future</code> 完成时, 它会应用我们的函数并用其结果来完成第二个 <code>Future</code> 。 最终我们得到的结果是 10. 先前的 <code>Future</code> 仍然持有字符串“HelloWorld”，而不受<code>map</code>的影响.</p>
+<p>如果我们只是修改一个<code>Future</code>，<code>map</code>方法就够用了。 但如果有2个以上<code>Future</code>时，<code>map</code>无法将他们组合到一起:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f1</span> =</span> <span class="hljs-type">Future</span> {
+  <span class="hljs-string">"Hello"</span> + <span class="hljs-string">"World"</span>
+}
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f2</span> =</span> <span class="hljs-type">Future</span>.successful(<span class="hljs-number">3</span>)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f3</span> =</span> f1 map { x =&gt;
+  f2 map { y =&gt;
+    x.length * y
+  }
+}
+f3 foreach println
+</code></pre>
+<p><code>f3</code> 的类型是 <code>Future[Future[Int]]</code> 而不是我们所期望的 <code>Future[Int]</code>. 这时我们需要使用 <code>flatMap</code> 方法:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f1</span> =</span> <span class="hljs-type">Future</span> {
+  <span class="hljs-string">"Hello"</span> + <span class="hljs-string">"World"</span>
+}
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f2</span> =</span> <span class="hljs-type">Future</span>.successful(<span class="hljs-number">3</span>)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f3</span> =</span> f1 flatMap { x =&gt;
+  f2 map { y =&gt;
+    x.length * y
+  }
+}
+f3 foreach println
+</code></pre>
+<p>使用嵌套的<code>map</code>或<code>flatmap</code>组合子来组合<code>Future</code>，有时会变得非常复杂和难以阅读，这时使用 Scala 的 ‘for comprehensions’ 一般会生成可读性更好的代码。见下一部分的示例。</p>
+<p>如果你需要进行条件筛选外延，可以使用<code>filter</code>:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">future1</span> =</span> <span class="hljs-type">Future</span>.successful(<span class="hljs-number">4</span>)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">future2</span> =</span> future1.filter(_ % <span class="hljs-number">2</span> == <span class="hljs-number">0</span>)
+
+future2 foreach println
+
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">failedFilter</span> =</span> future1.filter(_ % <span class="hljs-number">2</span> == <span class="hljs-number">1</span>).recover {
+  <span class="hljs-comment">// When filter fails, it will have a java.util.NoSuchElementException</span>
+  <span class="hljs-keyword">case</span> m: <span class="hljs-type">NoSuchElementException</span> =&gt; <span class="hljs-number">0</span>
+}
+
+failedFilter foreach println
+</code></pre>
+<h5 id="for-comprehensions">For Comprehensions</h5>
+<p>由于 <code>Future</code> 拥有 <code>map</code>, <code>filter</code> 和 <code>flatMap</code> 方法，它可以方便地用于 ‘for comprehension’:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f</span> =</span> <span class="hljs-keyword">for</span> {
+  a &lt;- <span class="hljs-type">Future</span>(<span class="hljs-number">10</span> / <span class="hljs-number">2</span>) <span class="hljs-comment">// 10 / 2 = 5</span>
+  b &lt;- <span class="hljs-type">Future</span>(a + <span class="hljs-number">1</span>) <span class="hljs-comment">//  5 + 1 = 6</span>
+  c &lt;- <span class="hljs-type">Future</span>(a - <span class="hljs-number">1</span>) <span class="hljs-comment">//  5 - 1 = 4</span>
+  <span class="hljs-keyword">if</span> c &gt; <span class="hljs-number">3</span> <span class="hljs-comment">// Future.filter</span>
+} <span class="hljs-keyword">yield</span> b * c <span class="hljs-comment">//  6 * 4 = 24</span>
+
+<span class="hljs-comment">// Note that the execution of futures a, b, and c</span>
+<span class="hljs-comment">// are not done in parallel.</span>
+
+f foreach println
+</code></pre>
+<p>这样写代码的时候需要记住的是：虽然看上去上例的部分代码可以并发地运行，for comprehension的每一步实际是顺序执行的。每一步是在单独的线程中运行的，但是相较于将所有的计算在一个单独的<code>Future</code>中运行并没有太大好处. 只有在先（译者注：异步地）创建<code>Future</code>，然后对其进行组合的情况下才能真正得到好处。</p>
+<h5 id="-futures">组合 Futures</h5>
+<p>上例中的for comprehension 是对<code>Future</code>进行组合的例子. 这种方法的常见用例是将多个<code>Actor</code>的回应组合成一个单独的计算而不用调用<code>Await.result</code>或<code>Await.ready</code>来阻塞地获得每一个结果. 先看看使用<code>Await.result</code>的例子:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f1</span> =</span> ask(actor1, msg1)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f2</span> =</span> ask(actor2, msg2)
+
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">a</span> =</span> <span class="hljs-type">Await</span>.result(f1, <span class="hljs-number">3</span> seconds).asInstanceOf[<span class="hljs-type">Int</span>]
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">b</span> =</span> <span class="hljs-type">Await</span>.result(f2, <span class="hljs-number">3</span> seconds).asInstanceOf[<span class="hljs-type">Int</span>]
+
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f3</span> =</span> ask(actor3, (a + b))
+
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">result</span> =</span> <span class="hljs-type">Await</span>.result(f3, <span class="hljs-number">3</span> seconds).asInstanceOf[<span class="hljs-type">Int</span>]
+</code></pre>
+<blockquote>
+<p>警告</p>
+<p><code>Await.result</code> 和 <code>Await.ready</code> 为<strong>必须</strong>阻塞的特殊情况提供的，一个很好的经验法则是仅在你知道为什么你<strong>必须</strong>阻塞的情况下使用它们。对于所有其他情况，使用如下所述的异步组合。</p>
+</blockquote>
+<p>这里我们等待前2个 <code>Actor</code> 的结果然后将其发送给第三个 <code>Actor</code>. 我们调用了3次 <code>Await.result</code> , 导致我们的程序在获得最终结果前阻塞了3次。 现在跟下例比较:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f1</span> =</span> ask(actor1, msg1)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f2</span> =</span> ask(actor2, msg2)
+
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f3</span> =</span> <span class="hljs-keyword">for</span> {
+  a &lt;- f1.mapTo[<span class="hljs-type">Int</span>]
+  b &lt;- f2.mapTo[<span class="hljs-type">Int</span>]
+  c &lt;- ask(actor3, (a + b)).mapTo[<span class="hljs-type">Int</span>]
+} <span class="hljs-keyword">yield</span> c
+
+f3 foreach println
+</code></pre>
+<p>这里我们有两个actor各自处理自己的一条消息。 一旦这2个结果可用了 (注意我们并没有阻塞地等待这些结果！), 它们会被加起来发送给第三个 <code>Actor</code>, 这第三个actor回应一个字符串，我们把它赋值给 ‘result’.</p>
+<p>上面的方法对已知给定Actor数量的时候就足够了，但是当Actor数量较大时就显得比较笨重。 <code>sequence</code> 和 <code>traverse</code> 两个辅助方法可以帮助处理更复杂的情况。 这两个方法都是用来将 <code>T[Future[A]]</code> 转换为 <code>Future[T[A]]</code>（其中<code>T</code> 是 <code>Traversable</code>子类）. 例如:</p>
+<pre><code class="lang-scala"><span class="hljs-comment">// oddActor returns odd numbers sequentially from 1 as a List[Future[Int]]</span>
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">listOfFutures</span> =</span> <span class="hljs-type">List</span>.fill(<span class="hljs-number">100</span>)(akka.pattern.ask(oddActor, <span class="hljs-type">GetNext</span>).mapTo[<span class="hljs-type">Int</span>])
+
+<span class="hljs-comment">// now we have a Future[List[Int]]</span>
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">futureList</span> =</span> <span class="hljs-type">Future</span>.sequence(listOfFutures)
+
+<span class="hljs-comment">// Find the sum of the odd numbers</span>
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">oddSum</span> =</span> futureList.map(_.sum)
+oddSum foreach println
+</code></pre>
+<p>现在来解释一下, <code>Future.sequence</code> 将输入的 <code>List[Future[Int]]</code> 转换为 <code>Future[List[Int]]</code>. 这样我们就可以将 <code>map</code> 直接作用于 <code>List[Int]</code>, 从而得到 <code>List</code> 的总和.</p>
+<p><code>traverse</code> 方法与 <code>sequence</code> 类似, 但它以 <code>T[A]</code> 和 <code>A =&gt; Future[B]</code> 函数为参数返回一个 <code>Future[T[B]]</code>, 这里的 <code>T</code> 同样也是 <code>Traversable</code> 的子类. 例如, 用 <code>traverse</code> 来计算前100个奇数的和:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">futureList</span> =</span> <span class="hljs-type">Future</span>.traverse((<span class="hljs-number">1</span> to <span class="hljs-number">100</span>).toList)(x =&gt; <span class="hljs-type">Future</span>(x * <span class="hljs-number">2</span> - <span class="hljs-number">1</span>))
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">oddSum</span> =</span> futureList.map(_.sum)
+oddSum foreach println
+</code></pre>
+<p>其结果与这个例子是一样的:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">futureList</span> =</span> <span class="hljs-type">Future</span>.sequence((<span class="hljs-number">1</span> to <span class="hljs-number">100</span>).toList.map(x =&gt; <span class="hljs-type">Future</span>(x * <span class="hljs-number">2</span> - <span class="hljs-number">1</span>)))
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">oddSum</span> =</span> futureList.map(_.sum)
+oddSum foreach println
+</code></pre>
+<p>但是用 <code>traverse</code> 也许会快一些，因为它不用创建一个 <code>List[Future[Int]]</code> 的临时变量.</p>
+<p>然后我们有一个方法 <code>fold</code>，它的参数包括一个初始值 , 一个 <code>Future</code>序列和一个作用于初始值和<code>Future</code>类型返回与初始值相同类型的函数, 它将这个函数异步地应用于future序列的所有元素，它的执行将在最后一个Future完成之后开始。</p>
+<pre><code class="lang-scala"><span class="hljs-comment">// Create a sequence of Futures</span>
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">futures</span> =</span> <span class="hljs-keyword">for</span> (i &lt;- <span class="hljs-number">1</span> to <span class="hljs-number">1000</span>) <span class="hljs-keyword">yield</span> <span class="hljs-type">Future</span>(i * <span class="hljs-number">2</span>)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">futureSum</span> =</span> <span class="hljs-type">Future</span>.fold(futures)(<span class="hljs-number">0</span>)(_ + _)
+futureSum foreach println
+</code></pre>
+<p>就是这么简单！</p>
+<p>如果传给 <code>fold</code> 的序列是空的, 它将返回初始值, 在上例中，这个值是0. 有时你没有一个初始值，而使用序列中第一个已完成的<code>Future</code>的值作为初始值，你可以使用 <code>reduce</code>, 它的用法是这样的:</p>
+<pre><code class="lang-scala"><span class="hljs-comment">// Create a sequence of Futures</span>
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">futures</span> =</span> <span class="hljs-keyword">for</span> (i &lt;- <span class="hljs-number">1</span> to <span class="hljs-number">1000</span>) <span class="hljs-keyword">yield</span> <span class="hljs-type">Future</span>(i * <span class="hljs-number">2</span>)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">futureSum</span> =</span> <span class="hljs-type">Future</span>.reduce(futures)(_ + _)
+futureSum foreach println
+</code></pre>
+<p>与 <code>fold</code> 一样, 它是在最后一个 <code>Future</code> 完成后异步执行的, 你也可以对这个过程进行并行化：将future分成子序列分别进行reduce，然后对reduce的结果再次reduce。</p>
+<h3 id="">回调</h3>
+<p>有时你只想要监听 <code>Future</code> 的完成事件, 对其进行响应，不是创建新的<code>Future</code>，而仅仅是产生副作用. Scala为这种情况准备了 <code>onComplete</code>, <code>onSuccess</code> 和 <code>onFailure</code>, 其中后两者是第一项的特例。</p>
+<pre><code class="lang-scala">future onSuccess {
+  <span class="hljs-keyword">case</span> <span class="hljs-string">"bar"</span>     =&gt; println(<span class="hljs-string">"Got my bar alright!"</span>)
+  <span class="hljs-keyword">case</span> x: <span class="hljs-type">String</span> =&gt; println(<span class="hljs-string">"Got some random string: "</span> + x)
+}
+</code></pre>
+<pre><code class="lang-scala">future onFailure {
+  <span class="hljs-keyword">case</span> ise: <span class="hljs-type">IllegalStateException</span> <span class="hljs-keyword">if</span> ise.getMessage == <span class="hljs-string">"OHNOES"</span> =&gt;
+  <span class="hljs-comment">//OHNOES! We are in deep trouble, do something!</span>
+  <span class="hljs-keyword">case</span> e: <span class="hljs-type">Exception</span> =&gt;
+  <span class="hljs-comment">//Do something else</span>
+}
+</code></pre>
+<pre><code class="lang-scala">future onComplete {
+  <span class="hljs-keyword">case</span> <span class="hljs-type">Success</span>(result)  =&gt; doSomethingOnSuccess(result)
+  <span class="hljs-keyword">case</span> <span class="hljs-type">Failure</span>(failure) =&gt; doSomethingOnFailure(failure)
+}
+</code></pre>
+<h3 id="">定义次序</h3>
+<p>由于回调的执行是无序的，而且可能是并发执行的, 当你需要操作有序的时候代码行为往往很怪异。但有一个解决办法是使用 <code>andThen</code>. 它会为指定的回调创建一个新的 <code>Future</code> , 这个 <code>Future</code> 与原先的 <code>Future</code> 拥有相同的结果, 这样就可以像下例一样定义次序:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">result</span> =</span> <span class="hljs-type">Future</span> { loadPage(url) } andThen {
+  <span class="hljs-keyword">case</span> <span class="hljs-type">Failure</span>(exception) =&gt; log(exception)
+} andThen {
+  <span class="hljs-keyword">case</span> _ =&gt; watchSomeTV()
+}
+result foreach println
+</code></pre>
+<h3 id="">辅助方法</h3>
+<p><code>Future</code> <code>fallbackTo</code> 将两个 <code>Futures</code> 合并成一个新的 <code>Future</code>, 如果第一个<code>Future</code>失败了，它将持有第二个 <code>Future</code> 的成功值。</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">future4</span> =</span> future1 fallbackTo future2 fallbackTo future3
+future4 foreach println
+</code></pre>
+<p>你也可以使用<code>zip</code>操作将两个 <code>Futures</code> 组合成一个新的持有二者成功结果的tuple元组的 <code>Future</code></p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">future3</span> =</span> future1 zip future2 map { <span class="hljs-keyword">case</span> (a, b) =&gt; a + <span class="hljs-string">" "</span> + b }
+future3 foreach println
+</code></pre>
+<h3 id="">异常</h3>
+<p>由于 <code>Future</code> 的结果是与程序的其它部分并发生成的，因此异常需要作特殊的处理。 不管是 <code>Actor</code> 或是派发器正在完成此 <code>Future</code>, 如果抛出了 <code>Exception</code> ，<code>Future</code> 将持有这个异常而不是一个有效的值. 如果 <code>Future</code> 持有 <code>Exception</code>, 调用 <code>Await.result</code> 将导致此异常被再次抛出从而得到正确的处理.</p>
+<p>通过返回一个不同的结果来处理 <code>Exception</code> 也是可能的. 这是使用 <code>recover</code> 方法实现的. 例如:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">future</span> =</span> akka.pattern.ask(actor, msg1) recover {
+  <span class="hljs-keyword">case</span> e: <span class="hljs-type">ArithmeticException</span> =&gt; <span class="hljs-number">0</span>
+}
+future foreach println
+</code></pre>
+<p>在这个例子中，如果actor回应了包含 <code>ArithmeticException</code>的<code>akka.actor.Status.Failure</code> , 我们的 <code>Future</code> 将持有 0 作为结果. <code>recover</code> 方法与标准的 try/catch 块非常相似, 可以用这种方式处理多种 <code>Exception</code>， 如果其中有没有提到的 <code>Exception</code>，这种异常将以“好像没有定义 <code>recover</code> 一样”的的方式来处理.</p>
+<p>你也可以使用 <code>recoverWith</code> 方法, 它和 <code>recover</code> 的关系就象 <code>flatMap</code> 与 <code>map</code>的关系, 用法如下:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">future</span> =</span> akka.pattern.ask(actor, msg1) recoverWith {
+  <span class="hljs-keyword">case</span> e: <span class="hljs-type">ArithmeticException</span> =&gt; <span class="hljs-type">Future</span>.successful(<span class="hljs-number">0</span>)
+  <span class="hljs-keyword">case</span> foo: <span class="hljs-type">IllegalArgumentException</span> =&gt;
+    <span class="hljs-type">Future</span>.failed[<span class="hljs-type">Int</span>](<span class="hljs-keyword">new</span> <span class="hljs-type">IllegalStateException</span>(<span class="hljs-string">"All br0ken!"</span>))
+}
+future foreach println
+</code></pre>
+<h3 id="after">After</h3>
+<p><code>akka.pattern.after</code>使得在给定超时后完成一个<code>Future</code>，获取其值或异常比昂的很容易。</p>
+<pre><code class="lang-scala"><span class="hljs-comment">// TODO after is unfortunately shadowed by ScalaTest, fix as part of #3759</span>
+<span class="hljs-comment">// import akka.pattern.after</span>
+
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">delayed</span> =</span> akka.pattern.after(<span class="hljs-number">200</span> millis, using = system.scheduler)(<span class="hljs-type">Future</span>.failed(
+  <span class="hljs-keyword">new</span> <span class="hljs-type">IllegalStateException</span>(<span class="hljs-string">"OHNOES"</span>)))
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">future</span> =</span> <span class="hljs-type">Future</span> { <span class="hljs-type">Thread</span>.sleep(<span class="hljs-number">1000</span>); <span class="hljs-string">"foo"</span> }
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">result</span> =</span> <span class="hljs-type">Future</span> firstCompletedOf <span class="hljs-type">Seq</span>(future, delayed)
+</code></pre>
 
                     
                     </section>
@@ -1730,10 +1919,10 @@
         </div>
 
         
-        <a href="../chapter2/06_location_transparency.html" class="navigation navigation-prev " aria-label="Previous page: 位置透明性"><i class="fa fa-angle-left"></i></a>
+        <a href="../chapter4/futures_and_agents.html" class="navigation navigation-prev " aria-label="Previous page: Futures与Agents"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../chapter2/08_message_delivery_reliability.html" class="navigation navigation-next " aria-label="Next page: 消息发送语义"><i class="fa fa-angle-right"></i></a>
+        <a href="../chapter4/02_agents.html" class="navigation navigation-next " aria-label="Next page: Agents"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

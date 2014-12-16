@@ -4,7 +4,7 @@
     <head>
         
         <meta charset="UTF-8">
-        <title>Akka与Java内存模型 | AKKA 2.3.6 Scala 文档</title>
+        <title>远程 | AKKA 2.3.6 Scala 文档</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 1.0.3">
@@ -18,10 +18,10 @@
     
     
     
-    <link rel="next" href="../chapter2/08_message_delivery_reliability.html" />
+    <link rel="next" href="../chapter5/04_serialization.html" />
     
     
-    <link rel="prev" href="../chapter2/06_location_transparency.html" />
+    <link rel="prev" href="../chapter5/02_cluster_usage.html" />
     
 
         
@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.7" data-basepath=".." data-revision="1418735449756">
+    <div class="book"  data-level="5.3" data-basepath=".." data-revision="1418735449756">
     
 
 <div class="book-summary">
@@ -296,7 +296,7 @@
         </li>
     
         
-        <li class="chapter active" data-level="2.7" data-path="chapter2/07_akka_and_the_java_memory_model.html">
+        <li class="chapter " data-level="2.7" data-path="chapter2/07_akka_and_the_java_memory_model.html">
             
                 
                     <a href="../chapter2/07_akka_and_the_java_memory_model.html">
@@ -678,7 +678,7 @@
         </li>
     
         
-        <li class="chapter " data-level="5.3" data-path="chapter5/03_remoting.html">
+        <li class="chapter active" data-level="5.3" data-path="chapter5/03_remoting.html">
             
                 
                     <a href="../chapter5/03_remoting.html">
@@ -1639,87 +1639,417 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_2">
+                    <section class="normal" id="section-gitbook_36">
                     
-                        <h1 id="akkajava">Akka与Java内存模型</h1>
-<p>使用包含Scala和Akka在内的Typesafe平台的主要好处是它简化了并发软件的编写过程。本文将讨论Typesafe平台，尤其是Akka是如何在并发应用中访问共享内存的。</p>
-<h3 id="java">Java内存模型</h3>
-<p>在Java 5之前，Java内存模型（JMM）定义是有问题的。当多个线程访问共享内存时很可能得到各种奇怪的结果，例如：</p>
+                        <h1 id="">远程</h1>
+<p>要了解关于Akka的远程调用能力的简介请参阅<a href="../chapter2/06_location_transparency.html">位置透明性</a>.</p>
+<blockquote>
+<p>注意</p>
+<p>正如那一章所解释的，Akka remoting是按照端到端（peer-to-peer）对等通信的方式设计的，并在建立客户端-服务器（client-server）模式时受到限制。特别是Akka Remoting除其他外，不能与网络地址转换（Network Address Translation）和负载均衡器（Load Balancer）一起工作。</p>
+</blockquote>
+<h3 id="actorsystem">使你的ActorSystem作好远程调用的准备</h3>
+<p>Akka 远程调用功能在一个单独的jar包中. 情确认你的项目中包括以下依赖:</p>
+<pre><code>&quot;com.typesafe.akka&quot; %% &quot;akka-remote&quot; % &quot;2.3.6&quot;
+</code></pre><p>要在Akka项目中使用远程调用，最少要在 <code>application.conf</code> 文件中加入以下内容:</p>
+<pre><code>akka {
+  actor {
+    provider = &quot;akka.remote.RemoteActorRefProvider&quot;
+  }
+  remote {
+    enabled-transports = [&quot;akka.remote.netty.tcp&quot;]
+    netty.tcp {
+      hostname = &quot;127.0.0.1&quot;
+      port = 2552
+    }
+  }
+}
+</code></pre><p>从上例中可以看到你开始时需要加入4个东西:</p>
 <ul>
-<li>一个线程看不到其它线程所写入的值：可见性问题</li>
-<li>由于指令没有按期望的顺序执行，一个线程观察到其它线程的 ‘不可能’ 行为：指令重排序问题</li>
-</ul>
-<p>随着Java 5中JSR 133的实现，很多这种问题都被解决了。 JMM是一组基于 “发生在先” 关系的规则, 限制了一个内存访问行为何时必须在另一个内存访问行为之前发生，以及反过来，它们何时能够不按顺序发生。这些规则的两个例子包括：</p>
-<ul>
-<li><strong>监视器锁规则：</strong> 对一个锁的释放先于所有后续对同一个锁的获取</li>
-<li><strong>volatile变量规则:</strong> 对一个volatile变量的写操作先于所有对同一volatile变量的后续读操作</li>
-</ul>
-<p>虽然JMM看起来很复杂，但是其规范试图在易用性和编写高性能、可扩展的并发数据结构的能力之间寻找一个平衡。</p>
-<h3 id="actorsjava">Actors与Java内存模型</h3>
-<p>使用Akka中的Actor实现，有两种方法让多个线程对共享的内存进行操作：</p>
-<ul>
-<li>如果一条消息被（例如，从另一个actor）发送到一个actor，大多数情况下消息是不可变的，但是如果这条消息不是一个正确创建的不可变对象，如果没有 “发生先于” 规则, 有可能接收方会看到部分初始化的数据，甚至可能看到无中生有的数据（long/double）。</li>
-<li>如果一个actor在处理某条消息时改变了自己的内部状态，而之后又在处理其它消息时又访问了这个状态。一条很重要的需要了解的规则是，在使用actor模型时你无法保证，同一个线程会在处理不同的消息时使用同一个actor。</li>
-</ul>
-<p>为了避免actor中的可见性和重排序问题，Akka保证以下两条 “发生在先” 规则:</p>
-<ul>
-<li><strong>actor发送规则 : </strong>一条消息的发送动作先于同一个actor对同一条消息的接收。</li>
-<li><strong>actor后续处理规则: </strong>一条消息的处理先于同一个actor的下一条消息处理</li>
+<li>将 provider 从 <code>akka.actor.LocalActorRefProvider</code> 改为 <code>akka.remote.RemoteActorRefProvider</code></li>
+<li>增加远程主机名——你希望运行actor系统的主机; 这个主机名与传给远程系统的内容完全一样，用来标识这个系统，并为后续根据需要连接回这个系统时使用, 所以要把它设置成一个可到达的IP地址或一个可以正确解析的域名来保证网络可访问性.</li>
+<li>增加端口号——actor 系统监听的端口号，<code>0</code>表示让它自动选择</li>
 </ul>
 <blockquote>
 <p>注意</p>
-<p>通俗地说，这意味着当这个actor处理下一个消息的时候，对actor的内部字段的改变是可见的。因此，在你的actor中的域不需要是volitale或是同等可见性的。</p>
+<p>端口号对相同机器上的actor系统必须是唯一的，即使actor系统具有不同的名称。这是因为每个actor系统有其自身网络子系统，来监听连接并处理消息，以免与其他actor系统干扰。</p>
 </blockquote>
-<p>这两条规则都只应用于同一个actor实例，对不同的actor则无效。</p>
-<h3 id="futurejava">Future与Java内存模型</h3>
-<p>一个Future的完成 “先于” 任何注册到它的回调函数(译者注：闭包)的执行。</p>
-<p>我们建议不要在回调中捕捉（close over）非final的值 (Java中称final，Scala中称val), 如果你<strong>一定</strong>要捕捉非final的域，则它们必须被标记为<em>volatile</em>来让它的当前值对回调代码可见。</p>
-<p>如果你捕捉一个引用，你还必须保证它所指代的实例是线程安全的。我们强烈建议远离使用锁的对象，因为它们会引入性能问题，甚至最坏可能造成死锁。</p>
-<p>这些是使用synchronized的风险。</p>
-<h3 id="stmjava">STM与Java内存模型</h3>
-<p>Akka中的软件事务性内存 (STM) 也提供了一条 “发生在先” 规则:</p>
+<p>上例只是演示了要进行远程调用所需要添加的最小属性。所有的设置在<a href="#remote-configuration-scala">远程调用配置</a>一节中描述。</p>
+<h3 id="">远程交互的类型</h3>
+<p>Akka 远程调用有两种方式:</p>
 <ul>
-<li><strong>事务性引用规则:</strong> 对一个事务性引用，在提交过程中一次成功的写操作，先于所有对同一事务性引用的后续读操作发生。</li>
+<li>查找 : 使用<code>actorSelection(path)</code>在远程主机上查找一个actor</li>
+<li>创建 : 使用<code>actorOf(Props(...), actorName)</code>在远程主机上创建一个actor</li>
 </ul>
-<p>这条规则非常象JMM中的 ‘volatile 变量’ 规则。目前Akka STM只支持延迟写，所以对共享内存的实际写操作会被延迟到事务提交之时。在事务中发生的写操作会被存放在一个本地缓冲区内 (事务的写操作集) ，并且对其它事务是不可见的。这就是为什么脏读是不可能的。</p>
-<p>这些规则在Akka中的实现会随时间而变化，精确的细节甚至可能依赖于所使用的配置。但是它们是建立在其它JMM规则之上的，如监视器锁规则、volatile变量规则。 这意味着Akka用户不需要操心为了提供“发生先于”关系而增加同步，因为这是Akka的工作。这样你可以腾出手来处理业务逻辑，让Akka框架来保证这些规则的满足。</p>
-<h3 id="a-namejmm-shared-stateaactor"><a name="jmm-shared-state"></a>Actor与共享的可变状态</h3>
-<p>因为Akka运行在JVM上，所以还有一些其它的规则需要遵守。</p>
+<p>下面章节将对这两种方法进行详细介绍.</p>
+<h3 id="-actors">查找远程 Actors</h3>
+<p><code>actorSelection(path)</code>会获得远程结点上一个Actor的<code>ActorSelection</code>, 例如:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">selection</span> =</span>
+  context.actorSelection(<span class="hljs-string">"akka.tcp://actorSystemName@10.0.0.1:2552/user/actorName"</span>)
+</code></pre>
+<p>可以看到以下模式被用来在远程结点上查找一个actor:</p>
+<pre><code>akka.&lt;protocol&gt;://&lt;actor system&gt;@&lt;hostname&gt;:&lt;port&gt;/&lt;actor path&gt;
+</code></pre><p>一旦得到了actor的selection，你就可以像与本地actor通讯一样与它进行通迅, 例如:</p>
+<pre><code>selection ! &quot;Pretty awesome feature&quot;
+</code></pre><p>要获得 <code>ActorSelection</code>的 <code>ActorRef</code> 你需要发送一条消息到selection，然后使用actor答复中的<code>sender</code>引用。有一个内置的<code>Identify</code>消息所有Actor都会理解并自动回复一个包含 <code>ActorRef</code> 的 <code>ActorIdentity</code> 消息。这也可以通过 <code>ActorSelection</code>的<code>resolveOne</code>方法实现，它返回一个包含匹配<code>ActorRef</code>的<code>Future</code>。</p>
+<blockquote>
+<p>注意</p>
+<p>要了解更多actor地址和路径的组成、使用的详细信息, 请参考 <a href="../chapter2/05_actor_references_paths_and_addresses.html">Actor 引用，路径和地址</a>.</p>
+</blockquote>
+<h3 id="-actor">创建远程 Actor</h3>
+<p>在Akka中要使用远程创建actor的功能，需要对 <code>application.conf</code> 文件进行以下修改 (只显示deployment部分):</p>
+<pre><code>akka {
+  actor {
+    deployment {
+      /sampleActor {
+        remote = &quot;akka.tcp://sampleActorSystem@127.0.0.1:2553&quot;
+      }
+    }
+  }
+}
+</code></pre><p>这个配置告知Akka当一个路径为<code>/sampleActor</code>的actor被创建时，即使用<code>system.actorOf(Props(...), &quot;sampleActor&quot;)</code>时，要进行响应. 指定的actor不会被直接实例化， 而是远程actor系统的daemon会被要求创建这个actor, 本例中的远程actor系统是 <code>sampleActorSystem@127.0.0.1:2553</code>.</p>
+<p>一旦配置了以上属性你就可以在代码中进行如下操作:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">actor</span> =</span> system.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">SampleActor</span>], <span class="hljs-string">"sampleActor"</span>)
+actor ! <span class="hljs-string">"Pretty slick"</span>
+</code></pre>
+<p>actor类<code>SampleActor</code>必须在运行时可用, 即，actor系统的classloader中必须有一个包含这个类的JAR包.</p>
+<blockquote>
+<p>注意</p>
+<p>当创建actor传递构造函数参数时，为了确保<code>Props</code>的序列化特性，不要是内部类作为工厂：它将天生地捕获其封闭对象的引用，而在大多数情况下对象的引用是不可序列化的。最好在actor类的伴生对象中创建工厂方法。</p>
+<p>通过设置配置项目<code>akka.actor.serialize-creators=on</code>，所有Props的序列化都可以被测试。只有其<code>deploy</code>具有<code>LocalScope</code>的Props会被免除这一检查。</p>
+<p>注意</p>
+<p>你可以使用星号作为通配符匹配actor路径，因此你可以指定：<code>/*/sampleActor</code>，并匹配该树形结构中那一级别上的所有 <code>sampleActor</code>。你也能在最后一个位置使用通配符来匹配某一级别的所有actor：<code>/someParent/*</code>。非通配符匹配相比之下总是有更高的优先级，所以：<code>/foo/bar</code>被认为比<code>/foo/*</code><strong>更具体</strong>，并且只有优先级最高的匹配才会被使用。请注意它<strong>不能</strong>用于部分匹配，像这样：<code>/foo*/bar</code>, <code>/f*o/bar</code>等。</p>
+</blockquote>
+<h5 id="">用代码进行远程部署</h5>
+<p>要允许动态部署系统，也可以在用来创建actor的<code>Props</code>中包含deployment配置 : 这一部分信息与配置文件中的deployment部分是等价的, 如果两者都有，则外部配置拥有更高的优先级.</p>
+<p>加入这些import:</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.{ <span class="hljs-type">Props</span>, <span class="hljs-type">Deploy</span>, <span class="hljs-type">Address</span>, <span class="hljs-type">AddressFromURIString</span> }
+<span class="hljs-keyword">import</span> akka.remote.<span class="hljs-type">RemoteScope</span>
+</code></pre>
+<p>和一个像这样的远程地址:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">one</span> =</span> <span class="hljs-type">AddressFromURIString</span>(<span class="hljs-string">"akka.tcp://sys@host:1234"</span>)
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">two</span> =</span> <span class="hljs-type">Address</span>(<span class="hljs-string">"akka.tcp"</span>, <span class="hljs-string">"sys"</span>, <span class="hljs-string">"host"</span>, <span class="hljs-number">1234</span>) <span class="hljs-comment">// this gives the same</span>
+</code></pre>
+<p>你可以像这样建议系统在此远程结点上创建一个子actor:</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">ref</span> =</span> system.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">SampleActor</span>].
+  withDeploy(<span class="hljs-type">Deploy</span>(scope = <span class="hljs-type">RemoteScope</span>(address))))
+</code></pre>
+<h3 id="">生命周期和故障恢复模式</h3>
+<p><img src="../images/association_lifecycle1.png" alt=""></p>
+<p>每个远程系统的链接可以在上面所示的四个状态之一。对一个给定<code>Address</code>的远程系统，在任何通信发生之前，其链接状态为<code>Idle</code>。第一次，一条消息试图发送到远程系统，或一个呼入连接被接受，则链接状态变为<code>Active</code>，表明两个系统有消息来发送或接收，并且目前没有发生失败。当通信发生故障和两个系统之间失去连接时，链接变为<code>Gated</code>。</p>
+<p>在这个状态下，系统不会尝试连接到远程主机，并将丢弃所有出站消息。链接处于<code>Gated</code>状态的时间由设置<code>akka.remote.retry-gate-closed-for</code>控制： 这个时间过去后链接状态会重新变为<code>Idle</code>。<code>Gate</code>从某种意义上是单方面的，在<code>Gate</code>状态下的任何时候，一个<em>入站</em>连接被成功接受，它将自动转为<code>Active</code>并且通信会立即恢复。</p>
+<p>面对因为参与系统的状态不一致导致的无法恢复的通信失败，远程系统变为<code>Quarantined</code>。与<code>Gate</code>不同，隔离是永久性的，并一直持续到其中一个系统重新启动。重新启动后通讯可以再度恢复，并且链接可以重新变为<code>Active</code>。</p>
+<h3 id="actor">监视远程actor</h3>
+<p>监视一个远程actor与监视一个本地actor没有不同，如<a href="../chapter3/01_actors.html#deathwatch-scala">使用DeathWatch进行生命周期监控</a>中所述。</p>
+<blockquote>
+<p>警告</p>
+<p><em>警告：</em> 监视通过<code>actorFor</code>获取的<code>ActorRef</code>在失去连接时不会触发<code>Terminated</code>消息。<code>actorFor</code>是被<code>actorSelection</code>取代的废弃方法。应监视通过<code>Identify</code>和<code>ActorIdentity</code>获得的<code>ActorRef</code>，如<a href="../chapter3/01_actors.html#actorSelection-scala">通过Actor Selection定位Actor</a>所描述的。</p>
+</blockquote>
+<h5 id="">失效检测器</h5>
+<p>在底层，远程death watch使用心跳消息和一个失效检测器来对网络故障和JVM崩溃生成<code>Terminated</code>消息，并对被监视的actor优雅地终止。</p>
+<p>心跳到达的时间是由<a href="http://ddg.jaist.ac.jp/pub/HDY+04.pdf" target="_blank">Phi自增失效检测器</a>的一个实现解释的。</p>
+<p>对故障的怀疑级别由名为<em>phi</em>的值给定。Phi失效检测器的基本思想是在某个规模上描述<em>phi</em>值，来动态地调整以反映当前的网络状况。</p>
+<p><em>phi</em>值是这样计算的：</p>
+<pre><code>phi = -log10(1 - F(timeSinceLastHeartbeat))
+</code></pre><p>其中F是正态分布曲线的平均值和标准偏差的估计，从历史的心跳间隔到达次数的累积分布函数。</p>
+<p>在<a href="#remote-configuration-scala">远程配置</a>中你可以调整<code>akka.remote.watch-failure-detector.threshold</code>来定义什么样的<em>phi</em>值被认为是一个失败。</p>
+<p>一个低的<code>threshold</code>容易产生许多假阳性反应，但可以确保一个真正崩溃发生时能快速检测到。相反，一个高<code>threshold</code>会生成更少的错误，但需要更多的时间来检测真正的崩溃。默认的<code>threshold</code>是10，它适合大多数情况。但是在云环境中，如Amazon EC2，该值可增至12来匹配有时会发生在这类平台上的网络问题。</p>
+<p>下面的图表说明了<em>phi</em>随着距离上次心跳的时间的增加是如何增加的。</p>
+<p><img src="../images/phi1.png" alt=""></p>
+<p>Phi是通过历史讲个到达次数的平均值和标准偏差计算的。前面的图表是标准偏差为200 ms的例子。如果心跳到达偏差更小，则曲线会变得更陡峭，即有可能更快地确定故障。标准偏差为 100 毫秒的曲线看起来像这样。</p>
+<p><img src="../images/phi2.png" alt=""></p>
+<p>为了能够适应突然的异常，如垃圾收集导致的暂停和瞬态网络故障，失效检测器配置了一个便捷——<code>akka.remote.watch-failure-detector.acceptable-heartbeat-pause</code>。你可能想要根据以来的环境调整<a href="#remote-configuration-scala">远程配置</a>。当<code>acceptable-heartbeat-pause</code>被设置为3秒时，曲线看上去像这样。</p>
+<p><img src="../images/phi3.png" alt=""></p>
+<h3 id="">序列化</h3>
+<p>对actor使用远程调用时，你必须保证这些actor所使用的<code>props</code>和<code>messages</code>是可序列化的. 如果不能保证会导致系统产生意料之外的行为.</p>
+<p>更多信息请参阅<a href="04_serialization.html">序列化(Scala)</a>。</p>
+<h3 id="actor">有远程目标的路由actor</h3>
+<p>将远程调用与<a href="../chapter3/06_routing.html">路由(Scala)</a>进行组合绝对是可行的.</p>
+<p>远程部署routees池可以这样被配置:</p>
+<pre><code>akka.actor.deployment {
+  /parent/remotePool {
+    router = round-robin-pool
+    nr-of-instances = 10
+    target.nodes = [&quot;akka.tcp://app@10.0.0.2:2552&quot;, &quot;akka://app@10.0.0.3:2552&quot;]
+  }
+}
+</code></pre><p>此配置设置将克隆10个定义在<code>remotePool</code>的<code>Props</code>的actor，并将其均匀地分布在两个给定的目标节点上部署。</p>
+<p>一个远程actor group可以这样配置：</p>
+<pre><code>akka.actor.deployment {
+  /parent/remoteGroup {
+    router = round-robin-group
+    routees.paths = [
+      &quot;akka.tcp://app@10.0.0.1:2552/user/workers/w1&quot;,
+      &quot;akka.tcp://app@10.0.0.2:2552/user/workers/w1&quot;,
+      &quot;akka.tcp://app@10.0.0.3:2552/user/workers/w1&quot;]
+  }
+}
+</code></pre><p>此配置设置将想定义的远程actor路径发送消息。它要求你在远程节点相匹配的路径上创建目标actor。这不是由路由器做的。</p>
+<h3 id="">远程处理示例</h3>
+<p><a href="http://www.typesafe.com/platform/getstarted" target="_blank">Typesafe Activator</a>。名为<a href="http://www.typesafe.com/activator/template/akka-sample-remote-scala" target="_blank">Akka Remote Samples with Scala</a>的教程一并演示了远程部署和查找远程actor。</p>
+<h3 id="">可插拔的传输支持</h3>
+<p>Akka可以为远程系统配置使用不同的传输协议进行通信。此功能的核心部件是<code>akka.remote.Transport</code> SPI。传输实现必须扩展这一特质。可以通过设置<code>akka.remote.enabled-transports</code>配置键，使其指向一个或多个包含驱动程序说明的配置节，来载入传输。</p>
+<p>设置基于SSL驱动程序的Netty作为默认值的示例：</p>
+<pre><code>akka {
+  remote {
+    enabled-transports = [akka.remote.netty.ssl]
+
+    netty.ssl.security {
+      key-store = &quot;mykeystore&quot;
+      trust-store = &quot;mytruststore&quot;
+      key-store-password = &quot;changeme&quot;
+      key-password = &quot;changeme&quot;
+      trust-store-password = &quot;changeme&quot;
+      protocol = &quot;TLSv1&quot;
+      random-number-generator = &quot;AES128CounterSecureRNG&quot;
+      enabled-algorithms = [TLS_RSA_WITH_AES_128_CBC_SHA]
+    }
+  }
+}
+</code></pre><p>一个设置自定义传输实现的示例：</p>
+<pre><code>akka {
+  remote {
+    applied-transports = [&quot;akka.remote.mytransport&quot;]
+
+    mytransport {
+      # The transport-class configuration entry is required, and
+      # it must contain the fully qualified name of the transport
+      # implementation
+      transport-class = &quot;my.package.MyTransport&quot;
+
+      # It is possible to decorate Transports with additional services.
+      # Adapters should be registered in the &quot;adapters&quot; sections to
+      # be able to apply them to transports
+      applied-adapters = []
+
+      # Driver specific configuration options has to be in the same
+      # section:
+      some-config = foo
+      another-config = bar
+    }
+</code></pre><h3 id="">远程事件</h3>
+<p>可以监听Akka远程调用中发生的事件，也可以订阅/取消订阅这些事情，你只需要在<code>ActorSystem.eventStream</code>中为下面所列出类型的事件注册监听器.</p>
+<blockquote>
+<p>注意</p>
+<p>若要订阅任意远程事件，订阅<code>RemotingLifecycleEvent</code>。若要订阅只涉及链接的生命周期的事件，请订阅<code>akka.remote.AssociationEvent</code>。</p>
+<p>注意</p>
+<p>使用&quot;链接&quot;而不是&quot;连接&quot;一词，反映了远程处理子系统可能使用无连接传输，但链接类似于运输层连接，来维持点到点之间的Akka协议。</p>
+</blockquote>
+<p>默认情况下注册的事件监听器，会记录所有下面描述的事件。此默认值被选为帮助建立一个系统，但一旦完成了这一阶段的项目，一般会选择关掉此日志记录。</p>
+<blockquote>
+<p>注意</p>
+<p>设置<code>application.conf</code>中的<code>akka.remote.log-remote-lifecycle-events = off</code>来关闭日志记录。</p>
+</blockquote>
+<p>要在链接结束(&quot;disconnected&quot;)时收到通知，监听 <code>DisassociatedEvent</code>， 这个事件持有链接的方向（传入或传出）和参与方的地址.</p>
+<p>要在链接成功建立(&quot;connected&quot;)时收到通知，监听 <code>AssociatedEvent</code>， 这个事件持有链接的方向（传入或传出）和参与方的地址.</p>
+<p>要拦截与链接直接相关的错误，监听 <code>AssociationErrorEvent</code>， 这个事件持有链接的方向（传入或传出）、参与方的地址和<code>Throwable</code>原因.</p>
+<p>要在远程子系统准备好接受链接时收到通知，监听 <code>RemotingListenEvent</code>，这个事件持有远程监听的地址.</p>
+<p>要在远程子系统被关闭时收到通知，监听 <code>RemotingShutdownEvent</code>.</p>
+<p>要拦截与远程相关的广泛错误，监听包含<code>Throwable</code>原因的<code>RemotingErrorEvent</code>.</p>
+<h3 id="">远程安全</h3>
+<p>Akka提供了几种方式来加强远程节点（客户端/服务器）之间的安全：</p>
 <ul>
-<li>捕捉Actor内部状态并暴露给其它线程</li>
+<li>不受信任的模式</li>
+<li>安全 Cookie 握手</li>
 </ul>
-<pre><code class="lang-scala">
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyActor</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
-  <span class="hljs-keyword">var</span> state = ...
-  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
-    <span class="hljs-keyword">case</span> _ =&gt;
-      <span class="hljs-comment">// 错误的做法</span>
+<h5 id="">不受信任的模式</h5>
+<p>一旦Actor系统可以远程连接到另一个系统，它原则上可以向包含在该远程系统内的任何一个actor发送任何可能的消息。一个例子是可能会给系统守护者发送<code>PoisonPill</code>，关闭该系统。这并非总是符合期望，它可以通过下列设置禁用：</p>
+<pre><code>akka.remote.untrusted-mode = on
+</code></pre><p>对设置了此标志的系统，这禁用了系统消息发送（actor生命周期命令，DeathWatch，等等）和任何继承自<code>PossiblyHarmful</code>的消息。客户端应该发送他们，尽管它们会被丢弃和记录日志（在DEBUG调试级别以减少拒绝服务攻击的可能性）。<code>PossiblyHarmful</code> 涉及的预定义的消息，像 <code>PoisonPill</code> 和<code>Kill</code>，但它也可以被添加到用户定义的消息作为标记特质。</p>
+<p>通过actor selection发送的消息在不受信任模式下默认是丢弃的，但接收actor selection消息的权限可授予特定的actor，像这样在配置中定义：</p>
+<pre><code>akka.remote.trusted-selection-paths = [&quot;/user/receptionist&quot;, &quot;/user/namingService&quot;]
+</code></pre><p>实际的消息仍然必须不能是 <code>PossiblyHarmful</code>类型。</p>
+<p>总之，配置为不受信任模式的系统通过远程处理层传入的以下操作将被忽略：</p>
+<ul>
+<li>远程部署 （这也意味着没有远程监控）</li>
+<li>远程DeathWatch</li>
+<li><code>system.stop()</code>, <code>PoisonPill</code>, <code>Kill</code></li>
+<li>发送任何继承自<code>PossiblyHarmful</code>标记接口的消息，包括<code>Terminated</code></li>
+<li>通过actor selection发送的消息，除非目标定义在<code>trusted-selection-paths</code>中。</li>
+</ul>
+<blockquote>
+<p>注意</p>
+<p>启用不受信任模式并不会取消客户端能够自由选择其消息发送目标的能力，这意味着不按上述规则禁止的消息可以发送给远程系统中的任何一个actor。对一个面向客户的系统，仅仅包含一组定义良好的入口点actor，然后将请求转发（可能在执行验证后）到另一个包含实际工作者actor的actor系统是一个好的实践。如果两个服务器端系统之间消息传递使用本地<code>ActorRef</code>（他们安全地在同一个JVM上的两个actor系统之间交换），你可以通过标记他们为<code>PossiblyHarmful</code>来限制此接口上的消息，从而使客户端不能伪造。</p>
+</blockquote>
+<h5 id="-cookie-">安全 Cookie 握手</h5>
+<p>Akka远程处理还允许你指定一个安全cookie，它将被交换并确保在客户端和服务器之间的连接握手中是相同的。如果他们不相同，则客户端将被拒绝连接到服务器。</p>
+<p>安全cookie可以是任何类型的字符串。但推荐使用此脚本生成一个加密安全cookie——$<code>$AKKA_HOME/scripts/generate_config_with_secure_cookie.sh</code>或者从代码中使用<code>akka.util.Crypt.generateSecureCookie()</code>工具方法。</p>
+<p>你必须确保连接的客户端和服务器都有相同的一个安全 cookie，并同时打开了<code>require-cookie</code>选项。</p>
+<p>下面是一个示例配置：</p>
+<pre><code>akka.remote {
+  secure-cookie = &quot;090A030E0F0A05010900000A0C0E0C0B03050D05&quot;
+  require-cookie = on
+}
+</code></pre><h5 id="ssl">SSL</h5>
+<p>SSL可以用作远程运输，通过添加<code>akka.remote.netty.ssl</code>到<code>enabled-transport</code>配置节。请参阅<a href="#remote-configuration-scala">远程配置</a>以节中的设置说明。</p>
+<p>SSL支持是用Java安全套接字扩展实现的，请参阅官方的<a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/jsse/JSSERefGuide.html" target="_blank">Java安全套接字扩展文档</a>和相关的资源进行故障排除。</p>
+<blockquote>
+<p>注意</p>
+<p>当在Linux上使用SHA1PRNG时，推荐指定<code>-Djava.security.egd=file:/dev/./urandom</code>作为JVM参数形式指定以防止阻塞。它并<strong>不</strong>安全因为它重用了种子。使用&#39;/dev/./urandom&#39;，而不使用&#39;/dev/urandom&#39;是行不通的，见<a href="http://bugs.sun.com/view_bug.do?bug_id=6202721" target="_blank">Bug ID: 6202721</a>。</p>
+</blockquote>
+<h3 id="a-nameremote-configuration-scalaa"><a name="remote-configuration-scala"></a>远程配置</h3>
+<p>有很多与Akka远程处理相关的配置属性。可以在<a href="../chapter2/09_configuration.html#config-akka-remote">参考配置</a>中获取详细信息。(译者注：中文翻译附在本节后面，摘自Akka 2.0的翻译)</p>
+<blockquote>
+<p>注意</p>
+<p>以编程方式设置如监听IP和端口号的属性，最好是通过类似以下内容的方式：</p>
+<pre><code>ConfigFactory.parseString(&quot;akka.remote.netty.tcp.hostname=\&quot;1.2.3.4\&quot;&quot;)
+     .withFallback(ConfigFactory.load());
+</code></pre></blockquote>
+<h5 id="">远程配置信息：</h5>
+<pre><code class="lang-scala">#####################################
+# <span class="hljs-type">Akka</span> 远程调用参考配置文件 #
+#####################################
 
-      <span class="hljs-comment">// 非常错误，共享可变状态，</span>
-      <span class="hljs-comment">// 会让应用莫名其妙地崩溃</span>
-      <span class="hljs-type">Future</span> { state = <span class="hljs-type">NewState</span> }
-      anotherActor ? message onSuccess { r =&gt; state = r }
+# 本参考配置文件包含所有的缺省配置.
+# 在你自己的 application.conf 可对其进行编辑/重写.
 
-      <span class="hljs-comment">// 非常错误, 共享可变状态 bug</span>
-      <span class="hljs-comment">// "发送者"是一个可变变量，随每个消息改变</span>
-      <span class="hljs-type">Future</span> { expensiveCalculation(sender) }
+# 关于akka-actor.jar 中已有的akka.actor设置的注释被去掉了, 不然会发生重复设置.
 
-      <span class="hljs-comment">//正确的做法</span>
+akka {
 
-      <span class="hljs-comment">// 非常安全， "self" 被闭包捕捉是安全的</span>
-      <span class="hljs-comment">// 并且它是一个Actor引用, 是线程安全的</span>
-      <span class="hljs-type">Future</span> { expensiveCalculation() } onComplete { f =&gt; self ! f.value.get }
+  actor {
 
-      <span class="hljs-comment">// 非常安全，我们捕捉了一个固定值</span>
-      <span class="hljs-comment">// 并且它是一个Actor引用，是线程安全的</span>
-      <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">currentSender</span> =</span> sender
-      <span class="hljs-type">Future</span> { expensiveCalculation(currentSender) }
+    serializers {
+      proto = <span class="hljs-string">"akka.serialization.ProtobufSerializer"</span>
+    }
+
+
+    serialization-bindings {
+      # 由 com.google.protobuf.<span class="hljs-type">Message</span> 没有继承 <span class="hljs-type">Serializable</span> 但 <span class="hljs-type">GeneratedMessage</span>
+      # 有, 这里必须使用更明确的类来避免歧义
+      <span class="hljs-string">"com.google.protobuf.GeneratedMessage"</span> = proto
+    }
+
+    deployment {
+
+      <span class="hljs-keyword">default</span> {
+
+        # 如果设置为一个可用的远程地址, 这个有名称的actor会被部署到那个结点
+        # e.g. <span class="hljs-string">"akka://sys@host:port"</span>
+        remote = <span class="hljs-string">""</span>
+
+        target {
+
+          # 一个主机名和端口列表，用来创建一个非直接路由actor的子actor
+          #   格式应为 <span class="hljs-string">"akka://sys@host:port"</span>, 其中:
+          #    - sys 是远程actor系统的名称
+          #    - hostname 可以是主机名或远程主机应连接到的<span class="hljs-type">IP</span>地址
+          #    - port 应为其它结点上的远程服务的端口
+          # 象本地路由actor一样，新生成的actor实例的数量仍从
+          # nr-of-instances 配置中获取; 新的实例在给定的结点中将以
+          # round-robin 的方式分布
+          nodes = []
+
+        }
+      }
+    }
+  }
+
+  remote {
+
+    # 使用 akka.remote.<span class="hljs-type">RemoteTransport</span> 的哪个实现
+    # 缺省是基于<span class="hljs-type">TCP</span>，<span class="hljs-type">Netty</span>上的远程传输层
+    transport = <span class="hljs-string">"akka.remote.netty.NettyRemoteTransport"</span>
+
+    # 打开为服务器管理的actor的完全的安全性打开不信任模式, 允许不受信任的
+    # 客户端建立连接.
+    untrusted-mode = off
+
+    # 集群操作的 <span class="hljs-type">ACK</span> 超时, 例如检查 actor 等.
+    remote-daemon-ack-timeout = <span class="hljs-number">30</span>s
+
+    # 如果这个值是 <span class="hljs-string">"on"</span>, <span class="hljs-type">Akka</span> 会以<span class="hljs-type">DEBUG</span>级别记录所有接收到的消息到日志, 如果是 off 则不会被记录
+    log-received-messages = off
+
+    # 如果这个值是 <span class="hljs-string">"on"</span>, <span class="hljs-type">Akka</span> 会以<span class="hljs-type">DEBUG</span>级别记录所有发送的消息到日志，如果是 off 则不会被记录
+    log-sent-messages = off
+
+    # 每一个属性被标记为 (<span class="hljs-type">I</span>) 或 (<span class="hljs-type">O</span>) 或 (<span class="hljs-type">I</span>&amp;<span class="hljs-type">O</span>), <span class="hljs-type">I</span> 代表 “输入”  <span class="hljs-type">O</span> 代表 “输出” 连接.
+    # <span class="hljs-type">NettyRemoteTransport</span> 启动的服务器总是允许输入的连接, 当发送到某个尚未连接的目标时总是会启动活跃的客户端连接
+    # ; 如果配置指定，它可以重用输入的连接来发送应答，这被称为被动客户端连接
+    #  (i.e. 从服务器到客户端).
+    netty {
+
+      # (<span class="hljs-type">O</span>) 在延迟变长/溢出的情况下要等待多久 (阻塞发送方)
+      # 才取消发送
+      # <span class="hljs-number">0</span> 表示 <span class="hljs-string">"不取消"</span>, 任何正数表示最长的阻塞时间.
+      backoff-timeout = <span class="hljs-number">0</span>ms
+
+      # (<span class="hljs-type">I</span>&amp;<span class="hljs-type">O</span>) 用 '$<span class="hljs-type">AKKA_HOME</span>/scripts/generate_config_with_secure_cookie.sh' 创建自己cookie
+      # 或使用 <span class="hljs-symbol">'akka</span>.util.<span class="hljs-type">Crypt</span>.generateSecureCookie'
+      secure-cookie = <span class="hljs-string">""</span>
+
+      # (<span class="hljs-type">I</span>) 远程服务器是否要求连接对方也共享同样的 secure-cookie
+      # (在 <span class="hljs-symbol">'remot</span>e' 部分定义)?
+      require-cookie = off
+
+      # (<span class="hljs-type">I</span>) 重用输入连接来发送消息
+      use-passive-connections = on
+
+      # (<span class="hljs-type">I</span>) 远程调用所绑定的主机名或ip,
+      # 不设则使用<span class="hljs-type">InetAddress</span>.getLocalHost.getHostAddress
+      hostname = <span class="hljs-string">""</span>
+
+      # (<span class="hljs-type">I</span>) 客户端应连接到的缺省远程服务器端口.
+      # 缺省值为 <span class="hljs-number">2552</span> (<span class="hljs-type">AKKA</span>), <span class="hljs-number">0</span> 表示随机选择一个可用端口
+      port = <span class="hljs-number">2552</span>
+
+      # (<span class="hljs-type">O</span>) 创建输出连接时绑定到的本地网络接口地址 (<span class="hljs-type">IP</span> 地址)
+      # 设置为 <span class="hljs-string">""</span> 或 <span class="hljs-string">"auto"</span> 表示自动选择本地地址.
+      outbound-local-address = <span class="hljs-string">"auto"</span>
+
+      # (<span class="hljs-type">I</span>&amp;<span class="hljs-type">O</span>) 如果你希望发送内容较大的消息则设置这个参数
+      message-frame-size = <span class="hljs-number">1</span> <span class="hljs-type">MiB</span>
+
+      # (<span class="hljs-type">O</span>) 超时间隔
+      connection-timeout = <span class="hljs-number">120</span>s
+
+      # (<span class="hljs-type">I</span>) 储备连接的大小
+      backlog = <span class="hljs-number">4096</span>
+
+      # (<span class="hljs-type">I</span>) 核心线程空闲时保持存活的时间长度，以 akka.time-unit 为单位
+      execution-pool-keepalive = <span class="hljs-number">60</span>s
+
+      # (<span class="hljs-type">I</span>) 远程执行单元的核心池的大小
+      execution-pool-size = <span class="hljs-number">4</span>
+
+      # (<span class="hljs-type">I</span>) channel 大小的上限, <span class="hljs-number">0</span> 表示关闭
+      max-channel-memory-size = <span class="hljs-number">0</span>b
+
+      # (<span class="hljs-type">I</span>) 所有channel总大小的上限, <span class="hljs-number">0</span> 表示关闭
+      max-total-memory-size = <span class="hljs-number">0</span>b
+
+      # (<span class="hljs-type">O</span>) 活跃客户端重连的间隔
+      reconnect-delay = <span class="hljs-number">5</span>s
+
+      # (<span class="hljs-type">O</span>) 读非活跃时间 (最小单位为秒)
+      # 经过这么长时间后，活跃客户端将被关闭;
+      # 当有新的通信请求时将被重新建立.
+      # <span class="hljs-number">0</span>表示关闭这个功能
+      read-timeout = <span class="hljs-number">0</span>s
+
+      # (<span class="hljs-type">O</span>) 写非活跃时间 (最小单位为秒)
+      # 经过这么长时间后将发送心跳.
+      # <span class="hljs-number">0</span>表示关闭这个功能
+      write-timeout = <span class="hljs-number">10</span>s
+
+      # (<span class="hljs-type">O</span>) 读和写的非活跃时间 (最小单位为秒)
+      # 经过这么长时间后活跃客户端连接将被关闭;
+      # 当有新的通信请求时将被重新建立
+      # <span class="hljs-number">0</span>表示关闭这个功能
+      all-timeout = <span class="hljs-number">0</span>s
+
+      # (<span class="hljs-type">O</span>) 客户端应进行重连的最大时间窗口
+      reconnection-time-window = <span class="hljs-number">600</span>s
+    }
+
+    # 系统 actor <span class="hljs-string">"network-event-sender"</span> 所使用的派发器
+    network-event-sender-dispatcher {
+      executor = thread-pool-executor
+      <span class="hljs-class"><span class="hljs-keyword">type</span> =</span> <span class="hljs-type">PinnedDispatcher</span>
+    }
   }
 }
 </code></pre>
-<ul>
-<li>消息<strong>应当</strong>是不可变的, 这是为了避开共享可变状态的陷阱。</li>
-</ul>
 
                     
                     </section>
@@ -1730,10 +2060,10 @@
         </div>
 
         
-        <a href="../chapter2/06_location_transparency.html" class="navigation navigation-prev " aria-label="Previous page: 位置透明性"><i class="fa fa-angle-left"></i></a>
+        <a href="../chapter5/02_cluster_usage.html" class="navigation navigation-prev " aria-label="Previous page: 集群用法"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../chapter2/08_message_delivery_reliability.html" class="navigation navigation-next " aria-label="Next page: 消息发送语义"><i class="fa fa-angle-right"></i></a>
+        <a href="../chapter5/04_serialization.html" class="navigation navigation-next " aria-label="Next page: 序列化"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

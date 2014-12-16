@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="8.1" data-basepath=".." data-revision="1418482047463">
+    <div class="book"  data-level="8.1" data-basepath=".." data-revision="1418735449756">
     
 
 <div class="book-summary">
@@ -1639,7 +1639,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_122">
+                    <section class="normal" id="section-gitbook_27">
                     
                         <h1 id="">持久化</h1>
 <p>Akka持久化使有状态的actor能留存其内部状态，以便在因JVM崩溃、监管者引起，或在集群中迁移导致的actor启动、重启时恢复它。Akka持久化背后的关键概念是持久化的只是一个actor的内部状态的的变化，而不是直接持久化其当前状态 （除了可选的快照）。这些更改永远只能被附加到存储，没什么是可变的，这使得高事务处理率和高效复制成为可能。有状态actor通过重放保存的变化来恢复，从而使它们可以重建其内部状态。重放的可以是完整历史记录，或着从某一个快照开始从而可以大大减少恢复时间。Akka持久化也提供了“至少一次消息传递语义”的点对点通信。</p>

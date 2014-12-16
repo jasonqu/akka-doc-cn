@@ -4,7 +4,7 @@
     <head>
         
         <meta charset="UTF-8">
-        <title>Akka与Java内存模型 | AKKA 2.3.6 Scala 文档</title>
+        <title>Futures与Agents | AKKA 2.3.6 Scala 文档</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 1.0.3">
@@ -18,10 +18,10 @@
     
     
     
-    <link rel="next" href="../chapter2/08_message_delivery_reliability.html" />
+    <link rel="next" href="../chapter4/01_futures.html" />
     
     
-    <link rel="prev" href="../chapter2/06_location_transparency.html" />
+    <link rel="prev" href="../chapter3/10_actor_dsl.html" />
     
 
         
@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.7" data-basepath=".." data-revision="1418735449756">
+    <div class="book"  data-level="4" data-basepath=".." data-revision="1418736434681">
     
 
 <div class="book-summary">
@@ -296,7 +296,7 @@
         </li>
     
         
-        <li class="chapter active" data-level="2.7" data-path="chapter2/07_akka_and_the_java_memory_model.html">
+        <li class="chapter " data-level="2.7" data-path="chapter2/07_akka_and_the_java_memory_model.html">
             
                 
                     <a href="../chapter2/07_akka_and_the_java_memory_model.html">
@@ -575,7 +575,7 @@
         </li>
     
         
-        <li class="chapter " data-level="4" data-path="chapter4/futures_and_agents.html">
+        <li class="chapter active" data-level="4" data-path="chapter4/futures_and_agents.html">
             
                 
                     <a href="../chapter4/futures_and_agents.html">
@@ -1639,87 +1639,9 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_2">
+                    <section class="normal" id="section-gitbook_47">
                     
-                        <h1 id="akkajava">Akka与Java内存模型</h1>
-<p>使用包含Scala和Akka在内的Typesafe平台的主要好处是它简化了并发软件的编写过程。本文将讨论Typesafe平台，尤其是Akka是如何在并发应用中访问共享内存的。</p>
-<h3 id="java">Java内存模型</h3>
-<p>在Java 5之前，Java内存模型（JMM）定义是有问题的。当多个线程访问共享内存时很可能得到各种奇怪的结果，例如：</p>
-<ul>
-<li>一个线程看不到其它线程所写入的值：可见性问题</li>
-<li>由于指令没有按期望的顺序执行，一个线程观察到其它线程的 ‘不可能’ 行为：指令重排序问题</li>
-</ul>
-<p>随着Java 5中JSR 133的实现，很多这种问题都被解决了。 JMM是一组基于 “发生在先” 关系的规则, 限制了一个内存访问行为何时必须在另一个内存访问行为之前发生，以及反过来，它们何时能够不按顺序发生。这些规则的两个例子包括：</p>
-<ul>
-<li><strong>监视器锁规则：</strong> 对一个锁的释放先于所有后续对同一个锁的获取</li>
-<li><strong>volatile变量规则:</strong> 对一个volatile变量的写操作先于所有对同一volatile变量的后续读操作</li>
-</ul>
-<p>虽然JMM看起来很复杂，但是其规范试图在易用性和编写高性能、可扩展的并发数据结构的能力之间寻找一个平衡。</p>
-<h3 id="actorsjava">Actors与Java内存模型</h3>
-<p>使用Akka中的Actor实现，有两种方法让多个线程对共享的内存进行操作：</p>
-<ul>
-<li>如果一条消息被（例如，从另一个actor）发送到一个actor，大多数情况下消息是不可变的，但是如果这条消息不是一个正确创建的不可变对象，如果没有 “发生先于” 规则, 有可能接收方会看到部分初始化的数据，甚至可能看到无中生有的数据（long/double）。</li>
-<li>如果一个actor在处理某条消息时改变了自己的内部状态，而之后又在处理其它消息时又访问了这个状态。一条很重要的需要了解的规则是，在使用actor模型时你无法保证，同一个线程会在处理不同的消息时使用同一个actor。</li>
-</ul>
-<p>为了避免actor中的可见性和重排序问题，Akka保证以下两条 “发生在先” 规则:</p>
-<ul>
-<li><strong>actor发送规则 : </strong>一条消息的发送动作先于同一个actor对同一条消息的接收。</li>
-<li><strong>actor后续处理规则: </strong>一条消息的处理先于同一个actor的下一条消息处理</li>
-</ul>
-<blockquote>
-<p>注意</p>
-<p>通俗地说，这意味着当这个actor处理下一个消息的时候，对actor的内部字段的改变是可见的。因此，在你的actor中的域不需要是volitale或是同等可见性的。</p>
-</blockquote>
-<p>这两条规则都只应用于同一个actor实例，对不同的actor则无效。</p>
-<h3 id="futurejava">Future与Java内存模型</h3>
-<p>一个Future的完成 “先于” 任何注册到它的回调函数(译者注：闭包)的执行。</p>
-<p>我们建议不要在回调中捕捉（close over）非final的值 (Java中称final，Scala中称val), 如果你<strong>一定</strong>要捕捉非final的域，则它们必须被标记为<em>volatile</em>来让它的当前值对回调代码可见。</p>
-<p>如果你捕捉一个引用，你还必须保证它所指代的实例是线程安全的。我们强烈建议远离使用锁的对象，因为它们会引入性能问题，甚至最坏可能造成死锁。</p>
-<p>这些是使用synchronized的风险。</p>
-<h3 id="stmjava">STM与Java内存模型</h3>
-<p>Akka中的软件事务性内存 (STM) 也提供了一条 “发生在先” 规则:</p>
-<ul>
-<li><strong>事务性引用规则:</strong> 对一个事务性引用，在提交过程中一次成功的写操作，先于所有对同一事务性引用的后续读操作发生。</li>
-</ul>
-<p>这条规则非常象JMM中的 ‘volatile 变量’ 规则。目前Akka STM只支持延迟写，所以对共享内存的实际写操作会被延迟到事务提交之时。在事务中发生的写操作会被存放在一个本地缓冲区内 (事务的写操作集) ，并且对其它事务是不可见的。这就是为什么脏读是不可能的。</p>
-<p>这些规则在Akka中的实现会随时间而变化，精确的细节甚至可能依赖于所使用的配置。但是它们是建立在其它JMM规则之上的，如监视器锁规则、volatile变量规则。 这意味着Akka用户不需要操心为了提供“发生先于”关系而增加同步，因为这是Akka的工作。这样你可以腾出手来处理业务逻辑，让Akka框架来保证这些规则的满足。</p>
-<h3 id="a-namejmm-shared-stateaactor"><a name="jmm-shared-state"></a>Actor与共享的可变状态</h3>
-<p>因为Akka运行在JVM上，所以还有一些其它的规则需要遵守。</p>
-<ul>
-<li>捕捉Actor内部状态并暴露给其它线程</li>
-</ul>
-<pre><code class="lang-scala">
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyActor</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
-  <span class="hljs-keyword">var</span> state = ...
-  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
-    <span class="hljs-keyword">case</span> _ =&gt;
-      <span class="hljs-comment">// 错误的做法</span>
-
-      <span class="hljs-comment">// 非常错误，共享可变状态，</span>
-      <span class="hljs-comment">// 会让应用莫名其妙地崩溃</span>
-      <span class="hljs-type">Future</span> { state = <span class="hljs-type">NewState</span> }
-      anotherActor ? message onSuccess { r =&gt; state = r }
-
-      <span class="hljs-comment">// 非常错误, 共享可变状态 bug</span>
-      <span class="hljs-comment">// "发送者"是一个可变变量，随每个消息改变</span>
-      <span class="hljs-type">Future</span> { expensiveCalculation(sender) }
-
-      <span class="hljs-comment">//正确的做法</span>
-
-      <span class="hljs-comment">// 非常安全， "self" 被闭包捕捉是安全的</span>
-      <span class="hljs-comment">// 并且它是一个Actor引用, 是线程安全的</span>
-      <span class="hljs-type">Future</span> { expensiveCalculation() } onComplete { f =&gt; self ! f.value.get }
-
-      <span class="hljs-comment">// 非常安全，我们捕捉了一个固定值</span>
-      <span class="hljs-comment">// 并且它是一个Actor引用，是线程安全的</span>
-      <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">currentSender</span> =</span> sender
-      <span class="hljs-type">Future</span> { expensiveCalculation(currentSender) }
-  }
-}
-</code></pre>
-<ul>
-<li>消息<strong>应当</strong>是不可变的, 这是为了避开共享可变状态的陷阱。</li>
-</ul>
+                        <h1 id="futuresagents">Futures与Agents</h1>
 
                     
                     </section>
@@ -1730,10 +1652,10 @@
         </div>
 
         
-        <a href="../chapter2/06_location_transparency.html" class="navigation navigation-prev " aria-label="Previous page: 位置透明性"><i class="fa fa-angle-left"></i></a>
+        <a href="../chapter3/10_actor_dsl.html" class="navigation navigation-prev " aria-label="Previous page: Actor DSL"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../chapter2/08_message_delivery_reliability.html" class="navigation navigation-next " aria-label="Next page: 消息发送语义"><i class="fa fa-angle-right"></i></a>
+        <a href="../chapter4/01_futures.html" class="navigation navigation-next " aria-label="Next page: Futures"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

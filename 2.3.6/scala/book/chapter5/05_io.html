@@ -4,7 +4,7 @@
     <head>
         
         <meta charset="UTF-8">
-        <title>Akka与Java内存模型 | AKKA 2.3.6 Scala 文档</title>
+        <title>I/O | AKKA 2.3.6 Scala 文档</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 1.0.3">
@@ -18,10 +18,10 @@
     
     
     
-    <link rel="next" href="../chapter2/08_message_delivery_reliability.html" />
+    <link rel="next" href="../chapter5/06_using_tcp.html" />
     
     
-    <link rel="prev" href="../chapter2/06_location_transparency.html" />
+    <link rel="prev" href="../chapter5/04_serialization.html" />
     
 
         
@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.7" data-basepath=".." data-revision="1418735449756">
+    <div class="book"  data-level="5.5" data-basepath=".." data-revision="1418735449756">
     
 
 <div class="book-summary">
@@ -296,7 +296,7 @@
         </li>
     
         
-        <li class="chapter active" data-level="2.7" data-path="chapter2/07_akka_and_the_java_memory_model.html">
+        <li class="chapter " data-level="2.7" data-path="chapter2/07_akka_and_the_java_memory_model.html">
             
                 
                     <a href="../chapter2/07_akka_and_the_java_memory_model.html">
@@ -710,7 +710,7 @@
         </li>
     
         
-        <li class="chapter " data-level="5.5" data-path="chapter5/05_io.html">
+        <li class="chapter active" data-level="5.5" data-path="chapter5/05_io.html">
             
                 
                     <a href="../chapter5/05_io.html">
@@ -1639,87 +1639,48 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_2">
+                    <section class="normal" id="section-gitbook_38">
                     
-                        <h1 id="akkajava">Akka与Java内存模型</h1>
-<p>使用包含Scala和Akka在内的Typesafe平台的主要好处是它简化了并发软件的编写过程。本文将讨论Typesafe平台，尤其是Akka是如何在并发应用中访问共享内存的。</p>
-<h3 id="java">Java内存模型</h3>
-<p>在Java 5之前，Java内存模型（JMM）定义是有问题的。当多个线程访问共享内存时很可能得到各种奇怪的结果，例如：</p>
-<ul>
-<li>一个线程看不到其它线程所写入的值：可见性问题</li>
-<li>由于指令没有按期望的顺序执行，一个线程观察到其它线程的 ‘不可能’ 行为：指令重排序问题</li>
-</ul>
-<p>随着Java 5中JSR 133的实现，很多这种问题都被解决了。 JMM是一组基于 “发生在先” 关系的规则, 限制了一个内存访问行为何时必须在另一个内存访问行为之前发生，以及反过来，它们何时能够不按顺序发生。这些规则的两个例子包括：</p>
-<ul>
-<li><strong>监视器锁规则：</strong> 对一个锁的释放先于所有后续对同一个锁的获取</li>
-<li><strong>volatile变量规则:</strong> 对一个volatile变量的写操作先于所有对同一volatile变量的后续读操作</li>
-</ul>
-<p>虽然JMM看起来很复杂，但是其规范试图在易用性和编写高性能、可扩展的并发数据结构的能力之间寻找一个平衡。</p>
-<h3 id="actorsjava">Actors与Java内存模型</h3>
-<p>使用Akka中的Actor实现，有两种方法让多个线程对共享的内存进行操作：</p>
-<ul>
-<li>如果一条消息被（例如，从另一个actor）发送到一个actor，大多数情况下消息是不可变的，但是如果这条消息不是一个正确创建的不可变对象，如果没有 “发生先于” 规则, 有可能接收方会看到部分初始化的数据，甚至可能看到无中生有的数据（long/double）。</li>
-<li>如果一个actor在处理某条消息时改变了自己的内部状态，而之后又在处理其它消息时又访问了这个状态。一条很重要的需要了解的规则是，在使用actor模型时你无法保证，同一个线程会在处理不同的消息时使用同一个actor。</li>
-</ul>
-<p>为了避免actor中的可见性和重排序问题，Akka保证以下两条 “发生在先” 规则:</p>
-<ul>
-<li><strong>actor发送规则 : </strong>一条消息的发送动作先于同一个actor对同一条消息的接收。</li>
-<li><strong>actor后续处理规则: </strong>一条消息的处理先于同一个actor的下一条消息处理</li>
-</ul>
-<blockquote>
-<p>注意</p>
-<p>通俗地说，这意味着当这个actor处理下一个消息的时候，对actor的内部字段的改变是可见的。因此，在你的actor中的域不需要是volitale或是同等可见性的。</p>
-</blockquote>
-<p>这两条规则都只应用于同一个actor实例，对不同的actor则无效。</p>
-<h3 id="futurejava">Future与Java内存模型</h3>
-<p>一个Future的完成 “先于” 任何注册到它的回调函数(译者注：闭包)的执行。</p>
-<p>我们建议不要在回调中捕捉（close over）非final的值 (Java中称final，Scala中称val), 如果你<strong>一定</strong>要捕捉非final的域，则它们必须被标记为<em>volatile</em>来让它的当前值对回调代码可见。</p>
-<p>如果你捕捉一个引用，你还必须保证它所指代的实例是线程安全的。我们强烈建议远离使用锁的对象，因为它们会引入性能问题，甚至最坏可能造成死锁。</p>
-<p>这些是使用synchronized的风险。</p>
-<h3 id="stmjava">STM与Java内存模型</h3>
-<p>Akka中的软件事务性内存 (STM) 也提供了一条 “发生在先” 规则:</p>
-<ul>
-<li><strong>事务性引用规则:</strong> 对一个事务性引用，在提交过程中一次成功的写操作，先于所有对同一事务性引用的后续读操作发生。</li>
-</ul>
-<p>这条规则非常象JMM中的 ‘volatile 变量’ 规则。目前Akka STM只支持延迟写，所以对共享内存的实际写操作会被延迟到事务提交之时。在事务中发生的写操作会被存放在一个本地缓冲区内 (事务的写操作集) ，并且对其它事务是不可见的。这就是为什么脏读是不可能的。</p>
-<p>这些规则在Akka中的实现会随时间而变化，精确的细节甚至可能依赖于所使用的配置。但是它们是建立在其它JMM规则之上的，如监视器锁规则、volatile变量规则。 这意味着Akka用户不需要操心为了提供“发生先于”关系而增加同步，因为这是Akka的工作。这样你可以腾出手来处理业务逻辑，让Akka框架来保证这些规则的满足。</p>
-<h3 id="a-namejmm-shared-stateaactor"><a name="jmm-shared-state"></a>Actor与共享的可变状态</h3>
-<p>因为Akka运行在JVM上，所以还有一些其它的规则需要遵守。</p>
-<ul>
-<li>捕捉Actor内部状态并暴露给其它线程</li>
-</ul>
-<pre><code class="lang-scala">
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyActor</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
-  <span class="hljs-keyword">var</span> state = ...
-  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
-    <span class="hljs-keyword">case</span> _ =&gt;
-      <span class="hljs-comment">// 错误的做法</span>
+                        <h1 id="io">I/O</h1>
+<h3 id="">介绍</h3>
+<p><code>akka.io</code>包是由Akka和<a href="spray.io">spray.io</a>团队协作开发的。它的设计结合了<code>spray-io</code>模块的经验，并共同进行了改进，使其适应基于actor服务的更加普遍的消费需求。</p>
+<p>该 I/O 实现的指导设计目标是要达到极端的可扩展性，要毫不妥协地提供一个API正确匹配底层传输机制，并且是完全的事件驱动、无阻塞和异步。该API命中注定是网络协议实现和构建更高抽象的坚实基础；它不是为终端用户提供的全套的高级别的NIO包装。</p>
+<h3 id="">术语，概念</h3>
+<p>I/O API完全是基于actor的，意味着所有的操作实现都是通过消息传递而不是直接方法调用。每个 I/O 驱动程序 （TCP、 UDP） 有一个特殊的actor，被称为一个<strong>管理器</strong>，用作 API 的入口点。I/O 被分成几个驱动程序。用于某个特定驱动程序的管理器是通过 <code>IO</code> 入口点获取的。例如下面的代码查找 TCP 管理器，并返回其 <code>ActorRef</code>：</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.io.{ <span class="hljs-type">IO</span>, <span class="hljs-type">Tcp</span> }
+<span class="hljs-keyword">import</span> context.system <span class="hljs-comment">// implicitly used by IO(Tcp)</span>
 
-      <span class="hljs-comment">// 非常错误，共享可变状态，</span>
-      <span class="hljs-comment">// 会让应用莫名其妙地崩溃</span>
-      <span class="hljs-type">Future</span> { state = <span class="hljs-type">NewState</span> }
-      anotherActor ? message onSuccess { r =&gt; state = r }
-
-      <span class="hljs-comment">// 非常错误, 共享可变状态 bug</span>
-      <span class="hljs-comment">// "发送者"是一个可变变量，随每个消息改变</span>
-      <span class="hljs-type">Future</span> { expensiveCalculation(sender) }
-
-      <span class="hljs-comment">//正确的做法</span>
-
-      <span class="hljs-comment">// 非常安全， "self" 被闭包捕捉是安全的</span>
-      <span class="hljs-comment">// 并且它是一个Actor引用, 是线程安全的</span>
-      <span class="hljs-type">Future</span> { expensiveCalculation() } onComplete { f =&gt; self ! f.value.get }
-
-      <span class="hljs-comment">// 非常安全，我们捕捉了一个固定值</span>
-      <span class="hljs-comment">// 并且它是一个Actor引用，是线程安全的</span>
-      <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">currentSender</span> =</span> sender
-      <span class="hljs-type">Future</span> { expensiveCalculation(currentSender) }
-  }
-}
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">manager</span> =</span> <span class="hljs-type">IO</span>(<span class="hljs-type">Tcp</span>)
 </code></pre>
+<p>管理器接收 I/O 命令消息并实例化工作actor作为回应。工作actor将自身返回给 API 用户作为发送该命令的答复。例如给TCP 管理器发送<code>Connect</code>命令后，管理器创建了代表 TCP 连接的actor。当该actor通过发送一个<code>Connected</code>消息宣布自身后，所有与给定 TCP 连接相关的操作都可以通过发送消息到连接actor来调用。</p>
+<h5 id="deathwatch">DeathWatch和资源管理</h5>
+<p>I/O 工作actor接收命令，并且也发出事件。它们通常需要一个用户端对应的actor监听这些事件 （此类事件可以是入站的连接，传入的字节或写操作确认）。这些工作actor<strong>观察</strong>它们的对应监听。如果监听器停止工作，则工作actor将自动释放它所拥有的任何资源。这种设计使得该 API 更能抵抗资源泄漏。</p>
+<p>多亏I/O API是完全基于actor设计的，相反的方向也可以工作：一个负责处理连接的用户actor可以观察连接actor，如果它意外终止也将收到通知。</p>
+<h5 id="ack-nack">写模型(Ack, Nack)</h5>
+<p>I/O设备有一个最大吞吐量来限制写操作的频率和大小。当一个应用程序试图推相比设备处理能力更多的数据时，驱动程序不得不缓冲字节，直到设备能够继续写他们。缓冲可以处理短暂的密集写入——但没有缓冲区是无限的。这时需要&quot;流控制&quot;来避免设备缓冲区不足的问题。</p>
+<p>Akka支持两种类型的流量控制：</p>
 <ul>
-<li>消息<strong>应当</strong>是不可变的, 这是为了避开共享可变状态的陷阱。</li>
+<li><p><em>基于Ack</em>，当写操作成功的时候，驱动程序通知写者。</p>
+</li>
+<li><p><em>基于Nack</em>，当写操作失败时，驱动程序会通知写者。</p>
+</li>
 </ul>
+<p>每一种模型在Akka I/O的 TCP 和 UDP 实现中都可用。</p>
+<p>单独的写操作可以通过在写入消息（TCP中的<code>Write</code> 和UDP中的<code>Send</code>）中提供一个 ack 对象来确认。写操作完成时工作者将发送 ack 对象给写actor。这可以用于实现<em>基于Ack</em>的流量控制；只有当老数据被确认时才发送新数据。</p>
+<p>如果写入（或任何其他命令）失败，驱动程序会发送具有该命令一个特殊消息（UDP 和 TCP中是<code>CommandFailed</code>）来通知actor。此消息也会通知写者一个失败，作为那个写的一个nack。请注意，在基于nack 的流控制设置中，写者必须准备到，失败的写操作可能不是最近写操作的事实。例如，对于<code>W1</code>的写入失败通知可能在后来的写命令 <code>W2</code>和<code>W3</code>被发送之后到达。如果写者想要重发送任何nack消息，它可能需要保留一个挂起消息的缓冲区。</p>
+<blockquote>
+<p>警告</p>
+<p>一个确认的写并不意味着确认送达或存储的；收到一个写ack只是表明I/O 驱动程序成功处理了写操作。这里描述的 Ack/Nack 协议是一种流量控制手段而不是错误处理。换句话说，数据仍然可能会丢失，即使每一个写操作都被确认。</p>
+</blockquote>
+<h5 id="a-namebytestring_scalaabytestring"><a name="bytestring_scala"></a>ByteString</h5>
+<p>为了保持隔离，actor应该只通过不可变对象沟通。<code>ByteString</code> 是bytes的不可的容器。它被用在Akka I/O系统中，作为在jvm上处理IO的传统字节容器，如<code>Array[Byte]</code>和<code>ByteBuffer</code>的一种高效的、 不可变的替代者。</p>
+<p>ByteString 是一个<a href="rope-like &lt;http://en.wikipedia.org/wiki/Rope_\(computer_science\">绳状</a>)数据结构，它不可变且提供了高效地连接和切片操作（完美的 I/O）. 当两个<code>ByteString</code>被连接在一起时，是将两者都保存在结果<code>ByteString</code>内部而不是将它们复制到新的<code>Array</code>中. 像 <code>drop</code> 和 <code>take</code>这种操作返回的 <code>ByteString</code>仍引用之前的 <code>Array</code>, 只是改变了外部可见的offset和length。我们花了很大力气保证内部的 <code>Array</code> 不能被修改. 每次当不安全的 <code>Array</code> 被用于创建新的 <code>ByteString</code> 时，会创建一个防御性拷贝。如果你需要一个<code>ByteString</code>为其内容占用尽可能少的内存，使用 <code>compact</code> 方法来获取一个 <code>CompactByteString</code> 实例。如果 <code>ByteString</code> 表示只是原始数组中的一片，这将导致复制在片中的所有字节。</p>
+<p><code>ByteString</code> 从<code>IndexedSeq</code>继承了所有方法，它也有一些新的方法。更多信息请参考 <code>akka.util.ByteString</code> 类和其伴生对象的 ScalaDoc。</p>
+<p><code>ByteString</code>还带有它自己优化类——<code>ByteStringBuilder</code> 和 <code>ByteIterator</code>，在普通生成器和迭代器之外提供额外的功能。</p>
+<h5 id="-javaio-">与 java.io 的兼容性</h5>
+<p><code>ByteStringBuilder</code> 可以通过 <code>asOutputStream</code> 方法包装为一个 <code>java.io.OutputStream</code>。同样，<code>ByteIterator</code>可以通过 <code>asInputStream</code>包装为一个<code>java.io.InputStream</code>。使用这些，<code>akka.io</code> 应用程序可以集成基于 <code>java.io</code> 流的遗留代码。</p>
+<h3 id="">深入体系结构</h3>
+<p>关于内部体系结构设计有关的详细信息请参阅<a href="../chapter9/03_io_layer_design.html">I/O 层设计</a>。</p>
 
                     
                     </section>
@@ -1730,10 +1691,10 @@
         </div>
 
         
-        <a href="../chapter2/06_location_transparency.html" class="navigation navigation-prev " aria-label="Previous page: 位置透明性"><i class="fa fa-angle-left"></i></a>
+        <a href="../chapter5/04_serialization.html" class="navigation navigation-prev " aria-label="Previous page: 序列化"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../chapter2/08_message_delivery_reliability.html" class="navigation navigation-next " aria-label="Next page: 消息发送语义"><i class="fa fa-angle-right"></i></a>
+        <a href="../chapter5/06_using_tcp.html" class="navigation navigation-next " aria-label="Next page: 使用TCP"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

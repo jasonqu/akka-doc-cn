@@ -4,7 +4,7 @@
     <head>
         
         <meta charset="UTF-8">
-        <title>Akka与Java内存模型 | AKKA 2.3.6 Scala 文档</title>
+        <title>事件总线 | AKKA 2.3.6 Scala 文档</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 1.0.3">
@@ -18,10 +18,10 @@
     
     
     
-    <link rel="next" href="../chapter2/08_message_delivery_reliability.html" />
+    <link rel="next" href="../chapter6/02_logging.html" />
     
     
-    <link rel="prev" href="../chapter2/06_location_transparency.html" />
+    <link rel="prev" href="../chapter6/utilities.html" />
     
 
         
@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.7" data-basepath=".." data-revision="1418735449756">
+    <div class="book"  data-level="6.1" data-basepath=".." data-revision="1418735449756">
     
 
 <div class="book-summary">
@@ -296,7 +296,7 @@
         </li>
     
         
-        <li class="chapter active" data-level="2.7" data-path="chapter2/07_akka_and_the_java_memory_model.html">
+        <li class="chapter " data-level="2.7" data-path="chapter2/07_akka_and_the_java_memory_model.html">
             
                 
                     <a href="../chapter2/07_akka_and_the_java_memory_model.html">
@@ -812,7 +812,7 @@
                 
     
         
-        <li class="chapter " data-level="6.1" data-path="chapter6/01_event_bus.html">
+        <li class="chapter active" data-level="6.1" data-path="chapter6/01_event_bus.html">
             
                 
                     <a href="../chapter6/01_event_bus.html">
@@ -1639,87 +1639,252 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_2">
+                    <section class="normal" id="section-gitbook_45">
                     
-                        <h1 id="akkajava">Akka与Java内存模型</h1>
-<p>使用包含Scala和Akka在内的Typesafe平台的主要好处是它简化了并发软件的编写过程。本文将讨论Typesafe平台，尤其是Akka是如何在并发应用中访问共享内存的。</p>
-<h3 id="java">Java内存模型</h3>
-<p>在Java 5之前，Java内存模型（JMM）定义是有问题的。当多个线程访问共享内存时很可能得到各种奇怪的结果，例如：</p>
-<ul>
-<li>一个线程看不到其它线程所写入的值：可见性问题</li>
-<li>由于指令没有按期望的顺序执行，一个线程观察到其它线程的 ‘不可能’ 行为：指令重排序问题</li>
-</ul>
-<p>随着Java 5中JSR 133的实现，很多这种问题都被解决了。 JMM是一组基于 “发生在先” 关系的规则, 限制了一个内存访问行为何时必须在另一个内存访问行为之前发生，以及反过来，它们何时能够不按顺序发生。这些规则的两个例子包括：</p>
-<ul>
-<li><strong>监视器锁规则：</strong> 对一个锁的释放先于所有后续对同一个锁的获取</li>
-<li><strong>volatile变量规则:</strong> 对一个volatile变量的写操作先于所有对同一volatile变量的后续读操作</li>
-</ul>
-<p>虽然JMM看起来很复杂，但是其规范试图在易用性和编写高性能、可扩展的并发数据结构的能力之间寻找一个平衡。</p>
-<h3 id="actorsjava">Actors与Java内存模型</h3>
-<p>使用Akka中的Actor实现，有两种方法让多个线程对共享的内存进行操作：</p>
-<ul>
-<li>如果一条消息被（例如，从另一个actor）发送到一个actor，大多数情况下消息是不可变的，但是如果这条消息不是一个正确创建的不可变对象，如果没有 “发生先于” 规则, 有可能接收方会看到部分初始化的数据，甚至可能看到无中生有的数据（long/double）。</li>
-<li>如果一个actor在处理某条消息时改变了自己的内部状态，而之后又在处理其它消息时又访问了这个状态。一条很重要的需要了解的规则是，在使用actor模型时你无法保证，同一个线程会在处理不同的消息时使用同一个actor。</li>
-</ul>
-<p>为了避免actor中的可见性和重排序问题，Akka保证以下两条 “发生在先” 规则:</p>
-<ul>
-<li><strong>actor发送规则 : </strong>一条消息的发送动作先于同一个actor对同一条消息的接收。</li>
-<li><strong>actor后续处理规则: </strong>一条消息的处理先于同一个actor的下一条消息处理</li>
-</ul>
+                        <h1 id="">事件总线</h1>
+<p>最初设想是为了提供一种向多个actor群发消息的方法，之后<code>EventBus</code>被一般化为一组实现一个简单接口的可组合的特质:</p>
+<pre><code class="lang-scala"><span class="hljs-comment">/**
+ * Attempts to register the subscriber to the specified Classifier
+ * @return true if successful and false if not (because it was already
+ *   subscribed to that Classifier, or otherwise)
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">subscribe</span>(</span>subscriber: <span class="hljs-type">Subscriber</span>, to: <span class="hljs-type">Classifier</span>): <span class="hljs-type">Boolean</span>
+
+<span class="hljs-comment">/**
+ * Attempts to deregister the subscriber from the specified Classifier
+ * @return true if successful and false if not (because it wasn't subscribed
+ *   to that Classifier, or otherwise)
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">unsubscribe</span>(</span>subscriber: <span class="hljs-type">Subscriber</span>, from: <span class="hljs-type">Classifier</span>): <span class="hljs-type">Boolean</span>
+
+<span class="hljs-comment">/**
+ * Attempts to deregister the subscriber from all Classifiers it may be subscribed to
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">unsubscribe</span>(</span>subscriber: <span class="hljs-type">Subscriber</span>): <span class="hljs-type">Unit</span>
+
+<span class="hljs-comment">/**
+ * Publishes the specified Event to this bus
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">publish</span>(</span>event: <span class="hljs-type">Event</span>): <span class="hljs-type">Unit</span>
+</code></pre>
 <blockquote>
 <p>注意</p>
-<p>通俗地说，这意味着当这个actor处理下一个消息的时候，对actor的内部字段的改变是可见的。因此，在你的actor中的域不需要是volitale或是同等可见性的。</p>
+<p>请注意 EventBus 不会保留发布消息的发件人。如果你需要原始发件人的引用必须在消息内部提供。</p>
 </blockquote>
-<p>这两条规则都只应用于同一个actor实例，对不同的actor则无效。</p>
-<h3 id="futurejava">Future与Java内存模型</h3>
-<p>一个Future的完成 “先于” 任何注册到它的回调函数(译者注：闭包)的执行。</p>
-<p>我们建议不要在回调中捕捉（close over）非final的值 (Java中称final，Scala中称val), 如果你<strong>一定</strong>要捕捉非final的域，则它们必须被标记为<em>volatile</em>来让它的当前值对回调代码可见。</p>
-<p>如果你捕捉一个引用，你还必须保证它所指代的实例是线程安全的。我们强烈建议远离使用锁的对象，因为它们会引入性能问题，甚至最坏可能造成死锁。</p>
-<p>这些是使用synchronized的风险。</p>
-<h3 id="stmjava">STM与Java内存模型</h3>
-<p>Akka中的软件事务性内存 (STM) 也提供了一条 “发生在先” 规则:</p>
+<p>这个机制在Akka的多个地方用到，例如<a href="#event-stream">事件流</a>. 具体实现可以使用下面列出的特定构建工具块。</p>
+<p>一个事件总线必须定义以下三种抽象类型：</p>
 <ul>
-<li><strong>事务性引用规则:</strong> 对一个事务性引用，在提交过程中一次成功的写操作，先于所有对同一事务性引用的后续读操作发生。</li>
+<li><code>Event</code> 所有发布到该总线上的事件的类型</li>
+<li><code>Subscriber</code> 允许注册到该总线上的订阅者的类型</li>
+<li><code>Classifier</code> 定义用来派发消息时选择订阅者的分类器</li>
 </ul>
-<p>这条规则非常象JMM中的 ‘volatile 变量’ 规则。目前Akka STM只支持延迟写，所以对共享内存的实际写操作会被延迟到事务提交之时。在事务中发生的写操作会被存放在一个本地缓冲区内 (事务的写操作集) ，并且对其它事务是不可见的。这就是为什么脏读是不可能的。</p>
-<p>这些规则在Akka中的实现会随时间而变化，精确的细节甚至可能依赖于所使用的配置。但是它们是建立在其它JMM规则之上的，如监视器锁规则、volatile变量规则。 这意味着Akka用户不需要操心为了提供“发生先于”关系而增加同步，因为这是Akka的工作。这样你可以腾出手来处理业务逻辑，让Akka框架来保证这些规则的满足。</p>
-<h3 id="a-namejmm-shared-stateaactor"><a name="jmm-shared-state"></a>Actor与共享的可变状态</h3>
-<p>因为Akka运行在JVM上，所以还有一些其它的规则需要遵守。</p>
-<ul>
-<li>捕捉Actor内部状态并暴露给其它线程</li>
-</ul>
-<pre><code class="lang-scala">
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyActor</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
-  <span class="hljs-keyword">var</span> state = ...
-  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
-    <span class="hljs-keyword">case</span> _ =&gt;
-      <span class="hljs-comment">// 错误的做法</span>
+<p>下面的 trait 在这些类型中仍然是泛化的，但它们必须在任何具体的实现中被定义。</p>
+<h3 id="classifiers">类别（Classifiers）</h3>
+<p>这里提到的类别是Akka发布包的一部分，如果没找到合适的就实现一个自己的类别，并不困难，到 [github]（<a href="http://github.com/akka/akka/tree/v2.3.6/akka-actor/src/main/scala/akka/event/EventBus.scala）" target="_blank">http://github.com/akka/akka/tree/v2.3.6/akka-actor/src/main/scala/akka/event/EventBus.scala）</a> 了解已有类别的实现。</p>
+<h5 id="">查找分类法</h5>
+<p>最简单的分类法是给每个事件提取一个随机的类别，并为每一种类别维护一组订阅者。这可以用在收音机上选台来类比。 <code>LookupClassification</code> trait 仍然是泛化的，抽象了如何比较订阅者，以及具体分类的方法。</p>
+<p>需要实现的方法如下:</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.event.<span class="hljs-type">EventBus</span>
+<span class="hljs-keyword">import</span> akka.event.<span class="hljs-type">LookupClassification</span>
 
-      <span class="hljs-comment">// 非常错误，共享可变状态，</span>
-      <span class="hljs-comment">// 会让应用莫名其妙地崩溃</span>
-      <span class="hljs-type">Future</span> { state = <span class="hljs-type">NewState</span> }
-      anotherActor ? message onSuccess { r =&gt; state = r }
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MsgEnvelope</span>(</span>topic: <span class="hljs-type">String</span>, payload: <span class="hljs-type">Any</span>)
 
-      <span class="hljs-comment">// 非常错误, 共享可变状态 bug</span>
-      <span class="hljs-comment">// "发送者"是一个可变变量，随每个消息改变</span>
-      <span class="hljs-type">Future</span> { expensiveCalculation(sender) }
+<span class="hljs-comment">/**
+ * Publishes the payload of the MsgEnvelope when the topic of the
+ * MsgEnvelope equals the String specified when subscribing.
+ */</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LookupBusImpl</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">EventBus</span> <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> <span class="hljs-title">LookupClassification</span> {</span>
+  <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Event</span> =</span> <span class="hljs-type">MsgEnvelope</span>
+  <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Classifier</span> =</span> <span class="hljs-type">String</span>
+  <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Subscriber</span> =</span> <span class="hljs-type">ActorRef</span>
 
-      <span class="hljs-comment">//正确的做法</span>
+  <span class="hljs-comment">// is used for extracting the classifier from the incoming events</span>
+  <span class="hljs-keyword">override</span> <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">classify</span>(</span>event: <span class="hljs-type">Event</span>): <span class="hljs-type">Classifier</span> = event.topic
 
-      <span class="hljs-comment">// 非常安全， "self" 被闭包捕捉是安全的</span>
-      <span class="hljs-comment">// 并且它是一个Actor引用, 是线程安全的</span>
-      <span class="hljs-type">Future</span> { expensiveCalculation() } onComplete { f =&gt; self ! f.value.get }
+  <span class="hljs-comment">// will be invoked for each event for all subscribers which registered themselves</span>
+  <span class="hljs-comment">// for the event’s classifier</span>
+  <span class="hljs-keyword">override</span> <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">publish</span>(</span>event: <span class="hljs-type">Event</span>, subscriber: <span class="hljs-type">Subscriber</span>): <span class="hljs-type">Unit</span> = {
+    subscriber ! event.payload
+  }
 
-      <span class="hljs-comment">// 非常安全，我们捕捉了一个固定值</span>
-      <span class="hljs-comment">// 并且它是一个Actor引用，是线程安全的</span>
-      <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">currentSender</span> =</span> sender
-      <span class="hljs-type">Future</span> { expensiveCalculation(currentSender) }
+  <span class="hljs-comment">// must define a full order over the subscribers, expressed as expected from</span>
+  <span class="hljs-comment">// `java.lang.Comparable.compare`</span>
+  <span class="hljs-keyword">override</span> <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">compareSubscribers</span>(</span>a: <span class="hljs-type">Subscriber</span>, b: <span class="hljs-type">Subscriber</span>): <span class="hljs-type">Int</span> =
+    a.compareTo(b)
+
+  <span class="hljs-comment">// determines the initial size of the index data structure</span>
+  <span class="hljs-comment">// used internally (i.e. the expected number of different classifiers)</span>
+  <span class="hljs-keyword">override</span> <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">mapSize</span>:</span> <span class="hljs-type">Int</span> = <span class="hljs-number">128</span>
+
+}
+</code></pre>
+<p>对该实现的测试看上去像这样：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">lookupBus</span> =</span> <span class="hljs-keyword">new</span> <span class="hljs-type">LookupBusImpl</span>
+lookupBus.subscribe(testActor, <span class="hljs-string">"greetings"</span>)
+lookupBus.publish(<span class="hljs-type">MsgEnvelope</span>(<span class="hljs-string">"time"</span>, <span class="hljs-type">System</span>.currentTimeMillis()))
+lookupBus.publish(<span class="hljs-type">MsgEnvelope</span>(<span class="hljs-string">"greetings"</span>, <span class="hljs-string">"hello"</span>))
+expectMsg(<span class="hljs-string">"hello"</span>)
+</code></pre>
+<p>这种分类法在对某个特定事件没有任何订阅者时是高效的。</p>
+<h5 id="">子频道分类法</h5>
+<p>如果类别构成一个树形结构而且订阅可以不仅针对叶子结点，这种分类法可能是最合适的。 这可以类比成在安风格划分过的（多个）收音机频道中进行调台。 开发这种分类法是为了用在分类器正好是事件的JVM类，并且订阅者可能对订阅某个特定类的所有子类感兴趣的场合，但是它可以用在任何树形类别体系。</p>
+<p>需要实现的方法如下:</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.util.<span class="hljs-type">Subclassification</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">StartsWithSubclassification</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Subclassification</span>[</span><span class="hljs-type">String</span>] {
+  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">isEqual</span>(</span>x: <span class="hljs-type">String</span>, y: <span class="hljs-type">String</span>): <span class="hljs-type">Boolean</span> =
+    x == y
+
+  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">isSubclass</span>(</span>x: <span class="hljs-type">String</span>, y: <span class="hljs-type">String</span>): <span class="hljs-type">Boolean</span> =
+    x.startsWith(y)
+}
+
+<span class="hljs-keyword">import</span> akka.event.<span class="hljs-type">SubchannelClassification</span>
+
+<span class="hljs-comment">/**
+ * Publishes the payload of the MsgEnvelope when the topic of the
+ * MsgEnvelope starts with the String specified when subscribing.
+ */</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SubchannelBusImpl</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">EventBus</span> <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> <span class="hljs-title">SubchannelClassification</span> {</span>
+  <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Event</span> =</span> <span class="hljs-type">MsgEnvelope</span>
+  <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Classifier</span> =</span> <span class="hljs-type">String</span>
+  <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Subscriber</span> =</span> <span class="hljs-type">ActorRef</span>
+
+  <span class="hljs-comment">// Subclassification is an object providing `isEqual` and `isSubclass`</span>
+  <span class="hljs-comment">// to be consumed by the other methods of this classifier</span>
+  <span class="hljs-keyword">override</span> <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">subclassification</span>:</span> <span class="hljs-type">Subclassification</span>[<span class="hljs-type">Classifier</span>] =
+    <span class="hljs-keyword">new</span> <span class="hljs-type">StartsWithSubclassification</span>
+
+  <span class="hljs-comment">// is used for extracting the classifier from the incoming events</span>
+  <span class="hljs-keyword">override</span> <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">classify</span>(</span>event: <span class="hljs-type">Event</span>): <span class="hljs-type">Classifier</span> = event.topic
+
+  <span class="hljs-comment">// will be invoked for each event for all subscribers which registered</span>
+  <span class="hljs-comment">// themselves for the event’s classifier</span>
+  <span class="hljs-keyword">override</span> <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">publish</span>(</span>event: <span class="hljs-type">Event</span>, subscriber: <span class="hljs-type">Subscriber</span>): <span class="hljs-type">Unit</span> = {
+    subscriber ! event.payload
   }
 }
 </code></pre>
-<ul>
-<li>消息<strong>应当</strong>是不可变的, 这是为了避开共享可变状态的陷阱。</li>
-</ul>
+<p>对该实现的测试看上去像这样：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">subchannelBus</span> =</span> <span class="hljs-keyword">new</span> <span class="hljs-type">SubchannelBusImpl</span>
+subchannelBus.subscribe(testActor, <span class="hljs-string">"abc"</span>)
+subchannelBus.publish(<span class="hljs-type">MsgEnvelope</span>(<span class="hljs-string">"xyzabc"</span>, <span class="hljs-string">"x"</span>))
+subchannelBus.publish(<span class="hljs-type">MsgEnvelope</span>(<span class="hljs-string">"bcdef"</span>, <span class="hljs-string">"b"</span>))
+subchannelBus.publish(<span class="hljs-type">MsgEnvelope</span>(<span class="hljs-string">"abc"</span>, <span class="hljs-string">"c"</span>))
+expectMsg(<span class="hljs-string">"c"</span>)
+subchannelBus.publish(<span class="hljs-type">MsgEnvelope</span>(<span class="hljs-string">"abcdef"</span>, <span class="hljs-string">"d"</span>))
+expectMsg(<span class="hljs-string">"d"</span>)
+</code></pre>
+<p>这种分类法在某事件没有任何订阅者时也很高效，但它使用一个保守锁来对共内部的类别缓存进行同步，所以不适合订阅关系以很高的频率变化的场合（记住通过发送第一个消息来“打开”一个类别，也将需要重新检查所有之前的订阅）。</p>
+<h5 id="">扫描分类法</h5>
+<p>上一种分类法是为严格的树形多类别订阅设计的，而这个分类法是用在覆盖事件空间中可能互相重叠的非树形结构类别上的。 这可以比喻为有地理限制的（比如老旧的收音机信号传播方式）的（可能有多个）收音机频道之间进行调台。</p>
+<p>需要实现的方法如下:</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.event.<span class="hljs-type">ScanningClassification</span>
+
+<span class="hljs-comment">/**
+ * Publishes String messages with length less than or equal to the length
+ * specified when subscribing.
+ */</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ScanningBusImpl</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">EventBus</span> <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> <span class="hljs-title">ScanningClassification</span> {</span>
+  <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Event</span> =</span> <span class="hljs-type">String</span>
+  <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Classifier</span> =</span> <span class="hljs-type">Int</span>
+  <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Subscriber</span> =</span> <span class="hljs-type">ActorRef</span>
+
+  <span class="hljs-comment">// is needed for determining matching classifiers and storing them in an</span>
+  <span class="hljs-comment">// ordered collection</span>
+  <span class="hljs-keyword">override</span> <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">compareClassifiers</span>(</span>a: <span class="hljs-type">Classifier</span>, b: <span class="hljs-type">Classifier</span>): <span class="hljs-type">Int</span> =
+    <span class="hljs-keyword">if</span> (a &lt; b) -<span class="hljs-number">1</span> <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (a == b) <span class="hljs-number">0</span> <span class="hljs-keyword">else</span> <span class="hljs-number">1</span>
+
+  <span class="hljs-comment">// is needed for storing subscribers in an ordered collection</span>
+  <span class="hljs-keyword">override</span> <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">compareSubscribers</span>(</span>a: <span class="hljs-type">Subscriber</span>, b: <span class="hljs-type">Subscriber</span>): <span class="hljs-type">Int</span> =
+    a.compareTo(b)
+
+  <span class="hljs-comment">// determines whether a given classifier shall match a given event; it is invoked</span>
+  <span class="hljs-comment">// for each subscription for all received events, hence the name of the classifier</span>
+  <span class="hljs-keyword">override</span> <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">matches</span>(</span>classifier: <span class="hljs-type">Classifier</span>, event: <span class="hljs-type">Event</span>): <span class="hljs-type">Boolean</span> =
+    event.length &lt;= classifier
+
+  <span class="hljs-comment">// will be invoked for each event for all subscribers which registered themselves</span>
+  <span class="hljs-comment">// for a classifier matching this event</span>
+  <span class="hljs-keyword">override</span> <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">publish</span>(</span>event: <span class="hljs-type">Event</span>, subscriber: <span class="hljs-type">Subscriber</span>): <span class="hljs-type">Unit</span> = {
+    subscriber ! event
+  }
+}
+</code></pre>
+<p>对该实现的测试看上去像这样：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">scanningBus</span> =</span> <span class="hljs-keyword">new</span> <span class="hljs-type">ScanningBusImpl</span>
+scanningBus.subscribe(testActor, <span class="hljs-number">3</span>)
+scanningBus.publish(<span class="hljs-string">"xyzabc"</span>)
+scanningBus.publish(<span class="hljs-string">"ab"</span>)
+expectMsg(<span class="hljs-string">"ab"</span>)
+scanningBus.publish(<span class="hljs-string">"abc"</span>)
+expectMsg(<span class="hljs-string">"abc"</span>)
+</code></pre>
+<p>这种分类法耗费的时间总是与订阅关系的数量成正比，而与实际匹配的数量无关。</p>
+<h5 id="actor-">Actor 分类法</h5>
+<p>这种分类法原来是专门为实现 <a href="../chapter3/01_actors.html#deathwatch-scala">DeathWatch</a>开发的: 订阅者和类别都是 <code>ActorRef</code> 类型.</p>
+<p>需要实现的方法如下:</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.event.<span class="hljs-type">ActorEventBus</span>
+<span class="hljs-keyword">import</span> akka.event.<span class="hljs-type">ActorClassification</span>
+<span class="hljs-keyword">import</span> akka.event.<span class="hljs-type">ActorClassifier</span>
+
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Notification</span>(</span>ref: <span class="hljs-type">ActorRef</span>, id: <span class="hljs-type">Int</span>)
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ActorBusImpl</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">ActorEventBus</span> <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> <span class="hljs-title">ActorClassifier</span> <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> <span class="hljs-title">ActorClassification</span> {</span>
+  <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Event</span> =</span> <span class="hljs-type">Notification</span>
+
+  <span class="hljs-comment">// is used for extracting the classifier from the incoming events</span>
+  <span class="hljs-keyword">override</span> <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">classify</span>(</span>event: <span class="hljs-type">Event</span>): <span class="hljs-type">ActorRef</span> = event.ref
+
+  <span class="hljs-comment">// determines the initial size of the index data structure</span>
+  <span class="hljs-comment">// used internally (i.e. the expected number of different classifiers)</span>
+  <span class="hljs-keyword">override</span> <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">mapSize</span>:</span> <span class="hljs-type">Int</span> = <span class="hljs-number">128</span>
+}
+</code></pre>
+<p>对该实现的测试看上去像这样：</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">observer1</span> =</span> <span class="hljs-type">TestProbe</span>().ref
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">observer2</span> =</span> <span class="hljs-type">TestProbe</span>().ref
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">probe1</span> =</span> <span class="hljs-type">TestProbe</span>()
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">probe2</span> =</span> <span class="hljs-type">TestProbe</span>()
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">subscriber1</span> =</span> probe1.ref
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">subscriber2</span> =</span> probe2.ref
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">actorBus</span> =</span> <span class="hljs-keyword">new</span> <span class="hljs-type">ActorBusImpl</span>
+actorBus.subscribe(subscriber1, observer1)
+actorBus.subscribe(subscriber2, observer1)
+actorBus.subscribe(subscriber2, observer2)
+actorBus.publish(<span class="hljs-type">Notification</span>(observer1, <span class="hljs-number">100</span>))
+probe1.expectMsg(<span class="hljs-type">Notification</span>(observer1, <span class="hljs-number">100</span>))
+probe2.expectMsg(<span class="hljs-type">Notification</span>(observer1, <span class="hljs-number">100</span>))
+actorBus.publish(<span class="hljs-type">Notification</span>(observer2, <span class="hljs-number">101</span>))
+probe2.expectMsg(<span class="hljs-type">Notification</span>(observer2, <span class="hljs-number">101</span>))
+probe1.expectNoMsg(<span class="hljs-number">500.</span>millis)
+</code></pre>
+<p>这种分类器对事件类型仍然是泛化的，它在所有的场合下都是高效的。</p>
+<h3 id="a-nameevent-streama"><a name="event-stream"></a>事件流</h3>
+<p>事件流是每个actor系统的主事件总线：它用来携带 <a href="02_logging.html#logging-scala">日志消息</a> 和 <a href="#dead-letters">死信</a>，并且也可以被用户代码使用来达到其它目的。它使用 <a href="#subchannel-classification">子频道分类法</a> 使得可以向一组相关的频道进行注册 (就象 <code>RemoteLifeCycleMessage</code> 所用的那样). 以下例子演示了一个简单的订阅是如何工作的：</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.{ <span class="hljs-type">Actor</span>, <span class="hljs-type">DeadLetter</span>, <span class="hljs-type">Props</span> }
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Listener</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
+    <span class="hljs-keyword">case</span> d: <span class="hljs-type">DeadLetter</span> =&gt; println(d)
+  }
+}
+<span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">listener</span> =</span> system.actorOf(<span class="hljs-type">Props</span>(classOf[<span class="hljs-type">Listener</span>], <span class="hljs-keyword">this</span>))
+system.eventStream.subscribe(listener, classOf[<span class="hljs-type">DeadLetter</span>])
+</code></pre>
+<h5 id="">缺省的处理器</h5>
+<p>actor系统在启动时会创建一些actor，并为其在事件流上订阅日志消息：这些是缺省的处理器，可以配置在例如<code>application.conf</code>:</p>
+<pre><code>akka {
+  loggers = [&quot;akka.event.Logging$DefaultLogger&quot;]
+}
+</code></pre><p>这里以全路径类名列出的处理器将订阅所有配置的日志级别以上的日志事件类，并且当日志级别在运行时被修改时这些订阅关系也会同步修改:</p>
+<pre><code class="lang-scala">system.eventStream.setLogLevel(<span class="hljs-type">Logging</span>.<span class="hljs-type">DebugLevel</span>)
+</code></pre>
+<p>这意味着一个低于日志级别的日志事件，事实上根本不会被派发（除非专门为相应的事件类进行了手工订阅）</p>
+<h5 id="a-namedead-lettersa"><a name="dead-letters"></a>死信</h5>
+<p>正如 <a href="../chapter3/01_actors.html#stopping-actors-scala">终止actors</a>所述, 当actor终止后其邮箱队列中的剩余消息及后续被发送的消息都将被发送到死信邮箱， 它缺省情况下会发布打包在 <code>DeadLetter</code> 中的消息. 这种打包动作会保留被重定向消息的原始发送者、接收者以及消息内容。</p>
+<h5 id="">其它用处</h5>
+<p>事件流一直存在并可用，你可以向它发布你自己的事件 (它接受 <code>AnyRef</code>) 并对相应的JVM类添加订阅监听器。</p>
 
                     
                     </section>
@@ -1730,10 +1895,10 @@
         </div>
 
         
-        <a href="../chapter2/06_location_transparency.html" class="navigation navigation-prev " aria-label="Previous page: 位置透明性"><i class="fa fa-angle-left"></i></a>
+        <a href="../chapter6/utilities.html" class="navigation navigation-prev " aria-label="Previous page: 实用工具"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../chapter2/08_message_delivery_reliability.html" class="navigation navigation-next " aria-label="Next page: 消息发送语义"><i class="fa fa-angle-right"></i></a>
+        <a href="../chapter6/02_logging.html" class="navigation navigation-next " aria-label="Next page: 日志"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

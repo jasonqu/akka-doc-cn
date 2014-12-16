@@ -37,32 +37,32 @@ Akka持久化通过``PersistentActor``特质支持事件来源。一个actor可�
 ```scala
 import akka.actor._
 import akka.persistence._
- 
+
 case class Cmd(data: String)
 case class Evt(data: String)
- 
+
 case class ExampleState(events: List[String] = Nil) {
   def updated(evt: Evt): ExampleState = copy(evt.data :: events)
   def size: Int = events.length
   override def toString: String = events.reverse.toString
 }
- 
+
 class ExamplePersistentActor extends PersistentActor {
   override def persistenceId = "sample-id-1"
- 
+
   var state = ExampleState()
- 
+
   def updateState(event: Evt): Unit =
     state = state.updated(event)
- 
+
   def numEvents =
     state.size
- 
+
   val receiveRecover: Receive = {
     case evt: Evt                                 => updateState(evt)
     case SnapshotOffer(_, snapshot: ExampleState) => state = snapshot
   }
- 
+
   val receiveCommand: Receive = {
     case Cmd(data) =>
       persist(Evt(s"${data}-${numEvents}"))(updateState)
@@ -73,7 +73,7 @@ class ExamplePersistentActor extends PersistentActor {
     case "snap"  => saveSnapshot(state)
     case "print" => println(state)
   }
- 
+
 }
 ```
 
@@ -148,11 +148,11 @@ def receiveRecover: Receive = {
   case RecoveryCompleted => recoveryCompleted()
   case evt               => //...
 }
- 
+
 def receiveCommand: Receive = {
   case msg => //...
 }
- 
+
 def recoveryCompleted(): Unit = {
   // perform init after recovery, before any other messages
   // ...
@@ -169,13 +169,13 @@ def recoveryCompleted(): Unit = {
 
 ```scala
 class MyPersistentActor extends PersistentActor {
- 
+
   override def persistenceId = "my-stable-persistence-id"
- 
+
   def receiveRecover: Receive = {
     case _ => // handle recovery here
   }
- 
+
   def receiveCommand: Receive = {
     case c: String => {
       sender() ! c
@@ -184,11 +184,11 @@ class MyPersistentActor extends PersistentActor {
     }
   }
 }
- 
+
 // usage
 processor ! "a"
 processor ! "b"
- 
+
 // possible order of received messages:
 // a
 // b
@@ -215,13 +215,13 @@ processor ! "b"
 
 ```scala
 class MyPersistentActor extends PersistentActor {
- 
+
   override def persistenceId = "my-stable-persistence-id"
- 
+
   def receiveRecover: Receive = {
     case _ => // handle recovery here
   }
- 
+
   def receiveCommand: Receive = {
     case c: String => {
       sender() ! c
@@ -240,7 +240,7 @@ class MyPersistentActor extends PersistentActor {
 ```scala
 processor ! "a"
 processor ! "b"
- 
+
 // order of received messages:
 // a
 // b
@@ -280,7 +280,7 @@ akka.persistence.journal.max-message-batch-size = 200
 class MyView extends PersistentView {
   override def persistenceId: String = "some-persistence-id"
   override def viewId: String = "some-persistence-id-view"
- 
+
   def receive: Actor.Receive = {
     case payload if isPersistent =>
     // handle message from journal...
@@ -335,7 +335,7 @@ akka.persistence.view.auto-update = off
 ```scala
 class MyProcessor extends Processor {
   var state: Any = _
- 
+
   def receive = {
     case "snap"                                => saveSnapshot(state)
     case SaveSnapshotSuccess(metadata)         => // ...
@@ -358,7 +358,7 @@ case class SnapshotMetadata(@deprecatedName('processorId) persistenceId: String,
 ```scala
 class MyProcessor extends Processor {
   var state: Any = _
- 
+
   def receive = {
     case SnapshotOffer(metadata, offeredSnapshot) => state = offeredSnapshot
     case Persistent(payload, sequenceNr)          => // ...
@@ -399,34 +399,34 @@ processor ! Recover(fromSnapshot = SnapshotSelectionCriteria(
 ```scala
 import akka.actor.{ Actor, ActorPath }
 import akka.persistence.AtLeastOnceDelivery
- 
+
 case class Msg(deliveryId: Long, s: String)
 case class Confirm(deliveryId: Long)
- 
+
 sealed trait Evt
 case class MsgSent(s: String) extends Evt
 case class MsgConfirmed(deliveryId: Long) extends Evt
- 
+
 class MyPersistentActor(destination: ActorPath)
   extends PersistentActor with AtLeastOnceDelivery {
- 
+
   def receiveCommand: Receive = {
     case s: String           => persist(MsgSent(s))(updateState)
     case Confirm(deliveryId) => persist(MsgConfirmed(deliveryId))(updateState)
   }
- 
+
   def receiveRecover: Receive = {
     case evt: Evt => updateState(evt)
   }
- 
+
   def updateState(evt: Evt): Unit = evt match {
     case MsgSent(s) =>
       deliver(destination, deliveryId => Msg(deliveryId, s))
- 
+
     case MsgConfirmed(deliveryId) => confirmDelivery(deliveryId)
   }
 }
- 
+
 class MyDestination extends Actor {
   def receive = {
     case Msg(deliveryId, s) =>
@@ -461,7 +461,7 @@ import akka.persistence.snapshot._
 import akka.testkit.TestKit
 import com.typesafe.config._
 import org.scalatest.WordSpec
- 
+
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -477,13 +477,13 @@ import scala.concurrent.duration._
  * are written or none.
  */
 def writeMessages(messages: immutable.Seq[PersistentRepr]): Unit
- 
+
 /**
  * Plugin API: synchronously writes a batch of delivery confirmations to the journal.
  */
 @deprecated("writeConfirmations will be removed, since Channels will be removed.", since = "2.3.4")
 def writeConfirmations(confirmations: immutable.Seq[PersistentConfirmation]): Unit
- 
+
 /**
  * Plugin API: synchronously deletes messages identified by `messageIds` from the
  * journal. If `permanent` is set to `false`, the persistent messages are marked as
@@ -491,7 +491,7 @@ def writeConfirmations(confirmations: immutable.Seq[PersistentConfirmation]): Un
  */
 @deprecated("deleteMessages will be removed.", since = "2.3.4")
 def deleteMessages(messageIds: immutable.Seq[PersistentId], permanent: Boolean): Unit
- 
+
 /**
  * Plugin API: synchronously deletes all persistent messages up to `toSequenceNr`
  * (inclusive). If `permanent` is set to `false`, the persistent messages are marked
@@ -509,13 +509,13 @@ def deleteMessagesTo(persistenceId: String, toSequenceNr: Long, permanent: Boole
  * are written or none.
  */
 def asyncWriteMessages(messages: immutable.Seq[PersistentRepr]): Future[Unit]
- 
+
 /**
  * Plugin API: asynchronously writes a batch of delivery confirmations to the journal.
  */
 @deprecated("writeConfirmations will be removed, since Channels will be removed.", since = "2.3.4")
 def asyncWriteConfirmations(confirmations: immutable.Seq[PersistentConfirmation]): Future[Unit]
- 
+
 /**
  * Plugin API: asynchronously deletes messages identified by `messageIds` from the
  * journal. If `permanent` is set to `false`, the persistent messages are marked as
@@ -523,7 +523,7 @@ def asyncWriteConfirmations(confirmations: immutable.Seq[PersistentConfirmation]
  */
 @deprecated("asyncDeleteMessages will be removed.", since = "2.3.4")
 def asyncDeleteMessages(messageIds: immutable.Seq[PersistentId], permanent: Boolean): Future[Unit]
- 
+
 /**
  * Plugin API: asynchronously deletes all persistent messages up to `toSequenceNr`
  * (inclusive). If `permanent` is set to `false`, the persistent messages are marked
@@ -560,7 +560,7 @@ def asyncDeleteMessagesTo(persistenceId: String, toSequenceNr: Long, permanent: 
  * @see [[SyncWriteJournal]]
  */
 def asyncReplayMessages(persistenceId: String, fromSequenceNr: Long, toSequenceNr: Long, max: Long)(replayCallback: PersistentRepr ⇒ Unit): Future[Unit]
- 
+
 /**
  * Plugin API: asynchronously reads the highest stored sequence number for the
  * given `persistenceId`.
@@ -577,7 +577,7 @@ def asyncReadHighestSequenceNr(persistenceId: String, fromSequenceNr: Long): Fut
 ```scala
 # Path to the journal plugin to be used
 akka.persistence.journal.plugin = "my-journal"
- 
+
 # My custom journal plugin
 my-journal {
   # Class name of the plugin.
@@ -601,7 +601,7 @@ my-journal {
  * @param criteria selection criteria for loading.
  */
 def loadAsync(persistenceId: String, criteria: SnapshotSelectionCriteria): Future[Option[SelectedSnapshot]]
- 
+
 /**
  * Plugin API: asynchronously saves a snapshot.
  *
@@ -609,22 +609,22 @@ def loadAsync(persistenceId: String, criteria: SnapshotSelectionCriteria): Futur
  * @param snapshot snapshot.
  */
 def saveAsync(metadata: SnapshotMetadata, snapshot: Any): Future[Unit]
- 
+
 /**
  * Plugin API: called after successful saving of a snapshot.
  *
  * @param metadata snapshot metadata.
  */
 def saved(metadata: SnapshotMetadata)
- 
+
 /**
  * Plugin API: deletes the snapshot identified by `metadata`.
  *
  * @param metadata snapshot metadata.
  */
- 
+
 def delete(metadata: SnapshotMetadata)
- 
+
 /**
  * Plugin API: deletes all snapshots matching `criteria`.
  *
@@ -639,7 +639,7 @@ def delete(persistenceId: String, criteria: SnapshotSelectionCriteria)
 ```scala
 # Path to the snapshot store plugin to be used
 akka.persistence.snapshot-store.plugin = "my-snapshot-store"
- 
+
 # My custom snapshot store plugin
 my-snapshot-store {
   # Class name of the plugin.
@@ -690,21 +690,21 @@ class MyJournalSpec extends JournalSpec {
     """
       |akka.persistence.journal.plugin = "my.journal.plugin"
     """.stripMargin)
- 
+
   val storageLocations = List(
     new File(system.settings.config.getString("akka.persistence.journal.leveldb.dir")),
     new File(config.getString("akka.persistence.snapshot-store.local.dir")))
- 
+
   override def beforeAll() {
     super.beforeAll()
     storageLocations foreach FileUtils.deleteRecursively
   }
- 
+
   override def afterAll() {
     storageLocations foreach FileUtils.deleteRecursively
     super.afterAll()
   }
- 
+
 }
 ```
 
@@ -733,7 +733,7 @@ akka.persistence.journal.leveldb.dir = "target/journal"
 ```scala
   }
 }
- 
+
 class MyJournal extends AsyncWriteJournal {
   def asyncWriteMessages(messages: Seq[PersistentRepr]): Future[Unit] = ???
   def asyncWriteConfirmations(confirmations: Seq[PersistentConfirmation]): Future[Unit] = ???
@@ -742,7 +742,7 @@ class MyJournal extends AsyncWriteJournal {
   def asyncReplayMessages(persistenceId: String, fromSequenceNr: Long, toSequenceNr: Long, max: Long)(replayCallback: (PersistentRepr) => Unit): Future[Unit] = ???
   def asyncReadHighestSequenceNr(persistenceId: String, fromSequenceNr: Long): Future[Long] = ???
 }
- 
+
 class MySnapshotStore extends SnapshotStore {
   def loadAsync(persistenceId: String, criteria: SnapshotSelectionCriteria): Future[Option[SelectedSnapshot]] = ???
   def saveAsync(metadata: SnapshotMetadata, snapshot: Any): Future[Unit] = ???
@@ -750,11 +750,11 @@ class MySnapshotStore extends SnapshotStore {
   def delete(metadata: SnapshotMetadata): Unit = ???
   def delete(persistenceId: String, criteria: SnapshotSelectionCriteria): Unit = ???
 }
- 
+
 object PersistenceTCKDoc {
   new AnyRef {
     import akka.persistence.journal.JournalSpec
- 
+
     class MyJournalSpec extends JournalSpec {
       override val config = ConfigFactory.parseString(
         """
@@ -764,7 +764,7 @@ object PersistenceTCKDoc {
   }
   new AnyRef {
     import akka.persistence.snapshot.SnapshotStoreSpec
- 
+
     class MySnapshotStoreSpec extends SnapshotStoreSpec {
       override val config = ConfigFactory.parseString(
         """
@@ -774,30 +774,30 @@ object PersistenceTCKDoc {
   }
   new AnyRef {
     import java.io.File
- 
+
     import akka.persistence.journal.JournalSpec
     import org.iq80.leveldb.util.FileUtils
- 
+
     class MyJournalSpec extends JournalSpec {
       override val config = ConfigFactory.parseString(
         """
           |akka.persistence.journal.plugin = "my.journal.plugin"
         """.stripMargin)
- 
+
       val storageLocations = List(
         new File(system.settings.config.getString("akka.persistence.journal.leveldb.dir")),
         new File(config.getString("akka.persistence.snapshot-store.local.dir")))
- 
+
       override def beforeAll() {
         super.beforeAll()
         storageLocations foreach FileUtils.deleteRecursively
       }
- 
+
       override def afterAll() {
         storageLocations foreach FileUtils.deleteRecursively
         super.afterAll()
       }
- 
+
     }
   }
 }
@@ -822,7 +822,7 @@ trait SharedStoreUsage extends Actor {
   override def preStart(): Unit = {
     context.actorSelection("akka.tcp://example@127.0.0.1:2552/user/store") ! Identify(1)
   }
- 
+
   def receive = {
     case ActorIdentity(1, Some(store)) =>
       SharedLeveldbJournal.setStore(store, context.system)
@@ -885,15 +885,15 @@ akka.persistence.journal.leveldb-shared.store.native = off
 ```scala
 import akka.actor.FSM
 import akka.persistence.{ Persistent, Processor }
- 
+
 class PersistentDoor extends Processor with FSM[String, Int] {
   startWith("closed", 0)
- 
+
   when("closed") {
     case Event(Persistent("open", _), counter) =>
       goto("open") using (counter + 1) replying (counter)
   }
- 
+
   when("open") {
     case Event(Persistent("close", _), counter) =>
       goto("closed") using (counter + 1) replying (counter)
