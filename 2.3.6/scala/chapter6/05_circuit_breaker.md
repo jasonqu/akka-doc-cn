@@ -27,6 +27,8 @@ Akka库提供名为 `akka.pattern.CircuitBreaker`的断路器实现，具有如�
   * 可以为每个状态条目通过 `onOpen`、 `onClose` 和 `onHalfOpen` 提供回调
   * 这些都在提供的 `ExecutionContext` 中执行。
 
+![](../images/circuit-breaker-states.png)
+
 ###例子
 #####初始化
 下面是如何配置一个`CircuitBreaker`：
