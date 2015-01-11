@@ -86,25 +86,25 @@ akka文档中文翻译
 * [ ] 实验模块
    * [x] 持久化
    * [ ] 多节点测试 (翻译完成，待校验)
-   * [ ] Actors(使用Java的Lambda支持)
-   * [ ] FSM(使用Java的Lambda支持)
-   * [ ] 外部贡献
+   * [ ] Actors(使用Java的Lambda支持) not supported
+   * [ ] FSM(使用Java的Lambda支持) not supported
+   * [ ] 外部贡献 (翻译完成，待校验)
 * [ ] Akka开发者信息
-   * [ ] 构建Akka
-   * [ ] 多JVM测试
-   * [ ] I/O层设计
-   * [ ] 开发指南
-   * [ ] 文档指南
-   * [ ] 团队
+   * [ ] 构建Akka (翻译完成，待校验)
+   * [ ] 多JVM测试 (翻译完成，待校验)
+   * [ ] I/O层设计 (翻译完成，待校验)
+   * [ ] 开发指南 (翻译完成，待校验)
+   * [ ] 文档指南 not supported
+   * [ ] 团队 not supported
 * [ ] 工程信息
-   * [ ] 迁移指南
-   * [ ] 问题追踪
-   * [ ] 许可证
-   * [ ] 赞助商
-   * [ ] 项目
+   * [ ] 迁移指南 not supported
+   * [ ] 问题追踪 not supported
+   * [ ] 许可证 not supported
+   * [ ] 赞助商 not supported
+   * [ ] 项目 not supported
 * [ ] 附加信息
-   * [ ] 常见问题
-   * [ ] 图书
-   * [ ] 其他语言绑定
-   * [ ] Akka与OSGi
-   * [ ] 部分HTTP框架名单
+   * [ ] 常见问题 (翻译完成，待校验)
+   * [ ] 图书 not supported
+   * [ ] 其他语言绑定 not supported
+   * [ ] Akka与OSGi not supported
+   * [ ] 部分HTTP框架名单 not supported
