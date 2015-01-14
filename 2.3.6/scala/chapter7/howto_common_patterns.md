@@ -2,7 +2,7 @@
 
 本节列出了一些常见的actor模式，它们已被发现是有用的、优雅的或有启发意义的。所有主题都是受欢迎的，列出的示例主题包括消息路由策略，监督模式，重启处理等。作为一个特殊的奖励，这一节补充标记了贡献者的名字，如果每个Akka使用者在他或她的代码中发现重复出现的模式，并为所有人分享它的好处是多么美好的事情啊。在适和的情况下也可能加入``akka.pattern``包来创建一个[类OTP库（OTP-like library）](http://www.erlang.org/doc/man_index.html)。
 
-### 限制消息
+### <a id="throttling_messages"></a>限制消息
 
 贡献者：Kaspar Fischer
 
@@ -10,7 +10,7 @@
 
 该模式详见[在Akka2中做消息限流](http://letitcrash.com/post/28901663062/throttling-messages-in-akka-2)。
 
-### 跨节点平衡负载
+### <a id="balancing_workload_across_nodes"></a>跨节点平衡负载
 
 贡献者：Derek Wyatt
 
@@ -18,7 +18,7 @@
 
 该模式详见[Akka2跨节点负载均衡](http://letitcrash.com/post/29044669086/balancing-workload-across-nodes-with-akka-2>)。
 
-### 工作拉取模式来限流和分发工作，并防止邮箱溢出
+### <a id="work_pulling_pattern"></a>工作拉取模式来限流和分发工作，并防止邮箱溢出
 
 贡献者：Michael Pollmeier
 
@@ -26,7 +26,7 @@
 
 该模式详见[工作拉取模式来限流和分发工作，并防止邮箱溢出](http://www.michaelpollmeier.com/akka-work-pulling-pattern/)。
 
-### 有序终止
+### <a id="ordered_termination"></a>有序终止
 
 贡献者：Derek Wyatt
 
@@ -36,7 +36,7 @@
 
 该模式详见[一种Akka2终止器](http://letitcrash.com/post/29773618510/an-akka-2-terminator)。
 
-### Akka AMQP 代理
+### <a id="akka_amqp_proxies"></a>Akka AMQP 代理
 
 贡献者：Fabrice Drouin
 
@@ -44,7 +44,7 @@
 
 该模式详见[Akka AMQP 代理](http://letitcrash.com/post/29988753572/akka-amqp-proxies)。
 
-### Akka2 关闭模式
+### <a id="shutdown_patterns"></a>Akka2 关闭模式
 
 贡献者：Derek Wyatt
 
@@ -54,7 +54,7 @@
 
 该模式详见[Akka2 关闭模式](http://letitcrash.com/post/30165507578/shutdown-patterns-in-akka-2)。
 
-### Akka分布式（内存中）图处理
+### <a id="distributed_graph_processing"></a>Akka分布式（内存中）图处理
 
 贡献者：Adelbert Chang
 
@@ -62,7 +62,7 @@
 
 该模式详见[Akka分布式（内存中）图处理](http://letitcrash.com/post/30257014291/distributed-in-memory-graph-processing-with-akka)。
 
-### 案例研究：使用actor自动更新缓存
+### <a id="an_autoupdating_cache_using_actors"></a>案例研究：使用actor自动更新缓存
 贡献者：Eric Pederson
 
 "我们最近需要在一个缓慢的后端系统前构建一个高速缓存系统，并符合下列要求：
@@ -71,7 +71,7 @@
 
 该模式详见[案例研究：使用actor自动更新缓存](http://letitcrash.com/post/30509298968/case-study-an-auto-updating-cache-using-actors)。
 
-### 使用蜘蛛模式在actor系统中发现消息流
+### <a id="spider_pattern"></a>使用蜘蛛模式在actor系统中发现消息流
 
 贡献者：Raymond Roestenburg
 
@@ -81,7 +81,7 @@
 
 该模式详见[使用蜘蛛模式在actor系统中发现消息流](http://letitcrash.com/post/30585282971/discovering-message-flows-in-actor-systems-with-the)。
 
-### 调度周期性消息
+### <a id="scheduling_periodic_messages"></a>调度周期性消息
 
 此模式描述了如何安排周期性消息给自己，有两种不同方式。
 
@@ -131,7 +131,7 @@ class ScheduleInReceive extends Actor {
 }
 ```
 
-### 模板模式
+### <a id="template_pattern"></a>模板模式
 *贡献者：N. N.*
 
 这是一种特别好的模式，因为它甚至伴随着一些空的示例代码：
