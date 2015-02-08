@@ -20,7 +20,7 @@ Actors为你提供:
 * 异步、非阻塞、高性能的事件驱动编程模型。
 * 非常轻量的事件驱动处理（1G内存可容纳数百万个actors）。
 
-参阅 [Actors (Scala)](../chapter3/Actors.md) 和 [Actors (Java)](#TODO)
+参阅 [Actors (Scala)](../chapter3/01_actors.md) 和 [Actors (Java)](#TODO)
 
 
 ##### 容错性

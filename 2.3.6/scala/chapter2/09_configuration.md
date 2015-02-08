@@ -8,7 +8,7 @@
 * 路由器定义
 * 调度的调整
 
-Akka使用[Typesafe配置库](https://github.com/typesafehub/config)，它同样也是你自己的应用或库的不错选择，不管用不用Akka。这个库由Java实现，没有外部的依赖；本文后面将只对这个库有一些归纳，你应该查看其文档参考具体的使用（尤其是[ConfigFactory](http://typesafehub.github.io/config/v1.2.0/com/typesafe/config/ConfigFactory.html)）。
+Akka使用[Typesafe配置库](https://github.com/typesafehub/config)，它同样也是你自己的应用或库的不错选择，不管你用不用Akka。这个库由Java实现，没有外部的依赖；本文后面将只对这个库有一些归纳，你应该查看其文档参考具体的使用（尤其是[ConfigFactory](http://typesafehub.github.io/config/v1.2.0/com/typesafe/config/ConfigFactory.html)）。
 
 
 > 警告
