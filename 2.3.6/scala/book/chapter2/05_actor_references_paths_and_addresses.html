@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.5" data-basepath=".." data-revision="1418735449756">
+    <div class="book"  data-level="2.5" data-basepath=".." data-revision="1429064719816">
     
 
 <div class="book-summary">
@@ -942,188 +942,6 @@
                 
             
             
-            <ul class="articles">
-                
-    
-        
-        <li class="chapter " data-level="7.1" data-path="chapter7/01_throttling_messages.html">
-            
-                
-                    <a href="../chapter7/01_throttling_messages.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.1.</b>
-                        
-                         消息限流
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.2" data-path="chapter7/02_balancing_workload_across_nodes.html">
-            
-                
-                    <a href="../chapter7/02_balancing_workload_across_nodes.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.2.</b>
-                        
-                         跨节点平衡工作负载
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.3" data-path="chapter7/03_work_pulling_pattern.html">
-            
-                
-                    <a href="../chapter7/03_work_pulling_pattern.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.3.</b>
-                        
-                         工作拉取模式，来限流和分发工作，防止邮箱溢出
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.4" data-path="chapter7/04_ordered_termination.html">
-            
-                
-                    <a href="../chapter7/04_ordered_termination.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.4.</b>
-                        
-                         顺序终止
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.5" data-path="chapter7/05_akka_amqp_proxies.html">
-            
-                
-                    <a href="../chapter7/05_akka_amqp_proxies.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.5.</b>
-                        
-                         Akka AMQP代理
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.6" data-path="chapter7/06_shutdown_patterns.html">
-            
-                
-                    <a href="../chapter7/06_shutdown_patterns.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.6.</b>
-                        
-                         Akka 2中的关闭模式
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.7" data-path="chapter7/07_distributed_graph_processing.html">
-            
-                
-                    <a href="../chapter7/07_distributed_graph_processing.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.7.</b>
-                        
-                         使用Akka做分布式（内存）图像处理
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.8" data-path="chapter7/08_an_autoupdating_cache_using_actors.html">
-            
-                
-                    <a href="../chapter7/08_an_autoupdating_cache_using_actors.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.8.</b>
-                        
-                         案例分析：一个使用Actor的自动更新缓存
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.9" data-path="chapter7/09_spider_pattern.html">
-            
-                
-                    <a href="../chapter7/09_spider_pattern.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.9.</b>
-                        
-                         使用蜘蛛模式发现actor系统的消息流向
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.10" data-path="chapter7/10_scheduling_periodic_messages.html">
-            
-                
-                    <a href="../chapter7/10_scheduling_periodic_messages.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.10.</b>
-                        
-                         周期信息调度
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.11" data-path="chapter7/11_template_pattern.html">
-            
-                
-                    <a href="../chapter7/11_template_pattern.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.11.</b>
-                        
-                         模板模式
-                    </a>
-                
-            
-            
-        </li>
-    
-
-            </ul>
-            
         </li>
     
         
@@ -1639,7 +1457,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_7">
+                    <section class="normal" id="section-gitbook_40">
                     
                         <h1 id="actor-">Actor引用, 路径与地址</h1>
 <p>本章描述actor如何被确定，以及在一个可能是分布式的actor系统中如何定位。这与 <a href="02_actor_systems.html">Actor系统</a> 的核心概念有关：固有的树形监管结构和跨多个网络节点的actor之间进行透明通讯。</p>
@@ -1650,7 +1468,7 @@
 <p>根据actor系统的配置，支持几种不同类型的actor引用：</p>
 <ul>
 <li>纯本地actor引用，在配置为不使用网络功能的actor系统中使用。这些actor引用如果通过网络连接传给远程的JVM，将不能正常工作。</li>
-<li>本地actor引用，在配置为使用远程功能的actor系统中使用，来代表同一个JVM的actor。</li>
+<li>本地actor引用，在配置为使用远程功能的actor系统中使用，来代表同一个JVM的actor。为了能够在被发送到其它节点时仍然可达，这些引用包含了协议和远程地址信息。</li>
 <li>本地actor引用的一个子类，用在路由器中（routers，即混入 了 <code>Router</code> trait的actor）。它的逻辑结构与之前的本地引用是一样的，但是向它们发送的消息会被直接重定向到它的子actor。</li>
 <li>远程actor引用，代表可以通过远程通讯访问的actor，即向他们发送消息时会透明地对消息进行序列化，并发送到别的JVM。</li>
 <li>有几种特殊的actor引用类型，在实际用途中比较类似本地actor引用：<ul>
@@ -1666,7 +1484,7 @@
 </li>
 </ul>
 <h3 id="actor">什么是Actor路径?</h3>
-<p>由于actor是以一种严格的树形结构样式来创建的，所以沿着子actor到父actor的监管链，一直到actor系统的根存在一条唯一的actor名字序列。这个序列可以被看做是文件系统中的文件路径，所以我们称之为“路径”。就象在一些真正的文件系统中一样，也存在所谓的“符号链接”，即一个actor也许能通过不同的路径被访问到，除了原始路径外，其它的路径都涉及到对actor实际监管祖先链的部分路径的转换方法。这些特性将在下面的内容中介绍。</p>
+<p>由于actor是以一种严格的树形结构样式来创建的，所以沿着子actor到父actor的监管链，一直到actor系统的根存在一条唯一的actor名字序列。这个序列可以被看做是文件系统中的文件路径，所以我们称之为“路径”。就像在一些真正的文件系统中一样，也存在所谓的“符号链接”，即一个actor也许能通过不同的路径被访问到，除了原始路径外，其它的路径都涉及到对actor实际监管祖先链的某部分路径进行转换的方法。这些特性将在下面的内容中介绍。</p>
 <p>一个actor路径包含一个锚点，来标识actor系统的，之后是各路径元素的连接，从根监护者到指定的actor；路径元素是路径经过的actor的名字，以&quot;/&quot;分隔。</p>
 <h5 id="actor">Actor引用和路径之间有什么区别？</h5>
 <p>Actor引用标明了一个actor，其生命周期和actor的生命周期保持匹配；actor路径表示一个名称，其背后可能有也可能没有真实的actor，而且路径本身不具有生命周期，它永远不会失效。你可以创建一个actor路径，而无需创建一个actor，但你不能在创建actor引用时不创建相应的actor。</p>
@@ -1723,7 +1541,7 @@
 <p>如果你需要跟踪一个集合中的actor引用，并不关心具体的actor化身，你可以使用<code>ActorPath</code>为键（key），因为目标actor的标识符在比较actor路径时没有被用到。</p>
 <h3 id="actor">重用Actor路径</h3>
 <p>当一个actor被终止，其引用将指向一个死信邮箱，DeathWatch将发布其最终的转变，并且一般地它也不会起死回生（因为actor的生命周期不允许这样）。虽然以后可能创建一个具有相同路径的actor——如果无法保留actor系统开始以来创建的所有可用actor，则无法保证其反向成立——但是这不是一个好的实践：通过<code>acterFor</code>获取的已经‘死亡’的远程actor引用突然再次开始工作，但没有这种过渡和任何其他事件之间顺序的任何保证，因此，该路径的新居民可能收到本意是送给其以前住户的消息。</p>
-<p>在某些非常特殊的情况下这可能是正确的事情，但一定要限制这种处理只能由其监管者操作，因为它是唯一可以可靠地检测名称正确注销的actor，在此之前的新创建的孩子将失败。</p>
+<p>在某些非常特殊的情况下这可能是正确的事情，但一定要限制这种处理只能由其监管者操作，因为它是唯一可以可靠地检测名称正确注销的actor，在注销之前的新创建子actor的操作将失败。</p>
 <p>它在测试中可能也是必要的，当测试对象取决于某个特定路径被实例化的时候。在这种情况下，最好mock其监管者，这样它会将终止消息转发至测试过程正确的点，使后者能够等待登记名字的正确注销。</p>
 <h3 id="">与远程部署之间的互操作</h3>
 <p>当一个actor创建一个子actor，actor系统的部署者会决定新的actor是在同一个jvm中还是在其它节点上。如果是后者，actor的创建会通过网络连接引到另一个jvm中进行，因而在另一个actor系统中。远程系统会将新的actor放在一个专为这种场景所保留的特殊路径下，新的actor的监管者将会是一个远程actor引用（代表触发它创建动作的actor）。这时，<code>context.parent</code>（监管者引用）和<code>context.path.parent</code>（actor路径上的父actor）表示的actor是不同的。然而，在其监管者中查找这个actor的名称将会在远程节点上找到它，保持其逻辑结构，例如向另一个未确定(unresolved)的actor引用发送消息。</p>

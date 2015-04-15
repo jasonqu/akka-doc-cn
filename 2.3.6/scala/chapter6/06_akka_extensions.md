@@ -1,5 +1,7 @@
 # Akka扩展
 
+> 注：本节未经校验，如有问题欢迎提issue
+
 如果想要为Akka添加特性，有一个非常优美而且强大的工具，称为 Akka 扩展。它由两部分组成： ``Extension`` 和 ``ExtensionId``.
 
 Extensions 在每个 ``ActorSystem`` 中只会加载一次, 并被Akka所管理。 你可以选择按需加载你的Extension或是在 ``ActorSystem`` 创建时通过Akka配置来加载。 关于这些细节，见下文 “从配置中加载” 的部分.

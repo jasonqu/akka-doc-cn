@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.8" data-basepath=".." data-revision="1418735449756">
+    <div class="book"  data-level="2.8" data-basepath=".." data-revision="1429064719816">
     
 
 <div class="book-summary">
@@ -942,188 +942,6 @@
                 
             
             
-            <ul class="articles">
-                
-    
-        
-        <li class="chapter " data-level="7.1" data-path="chapter7/01_throttling_messages.html">
-            
-                
-                    <a href="../chapter7/01_throttling_messages.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.1.</b>
-                        
-                         消息限流
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.2" data-path="chapter7/02_balancing_workload_across_nodes.html">
-            
-                
-                    <a href="../chapter7/02_balancing_workload_across_nodes.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.2.</b>
-                        
-                         跨节点平衡工作负载
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.3" data-path="chapter7/03_work_pulling_pattern.html">
-            
-                
-                    <a href="../chapter7/03_work_pulling_pattern.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.3.</b>
-                        
-                         工作拉取模式，来限流和分发工作，防止邮箱溢出
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.4" data-path="chapter7/04_ordered_termination.html">
-            
-                
-                    <a href="../chapter7/04_ordered_termination.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.4.</b>
-                        
-                         顺序终止
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.5" data-path="chapter7/05_akka_amqp_proxies.html">
-            
-                
-                    <a href="../chapter7/05_akka_amqp_proxies.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.5.</b>
-                        
-                         Akka AMQP代理
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.6" data-path="chapter7/06_shutdown_patterns.html">
-            
-                
-                    <a href="../chapter7/06_shutdown_patterns.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.6.</b>
-                        
-                         Akka 2中的关闭模式
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.7" data-path="chapter7/07_distributed_graph_processing.html">
-            
-                
-                    <a href="../chapter7/07_distributed_graph_processing.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.7.</b>
-                        
-                         使用Akka做分布式（内存）图像处理
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.8" data-path="chapter7/08_an_autoupdating_cache_using_actors.html">
-            
-                
-                    <a href="../chapter7/08_an_autoupdating_cache_using_actors.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.8.</b>
-                        
-                         案例分析：一个使用Actor的自动更新缓存
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.9" data-path="chapter7/09_spider_pattern.html">
-            
-                
-                    <a href="../chapter7/09_spider_pattern.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.9.</b>
-                        
-                         使用蜘蛛模式发现actor系统的消息流向
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.10" data-path="chapter7/10_scheduling_periodic_messages.html">
-            
-                
-                    <a href="../chapter7/10_scheduling_periodic_messages.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.10.</b>
-                        
-                         周期信息调度
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.11" data-path="chapter7/11_template_pattern.html">
-            
-                
-                    <a href="../chapter7/11_template_pattern.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.11.</b>
-                        
-                         模板模式
-                    </a>
-                
-            
-            
-        </li>
-    
-
-            </ul>
-            
         </li>
     
         
@@ -1639,7 +1457,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_9">
+                    <section class="normal" id="section-gitbook_42">
                     
                         <h1 id="">消息发送语义</h1>
 <p>Akka帮助您在多核的单机上（“向上扩展”或纵向扩展）或分布式计算机网络中（“向外扩展”或横向扩展）构建可靠的应用程序。这里关键的抽象是，你的代码单元——actor——之间所有的交互都是通过消息传递完成，这也是为什么“消息是如何在actor之间传递”的准确语义应该拥有自己的章节。</p>
@@ -1670,7 +1488,7 @@
 <li>消息开始被目标actor处理？</li>
 <li>消息被目标actor成功处理？</li>
 </ol>
-<p>以上每个担保都具有不同的挑战和成本，并且很明显，存在一些情况导致任何消息传递框架都将无法遵守这些担保；想象例如可配置邮箱类型，以及一个有界的邮箱将如何与第三点互动，甚或第5点的“成功”由什么决定。</p>
+<p>以上每个担保都具有不同的挑战和成本，并且很明显，存在一些情况导致任何消息传递框架都将无法遵守这些担保；想象例如可配置邮箱类型，以及一个有界的邮箱将如何与第3点互动，甚或第5点的“成功”由什么决定。</p>
 <p>在上面的话中包含着同样的推理——<a href="http://www.infoq.com/articles/no-reliable-messaging" target="_blank">没人需要可靠地消息机制</a>。对发送者来说，确定交互是否成功的唯一有意义的方式是收到业务层级的确认消息，这不是Akka可以做到的（我们不会写一个“按我的意思来做”的框架，也没有人会想让我们这样做）。</p>
 <p>Akka拥抱了分布式计算，将消息传递的不可靠性明确化，因此它不会尝试说谎和实现一个有问题的抽象。这是一个已经在Erlang中大获成功的模型，它要求用户围绕它进行设计。你可以在<a href="http://www.erlang.org/faq/academic.html" target="_blank">&quot;Erlang 文档&quot;</a>中读到更多介绍（第10.9和10.10节），Akka紧密地沿用了这种方法。</p>
 <p>对这个问题的另一个角度是，通过只提供基本保障，那些无需更强可靠性的用例也就不要支付额外的实施成本；总是可以在基本的基础上添加更强的可靠性，但不可能相反移除可靠性，来获得更高的性能。</p>
@@ -1706,12 +1524,12 @@
 </blockquote>
 <h5 id="">失败消息的传达</h5>
 <p>请注意，上面只讨论了actor之间的用户消息的顺序保证。一个actor的孩子的失败是通过特殊的系统消息传达的，与普通用户发送的消息没有顺序关系。特别是：</p>
-<pre><code>子 actor ``C`` 发送 ``M`` 给其父节点 ``P``
-
-子 actor 失败并发送失败消息 ``F``
-
-父 actor ``P`` 可能以``M``, ``F``或``F``, ``M``的顺序收到两个事件
-</code></pre><p>这样做的原因是，内部系统消息有其自己的邮箱，因此用户和系统信息的排队的顺序不能保证其出队的时间顺序。</p>
+<blockquote>
+<p>子 actor <code>C</code> 发送 <code>M</code> 给其父节点 <code>P</code></p>
+<p>子 actor 失败并发送失败消息 <code>F</code></p>
+<p>父 actor <code>P</code> 可能以<code>M</code>, <code>F</code>或<code>F</code>, <code>M</code>的顺序收到两个事件</p>
+</blockquote>
+<p>这样做的原因是，内部系统消息有其自己的邮箱，因此用户和系统信息的排队的顺序不能保证其出队的时间顺序。</p>
 <h4 id="a-namethe-rules-for-in-jvm-local-message-sendsajvm"><a name="the-rules-for-in-jvm-local-message-sends"></a>JVM内（本地）消息发送规则</h4>
 <h5 id="">对本节介绍的内容要小心使用！</h5>
 <p>不建议依托本节所介绍的更强可靠性，因为它会绑定您的应用程序只能进行本地部署：为了适应在机器集群上运行，应用程序可能需要不同的设计（而不是仅仅是对actor采用一些本地消息交换模式）。我们的信条是“一次设计，按照任何你希望的方式部署”，要实现这一点，你应该只依靠<a href="#the-general-rules">一般规则</a>。</p>
@@ -1753,7 +1571,7 @@
 一个企业级确认的ACK-RETRY协议，在Akka Persistence模块中以<a href="../chapter3/08_persistence.html#at-least-once-delivery">至少一次投递</a>的方式支持了。<a href="../chapter3/08_persistence.html#at-least-once-delivery">至少一次投递</a>的消息可以通过跟踪标识符的方式进行重复的检测。实现第三步的另一种方式是在业务逻辑中实现消息处理的幂等性（译者注：即每次消息处理的结果都是一样的）。</p>
 <p>实现所有三个要求的另一个例子在<a href="../chapter8/05_external_contributions.html#reliable-proxy">可靠的代理模式</a>中展示了（现在被<a href="../chapter3/08_persistence.html#at-least-once-delivery">至少一次投递</a>所取代）。</p>
 <h5 id="">事件源</h5>
-<p>事件源（和分片）使得大型网站能扩展到支持数以十亿计的用户，并且其想法很简单：当一个组件（想象为actor）处理一个命令，它会生成表示该命令效果的一组事件的列表。这些事件除了被应用到该组件的状态之外，也被存储。这个方案的好处是，事件永远只会被附加存储上，没有什么是可变的；这使得完美的复制和扩展这一事件流的消费者群体得到支持（即其他组件也可以消费这个事件流，只需要复制组建的状态到一个新的空间中，并且对变化进行反应即可）。如果组件的状态丢失——由于某台机器的故障，或者是被淘汰出缓存——它仍然可以很容易地通过重播事件流（通常使用快照来加快处理）进行重建。<a href="../chapter3/08_persistence.html#event-sourcing"><code>event-sourcing</code></a>由Akka Persistence支持。</p>
+<p>事件源（和分片）使得大型网站能扩展到支持数以十亿计的用户，并且其想法很简单：当一个组件（想象为actor）处理一个命令，它会生成表示该命令效果的一组事件的列表。这些事件除了被应用到该组件的状态之外，也被存储。这个方案的好处是，事件永远只会被附加存储上，没有什么是可变的；这使得完美的复制和扩展这一事件流的消费者群体得到支持（即其他组件也可以消费这个事件流，只需要复制组件的状态到一个新的空间中，并且对变化进行反应即可）。如果组件的状态丢失——由于某台机器的故障，或者是被淘汰出缓存——它仍然可以很容易地通过重播事件流（通常使用快照来加快处理）进行重建。<a href="../chapter3/08_persistence.html#event-sourcing"><code>event-sourcing</code></a>由Akka Persistence支持。</p>
 <h4 id="">具有明确确认功能的邮箱</h4>
 <p>通过实现自定义邮箱类型，有可能在接收actor结束时重试消息处理，以处理临时故障。这种模式一般在本地通信上下文非常有用，否则投递担保不足以满足应用程序的需求。</p>
 <p>请注意，<a href="#the-rules-for-in-jvm-local-message-sends">”JVM内（本地）消息发送规则“</a>中的警告仍然有效。</p>
@@ -1761,12 +1579,12 @@
 <h3 id="">死信</h3>
 <p>不能被投递（并且可以被确定没有投递成功）的消息，会被投递到一个名为<code>/deadLetters</code>的人造actor。该投递以尽力而为为基础；它甚至可以在本地JVM中失败（例如actor终止时）。在不可靠的网络传输丢失的消息将会被丢弃，而不会作为死信处理。</p>
 <h5 id="">死信应该被用来做什么？</h5>
-<p>这个组件的主要用途是调试，特别是如果一个actor的发送并没有始终送达的时候（通常查看死信，你会发现发件者或接收者在某个环节上设置错了）。为了能更好地用于该目的，最好的实践是，尽可能避免发送消息到deadLetters，即使用一个合适的死信日志记录器（详见下文）来运行应用程序，并时不时地清理日志输出。这个实践——和其他所有实践类似——需要按照常识构建明智的应用程序：有可能避免发送消息给一个已终止的actor，给发送者代码增加的复杂性，多于调试输出带来的清晰度。</p>
+<p>这个组件的主要用途是调试，特别是如果一个actor的发送始终没有送达的时候（通常查看死信，你会发现发件者或接收者在某个环节上设置错了）。为了能更好地用于该目的，最好的实践是，尽可能避免发送消息到deadLetters，即使用一个合适的死信日志记录器（详见下文）来运行应用程序，并时不时地清理日志输出。这个实践——和其他所有实践类似——需要按照常识构建明智的应用程序：有可能避免发送消息给一个已终止的actor，给发送者代码增加的复杂性，多于调试输出带来的清晰度。</p>
 <p>死信服务与其他所有消息投递一样，对于投递保证遵循相同的规则的，因此它不能被用来实现投递保证。</p>
 <h5 id="">怎样接收死信？</h5>
-<p>一个actor可以在事件流中订阅类<code>akka.actor.DeadLetter</code>，请参阅<a href="#TODO">事件流（java）</a>或<a href="../chapter6/01_event_bus.html#event-stream-scala">事件流（scala）</a>来了解如何做到这一点。那么订阅的actor会收到从该点起收到（本地）系统中发布的所有死信。死信不会在网络上传播，如果你想在一个地方收集他们，你将不得不在每个网络节点上使用一个actor订阅，并手动转发。同时注意，在该节点上生成的死信，能够确定一个发送操作失败，这对于远程发送来说，可以是本地系统（如果不能建立网络连接）也可以是远程系统（如果你要发送的目标actor在该时间点不存在的话）。</p>
+<p>一个actor可以在事件流中订阅类<code>akka.actor.DeadLetter</code>，请参阅<a href="#TODO">事件流（java）</a>或<a href="../chapter6/01_event_bus.html#event-stream-scala">事件流（scala）</a>来了解如何做到这一点。那么订阅的actor会从该点起收到（本地）系统中发布的所有死信。死信不会在网络上传播，如果你想在一个地方收集他们，你将不得不在每个网络节点上使用一个actor订阅，并手动转发。同时注意，在该节点上生成的死信，能够确定一个发送操作失败，这对于远程发送来说，可以是本地系统（如果不能建立网络连接）也可以是远程系统（如果你要发送的目标actor在该时间点不存在的话）。</p>
 <h5 id="">（通常）不用担心死信</h5>
-<p>每当一个actor不是通过自身决定终止的，则存在这样的可能——它发送到自身的一些消息丢失了。它很容易会发生在复杂关闭场景，这些场景通常是良性的：看到一个<code>akka.dispatch.Terminate</code>消息被丢弃意味着，两个中断请求被发送，当然只有一个可以成功。同样道理，在停止个子树的actor时，如果父节点在终止的时候仍然观察着子节点，则你可能会看到从孩子发出的<code>akka.actor.Terminated</code>消息会转变为死信。</p>
+<p>每当一个actor不是通过自身决定终止的，则存在这样的可能——它发送到自身的一些消息丢失了。这在复杂关闭场景下是很容易发生的，而这些场景通常也是良性的：看到一个<code>akka.dispatch.Terminate</code>消息被丢弃意味着，两个中断请求被发送，当然只有一个可以成功。同样道理，在停止一个子树的actor时，如果父节点在终止的时候仍然观察着子节点，则你可能会看到从孩子发出的<code>akka.actor.Terminated</code>消息会转变为死信。</p>
 
                     
                     </section>

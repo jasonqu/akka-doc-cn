@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.1" data-basepath=".." data-revision="1418735449756">
+    <div class="book"  data-level="2.1" data-basepath=".." data-revision="1429064719816">
     
 
 <div class="book-summary">
@@ -942,188 +942,6 @@
                 
             
             
-            <ul class="articles">
-                
-    
-        
-        <li class="chapter " data-level="7.1" data-path="chapter7/01_throttling_messages.html">
-            
-                
-                    <a href="../chapter7/01_throttling_messages.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.1.</b>
-                        
-                         消息限流
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.2" data-path="chapter7/02_balancing_workload_across_nodes.html">
-            
-                
-                    <a href="../chapter7/02_balancing_workload_across_nodes.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.2.</b>
-                        
-                         跨节点平衡工作负载
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.3" data-path="chapter7/03_work_pulling_pattern.html">
-            
-                
-                    <a href="../chapter7/03_work_pulling_pattern.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.3.</b>
-                        
-                         工作拉取模式，来限流和分发工作，防止邮箱溢出
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.4" data-path="chapter7/04_ordered_termination.html">
-            
-                
-                    <a href="../chapter7/04_ordered_termination.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.4.</b>
-                        
-                         顺序终止
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.5" data-path="chapter7/05_akka_amqp_proxies.html">
-            
-                
-                    <a href="../chapter7/05_akka_amqp_proxies.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.5.</b>
-                        
-                         Akka AMQP代理
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.6" data-path="chapter7/06_shutdown_patterns.html">
-            
-                
-                    <a href="../chapter7/06_shutdown_patterns.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.6.</b>
-                        
-                         Akka 2中的关闭模式
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.7" data-path="chapter7/07_distributed_graph_processing.html">
-            
-                
-                    <a href="../chapter7/07_distributed_graph_processing.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.7.</b>
-                        
-                         使用Akka做分布式（内存）图像处理
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.8" data-path="chapter7/08_an_autoupdating_cache_using_actors.html">
-            
-                
-                    <a href="../chapter7/08_an_autoupdating_cache_using_actors.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.8.</b>
-                        
-                         案例分析：一个使用Actor的自动更新缓存
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.9" data-path="chapter7/09_spider_pattern.html">
-            
-                
-                    <a href="../chapter7/09_spider_pattern.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.9.</b>
-                        
-                         使用蜘蛛模式发现actor系统的消息流向
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.10" data-path="chapter7/10_scheduling_periodic_messages.html">
-            
-                
-                    <a href="../chapter7/10_scheduling_periodic_messages.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.10.</b>
-                        
-                         周期信息调度
-                    </a>
-                
-            
-            
-        </li>
-    
-        
-        <li class="chapter " data-level="7.11" data-path="chapter7/11_template_pattern.html">
-            
-                
-                    <a href="../chapter7/11_template_pattern.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>7.11.</b>
-                        
-                         模板模式
-                    </a>
-                
-            
-            
-        </li>
-    
-
-            </ul>
-            
         </li>
     
         
@@ -1639,7 +1457,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_4">
+                    <section class="normal" id="section-gitbook_37">
                     
                         <h1 id="">术语，概念</h1>
 <p>这一章我们将尝试建立通用的术语，对Akka面向的并发、分布式系统等提供一个坚实的讨论基础。请注意，这里的很多术语都没有统一的定义。我们只是希望在Akka文档的范围内给出可用的定义。</p>
@@ -1652,7 +1470,7 @@
 <p>如果一个线程的延迟会导致其它一些线程无限期的延迟，我们称之为 <em>阻塞</em>。一个很好的例子是资源可以被线程通过互斥锁独占。如果这个线程无限期地占有这个资源（例如不小心进入死循环），其他等待这个资源的线程就无法处理了。相反地，<em>非阻塞</em> 意味着没有线程可以无限期的阻塞其他线程。</p>
 <p>相比阻塞操作，我们推荐非阻塞的操作，因为很明显这样系统不会因为阻塞操作而不再继续处理。</p>
 <h3 id="-vs--vs-">死锁 vs. 饥饿 vs. 活锁</h3>
-<p>当多个参与者互相等待别人达到某个特殊的状态才能继续处理的时候，<em>死锁</em> 出现了。因为如果一些参与者不达到特定状态，所有的参与者都不能执行（就像<a href="http://en.wikipedia.org/wiki/Catch-22" target="_blank">《第二十二条军规》</a>描述的<a href="http://en.wikipedia.org/wiki/Catch-22_(logic)">那样</a>，所有相关子系统都停顿了。死锁和阻塞息息相关，因为阻塞使得一个参与者线程可以无限期地推迟其他线程的处理。</p>
+<p>当多个参与者互相等待别人达到某个特殊的状态才能继续处理的时候，<em>死锁</em> 出现了。因为如果一些参与者不达到特定状态，所有的参与者都不能执行（就像<a href="http://en.wikipedia.org/wiki/Catch-22" target="_blank">《第二十二条军规》</a>描述的<a href="http://en.wikipedia.org/wiki/Catch-22_(logic)">那样</a>），所有相关子系统都停顿了。死锁和阻塞息息相关，因为阻塞使得一个参与者线程可以无限期地推迟其他线程的处理。</p>
 <p>在死锁中，没有参与者可以处理，然而相对的 <em>饥饿</em> 可能发生，当有些参与者可以不断地处理，而另一些可能不行。一个典型的场景是一个幼稚的调度算法——总是选择高优先级的任务。如果高优先级的任务数量一直足够多，则低优先级的任务永远不会被完成。</p>
 <p><em>活锁</em> 和死锁类似，没有参与者可以处理。区别在于与进程进入等待其他进程处理的“冻结”状态不同，参与者不断地变换他们的状态。一个示例场景是两个参与者和两个特殊的资源。他们分别试图获取资源，并且检查是不是另一个参与者也需要这个资源。如果该资源被另一个参与者请求，则它们试图获取另一个资源。在一个很不幸的情况下，也许两个参与者会不停的在两个资源上“跳跃”，永远在谦让而不使用资源。</p>
 <h3 id="">竞态条件</h3>

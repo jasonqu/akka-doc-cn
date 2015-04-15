@@ -1,5 +1,7 @@
 # 远程
 
+> 注：本节未经校验，如有问题欢迎提issue
+
 要了解关于Akka的远程调用能力的简介请参阅[位置透明性](../chapter2/06_location_transparency.md).
 
 > 注意

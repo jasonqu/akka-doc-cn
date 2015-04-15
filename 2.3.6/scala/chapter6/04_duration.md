@@ -1,5 +1,7 @@
 # Duration
 
+> 注：本节未经校验，如有问题欢迎提issue
+
 Duration在Akka库中被广泛使用，这代表一个特殊的数据类型——`scala.concurrent.duration.Duration`。这个类型的值可以表示无限(`Duration.Inf`, `Duration.MinusInf`)或有限的时间段，或是`Duration.Undefined`。
 
 ###有限与无限

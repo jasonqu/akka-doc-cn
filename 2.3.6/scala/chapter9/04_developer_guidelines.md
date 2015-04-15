@@ -1,5 +1,7 @@
 # 开发指南
 
+> 注：本节未经校验，如有问题欢迎提issue
+
 > 注意
 
 > 首先阅读[Akka贡献者指南](https://github.com/akka/akka/blob/master/CONTRIBUTING.md)。

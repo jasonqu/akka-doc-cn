@@ -1,5 +1,7 @@
 # Futures
 
+> 注：本节未经校验，如有问题欢迎提issue
+
 ###简介
 在 Akka 中，一个[Future](http://en.wikipedia.org/wiki/Futures_and_promises)是用来获取某个并发操作结果的数据结构。这个结果可以以同步（阻塞）或异步（非阻塞）的方式访问。
 

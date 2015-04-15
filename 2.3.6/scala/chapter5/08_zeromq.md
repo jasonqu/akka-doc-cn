@@ -1,6 +1,6 @@
 # ZeroMQ
 
-TODO 从Akka 2.0文档中复制，没有仔细检查
+> 注： 直接从Akka 2.0文档中复制，没有仔细检查
 
 Akka提供一个 ZeroMQ 模块对 ZeroMQ 连接进行抽象从而允许Akka actor之间在ZeroMQ连接之上进行消息交互。这些消息可以是专有格式或者使用Protobuf来定义。socket actor缺省就具有容错性，当你调用newSocket方法创建新的Socket时它会恰当地对socket进行重新初始化。
 

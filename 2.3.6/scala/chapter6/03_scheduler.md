@@ -1,5 +1,7 @@
 # 调度器
 
+> 注：本节未经校验，如有问题欢迎提issue
+
 有时需要设定将来发生的事情，这时该怎么办? `ActorSystem` 就能搞定一切! 在那儿你能找到 `scheduler` 方法，它返回一个 `akka.actor.Scheduler` 实例, 这个实例在每个Actor系统里是唯一的，用来在内部指定一段时间后发生的行为。
 
 请注意定时任务是使用 ActorSystem 的 MessageDispatcher 执行的.

@@ -1,5 +1,7 @@
 # Agents
 
+> 注：本节未经校验，如有问题欢迎提issue
+
 Akka中的Agent是受 [Clojure agent](http://clojure.org/agents)启发的.
 
 Agent 提供对独立位置的异步修改. Agent在其生命周期中绑定到一个单独的存储位置，对这个存储位置的数据的修改（到一个新的状态）仅允许作为一个操作的结果发生。 对其进行修改的操作是函数，该函数被异步地应用于Agent的状态，其返回值成为Agent的新状态。 Agent的状态应该是不可变的。
