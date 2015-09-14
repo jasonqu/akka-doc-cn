@@ -1,6 +1,6 @@
 # 引言
 
-* [Akka是什么](01_What_is_Akka.md)
+* [Akka是什么](01_what_is_akka.md)
   * Akka实现了独特的混合模型
   * Scala 和 Java API
   * 使用Akka的两种方式
