@@ -81,7 +81,7 @@ Erlang方式的策略是当actor失败时，终止它们，然后当DeathWatch�
 以下部分展示了实际中不同的指令的效果，为此我们需要创建一个测试环境。首先我们需要一个合适的监管者：
 
 ```scala
-import akka.actor.Actor
+  import akka.actor.Actor
  
   class Supervisor extends Actor {
     import akka.actor.OneForOneStrategy
@@ -100,80 +100,7 @@ import akka.actor.Actor
       case p: Props => sender() ! context.actorOf(p)
     }
   }
- 
-  class Child extends Actor {
-    var state = 0
-    def receive = {
-      case ex: Exception => throw ex
-      case x: Int        => state = x
-      case "get"         => sender() ! state
-    }
-  }
-}
- 
-class FaultHandlingDocSpec extends AkkaSpec with ImplicitSender {
- 
-  import FaultHandlingDocSpec._
- 
-  "A supervisor" must {
- 
-    "apply the chosen strategy for its child" in {
- 
-      val supervisor = system.actorOf(Props[Supervisor], "supervisor")
- 
-      supervisor ! Props[Child]
-      val child = expectMsgType[ActorRef] // retrieve answer from TestKit’s testActor
-      EventFilter.warning(occurrences = 1) intercept {
-        child ! 42 // set state to 42
-        child ! "get"
-        expectMsg(42)
- 
-        child ! new ArithmeticException // crash it
-        child ! "get"
-        expectMsg(42)
-      }
-      EventFilter[NullPointerException](occurrences = 1) intercept {
-        child ! new NullPointerException // crash it harder
-        child ! "get"
-        expectMsg(0)
-      }
-      EventFilter[IllegalArgumentException](occurrences = 1) intercept {
-        watch(child) // have testActor watch “child”
-        child ! new IllegalArgumentException // break it
-        expectMsgPF() { case Terminated(`child`) => () }
-      }
-      EventFilter[Exception]("CRASH", occurrences = 2) intercept {
-        supervisor ! Props[Child] // create new child
-        val child2 = expectMsgType[ActorRef]
- 
-        watch(child2)
-        child2 ! "get" // verify it is alive
-        expectMsg(0)
- 
-        child2 ! new Exception("CRASH") // escalate failure
-        expectMsgPF() {
-          case t @ Terminated(`child2`) if t.existenceConfirmed => ()
-        }
-        val supervisor2 = system.actorOf(Props[Supervisor2], "supervisor2")
- 
-        supervisor2 ! Props[Child]
-        val child3 = expectMsgType[ActorRef]
- 
-        child3 ! 23
-        child3 ! "get"
-        expectMsg(23)
- 
-        child3 ! new Exception("CRASH")
-        child3 ! "get"
-        expectMsg(0)
-      }
-      // code here
-    }
-  }
-}
 ```
-
-//TODO 原文这里代码贴多了？
 
 该监管者将被用来创建一个可以做试验的子actor：
 

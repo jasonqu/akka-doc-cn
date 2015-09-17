@@ -1,6 +1,6 @@
 # 测试Actor系统
 
-* [TestKit 实例 (Scala)](09_1_testkit_example.md)
+* [TestKit 实例 (Scala)](09_1_testkit-example.md)
 
 对于任何软件开发，自动化测试都是开发过程中一个重要组成部分。actor 模型对于代码单元如何划分，它们之间如何交互提供了一种新的视角，这对如何编写测试也造成了影响。
 
