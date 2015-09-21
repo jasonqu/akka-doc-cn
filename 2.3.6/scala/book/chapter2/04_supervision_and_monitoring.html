@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.4" data-basepath=".." data-revision="1429064719816">
+    <div class="book"  data-level="2.4" data-basepath=".." data-revision="1442802141200">
     
 
 <div class="book-summary">
@@ -1457,7 +1457,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_43">
+                    <section class="normal" id="section-gitbook_118">
                     
                         <h1 id="">监管与监控</h1>
 <p>这一节将简述监管背后的概念、原语及语义。要了解这些如何转换成真实代码，请参阅相关的Scala和Java API章节。</p>
@@ -1492,7 +1492,7 @@
 <li>处理消息时一些外部资源的（临时性）失败</li>
 <li>actor内部状态崩溃了</li>
 </ul>
-<p>除非故障能被专门识别，否则所述的第三个原因不能被排除，从而引出内部状态需要被清除的结论。如果监管者确定它的其他子actor或本身不会受到崩溃的影响——例如使用了错误内核模式的自恢复应用——因此最好只重启这个孩子。具体实现是通过建立底层<code>Actor</code>类的新实例，并用新的<code>ActorRef</code>更换故障实例；能做到这一点是因为将actor都封装载了特殊的引用中。然后新actor恢复处理其邮箱，这意味着该启动在actor外部是不可见的，显著的异常是在发生失败期间的消息不会被重新处理。</p>
+<p>除非故障能被专门识别，否则所述的第三个原因不能被排除，从而引出内部状态需要被清除的结论。如果监管者确定它的其他子actor或本身不会受到崩溃的影响——例如使用了错误内核模式的能够自我恢复的应用——那么最好只重启这个孩子。具体实现是通过建立底层<code>Actor</code>类的新实例，并用新的<code>ActorRef</code>更换故障实例；能做到这一点是因为将actor都封装载了特殊的引用中。然后新actor恢复处理其邮箱，这意味着该启动在actor外部是不可见的，显著的异常是在发生失败期间的消息不会被重新处理。</p>
 <p>重启过程中所发生事件的精确次序是：</p>
 <ol>
 <li>actor被挂起（意味着它不会处理正常消息直到被恢复），并递归挂起其所有子actor</li>

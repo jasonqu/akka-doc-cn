@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.5" data-basepath=".." data-revision="1429064719816">
+    <div class="book"  data-level="2.5" data-basepath=".." data-revision="1442802141200">
     
 
 <div class="book-summary">
@@ -1457,7 +1457,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_40">
+                    <section class="normal" id="section-gitbook_116">
                     
                         <h1 id="actor-">Actor引用, 路径与地址</h1>
 <p>本章描述actor如何被确定，以及在一个可能是分布式的actor系统中如何定位。这与 <a href="02_actor_systems.html">Actor系统</a> 的核心概念有关：固有的树形监管结构和跨多个网络节点的actor之间进行透明通讯。</p>
@@ -1557,7 +1557,7 @@
 <li><code>&quot;/temp&quot;</code>是所有系统创建的短时actor的监管者，例如那些在<code>ActorRef.ask</code>的实现中用到的actor。</li>
 <li><code>&quot;/remote&quot;</code> 是一个人造虚拟路径，用来存放所有其监管者是远程actor引用的actor。</li>
 </ul>
-<p>需要为actor构建这样的名称空间源于一个核心的非常简单的设计目标：在层次结构中的一切都是一个actor，以及所有的actor都以相同方式工作。因此，你不仅可以查找你所创建的actor，你也可以查找系统守护者并发送消息（在这种情况下它会忠实地丢弃之）。这个强大的原则意味着不需要记住额外的怪异模式，它使整个系统更加统一和一致。</p>
+<p>需要为actor构建这样的名称空间源于一个核心的非常简单的设计目标：在树形结构中的一切都是一个actor，以及所有的actor都以相同方式工作。因此，你不仅可以查找你所创建的actor，你也可以查找系统守护者并发送消息（在这种情况下它会忠实地丢弃之）。这个强大的原则意味着不需要记住额外的怪异模式，它使整个系统更加统一和一致。</p>
 <p>如果您想了解更多关于actor系统的顶层结构，参考<a href="04_supervision_and_monitoring.html#toplevel-supervisors">顶级监管者</a>。</p>
 
                     

@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="4.1" data-basepath=".." data-revision="1429064719816">
+    <div class="book"  data-level="4.1" data-basepath=".." data-revision="1442802141200">
     
 
 <div class="book-summary">
@@ -1457,7 +1457,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_48">
+                    <section class="normal" id="section-gitbook_123">
                     
                         <h1 id="futures">Futures</h1>
 <blockquote>
@@ -1599,7 +1599,7 @@ failedFilter foreach println
 
 f foreach println
 </code></pre>
-<p>这样写代码的时候需要记住的是：虽然看上去上例的部分代码可以并发地运行，for comprehension的每一步实际是顺序执行的。每一步是在单独的线程中运行的，但是相较于将所有的计算在一个单独的<code>Future</code>中运行并没有太大好处. 只有在先（译者注：异步地）创建<code>Future</code>，然后对其进行组合的情况下才能真正得到好处。</p>
+<p>这样写代码的时候需要记住的是：虽然看上去上例的部分代码可以并发地运行，for comprehension的每一步实际是顺序执行的。每一步是在单独的线程中运行的，但是相较于将所有的计算在一个单独的<code>Future</code>中运行并没有太大好处。只有先创建<code>Future</code>，然后对其进行组合的情况下才能真正得到好处。</p>
 <h5 id="-futures">组合 Futures</h5>
 <p>上例中的for comprehension 是对<code>Future</code>进行组合的例子. 这种方法的常见用例是将多个<code>Actor</code>的回应组合成一个单独的计算而不用调用<code>Await.result</code>或<code>Await.ready</code>来阻塞地获得每一个结果. 先看看使用<code>Await.result</code>的例子:</p>
 <pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">f1</span> =</span> ask(actor1, msg1)

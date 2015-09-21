@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="3.3" data-basepath=".." data-revision="1429064719816">
+    <div class="book"  data-level="3.3" data-basepath=".." data-revision="1442802141200">
     
 
 <div class="book-summary">
@@ -1457,7 +1457,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_5">
+                    <section class="normal" id="section-gitbook_82">
                     
                         <h1 id="">容错</h1>
 <p>如<a href="../chapter2/02_actor_systems.html">Actor系统</a>中所述，每一个actor都是其子actor的监管者，而且每一个actor会定义一个处理错误的监管策略。这个策略制定以后就不能修改，因为它被集成为actor系统结构所必须的一部分。</p>
@@ -1521,7 +1521,7 @@
 <p>顶级actor是指那些使用<code>system.actorOf()</code>创建的，而它们将是<a href="../chapter2/04_supervision_and_monitoring.html#user-guardian">User监管Actor</a>的子actor。这里没有使用特殊规则，监管者只是应用了已配置的策略。</p>
 <h3 id="">测试应用</h3>
 <p>以下部分展示了实际中不同的指令的效果，为此我们需要创建一个测试环境。首先我们需要一个合适的监管者：</p>
-<pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Actor</span>
+<pre><code class="lang-scala">  <span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Actor</span>
 
   <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Supervisor</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
     <span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">OneForOneStrategy</span>
@@ -1540,79 +1540,7 @@
       <span class="hljs-keyword">case</span> p: <span class="hljs-type">Props</span> =&gt; sender() ! context.actorOf(p)
     }
   }
-
-  <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Child</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">Actor</span> {</span>
-    <span class="hljs-keyword">var</span> state = <span class="hljs-number">0</span>
-    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">receive</span> =</span> {
-      <span class="hljs-keyword">case</span> ex: <span class="hljs-type">Exception</span> =&gt; <span class="hljs-keyword">throw</span> ex
-      <span class="hljs-keyword">case</span> x: <span class="hljs-type">Int</span>        =&gt; state = x
-      <span class="hljs-keyword">case</span> <span class="hljs-string">"get"</span>         =&gt; sender() ! state
-    }
-  }
-}
-
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FaultHandlingDocSpec</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span></span> <span class="hljs-title">AkkaSpec</span> <span class="hljs-keyword"><span class="hljs-keyword">with</span></span> <span class="hljs-title">ImplicitSender</span> {</span>
-
-  <span class="hljs-keyword">import</span> <span class="hljs-type">FaultHandlingDocSpec</span>._
-
-  <span class="hljs-string">"A supervisor"</span> must {
-
-    <span class="hljs-string">"apply the chosen strategy for its child"</span> in {
-
-      <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">supervisor</span> =</span> system.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">Supervisor</span>], <span class="hljs-string">"supervisor"</span>)
-
-      supervisor ! <span class="hljs-type">Props</span>[<span class="hljs-type">Child</span>]
-      <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">child</span> =</span> expectMsgType[<span class="hljs-type">ActorRef</span>] <span class="hljs-comment">// retrieve answer from TestKit’s testActor</span>
-      <span class="hljs-type">EventFilter</span>.warning(occurrences = <span class="hljs-number">1</span>) intercept {
-        child ! <span class="hljs-number">42</span> <span class="hljs-comment">// set state to 42</span>
-        child ! <span class="hljs-string">"get"</span>
-        expectMsg(<span class="hljs-number">42</span>)
-
-        child ! <span class="hljs-keyword">new</span> <span class="hljs-type">ArithmeticException</span> <span class="hljs-comment">// crash it</span>
-        child ! <span class="hljs-string">"get"</span>
-        expectMsg(<span class="hljs-number">42</span>)
-      }
-      <span class="hljs-type">EventFilter</span>[<span class="hljs-type">NullPointerException</span>](occurrences = <span class="hljs-number">1</span>) intercept {
-        child ! <span class="hljs-keyword">new</span> <span class="hljs-type">NullPointerException</span> <span class="hljs-comment">// crash it harder</span>
-        child ! <span class="hljs-string">"get"</span>
-        expectMsg(<span class="hljs-number">0</span>)
-      }
-      <span class="hljs-type">EventFilter</span>[<span class="hljs-type">IllegalArgumentException</span>](occurrences = <span class="hljs-number">1</span>) intercept {
-        watch(child) <span class="hljs-comment">// have testActor watch “child”</span>
-        child ! <span class="hljs-keyword">new</span> <span class="hljs-type">IllegalArgumentException</span> <span class="hljs-comment">// break it</span>
-        expectMsgPF() { <span class="hljs-keyword">case</span> <span class="hljs-type">Terminated</span>(`child`) =&gt; () }
-      }
-      <span class="hljs-type">EventFilter</span>[<span class="hljs-type">Exception</span>](<span class="hljs-string">"CRASH"</span>, occurrences = <span class="hljs-number">2</span>) intercept {
-        supervisor ! <span class="hljs-type">Props</span>[<span class="hljs-type">Child</span>] <span class="hljs-comment">// create new child</span>
-        <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">child2</span> =</span> expectMsgType[<span class="hljs-type">ActorRef</span>]
-
-        watch(child2)
-        child2 ! <span class="hljs-string">"get"</span> <span class="hljs-comment">// verify it is alive</span>
-        expectMsg(<span class="hljs-number">0</span>)
-
-        child2 ! <span class="hljs-keyword">new</span> <span class="hljs-type">Exception</span>(<span class="hljs-string">"CRASH"</span>) <span class="hljs-comment">// escalate failure</span>
-        expectMsgPF() {
-          <span class="hljs-keyword">case</span> t @ <span class="hljs-type">Terminated</span>(`child2`) <span class="hljs-keyword">if</span> t.existenceConfirmed =&gt; ()
-        }
-        <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">supervisor2</span> =</span> system.actorOf(<span class="hljs-type">Props</span>[<span class="hljs-type">Supervisor2</span>], <span class="hljs-string">"supervisor2"</span>)
-
-        supervisor2 ! <span class="hljs-type">Props</span>[<span class="hljs-type">Child</span>]
-        <span class="hljs-function"><span class="hljs-keyword">val</span> <span class="hljs-title">child3</span> =</span> expectMsgType[<span class="hljs-type">ActorRef</span>]
-
-        child3 ! <span class="hljs-number">23</span>
-        child3 ! <span class="hljs-string">"get"</span>
-        expectMsg(<span class="hljs-number">23</span>)
-
-        child3 ! <span class="hljs-keyword">new</span> <span class="hljs-type">Exception</span>(<span class="hljs-string">"CRASH"</span>)
-        child3 ! <span class="hljs-string">"get"</span>
-        expectMsg(<span class="hljs-number">0</span>)
-      }
-      <span class="hljs-comment">// code here</span>
-    }
-  }
-}
 </code></pre>
-<p>//TODO 原文这里代码贴多了？</p>
 <p>该监管者将被用来创建一个可以做试验的子actor：</p>
 <pre><code class="lang-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">Actor</span>
 

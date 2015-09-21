@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="2.7" data-basepath=".." data-revision="1429064719816">
+    <div class="book"  data-level="2.7" data-basepath=".." data-revision="1442802141200">
     
 
 <div class="book-summary">
@@ -1457,7 +1457,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_36">
+                    <section class="normal" id="section-gitbook_112">
                     
                         <h1 id="akkajava">Akka与Java内存模型</h1>
 <p>使用包含Scala和Akka在内的Typesafe平台的主要好处是它简化了并发软件的编写过程。本文将讨论Typesafe平台，尤其是Akka是如何在并发应用中访问共享内存的。</p>
@@ -1481,8 +1481,8 @@
 </ul>
 <p>为了避免actor中的可见性和重排序问题，Akka保证以下两条 “发生在先” 规则:</p>
 <ul>
-<li><strong>actor发送规则 : </strong>一条消息的发送动作先于同一个actor对同一条消息的接收。</li>
-<li><strong>actor后续处理规则: </strong>一条消息的处理先于同一个actor的下一条消息处理</li>
+<li><strong>actor发送规则 : </strong>一条消息的发送动作先于目标actor对同一条消息的接收。</li>
+<li><strong>actor后续处理规则: </strong>对同一个actor，一条消息的处理先于下一条消息处理</li>
 </ul>
 <blockquote>
 <p>注意</p>
