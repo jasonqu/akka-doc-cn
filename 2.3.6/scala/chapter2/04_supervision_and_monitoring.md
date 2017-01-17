@@ -79,7 +79,7 @@ Akka中有两种类型的监管策略：`OneForOneStrategy` 和`AllForOneStrateg
 
 通常停止一个孩子（即对失败不再响应）不会自动终止多对一策略中其他的孩子；可以很容易地通过观察它们的生命周期来做到这点：如果`Terminated`的消息不能被监管者处理，它会抛出一个`DeathPactException`，并（这取决于其监管者）将重新启动，默认`preRestart`操作会终止所有的孩子。当然这也可以被显式地处理。
 
-请注意，在多对一监管者下创建一个临时的actor会导致一个问题：临时actor的失败上升会使所有永久actor受到影响。如果这不是所期望的，安装一个中间监管者；这可以很容易地通过为工作者声明大小为1的路由器来完成，请参阅路由[routing-scala](../chapter3/06_routing.md)或[routing-java`](#TODO)。
+请注意，在多对一监管者下创建一个临时的actor会导致一个问题：临时actor的失败上升会使所有永久actor受到影响。如果这不是所期望的，安装一个中间监管者；这可以很容易地通过为工作者声明大小为1的路由器来完成，请参阅路由[routing-scala](../chapter3/06_routing.md)或[routing-java](#TODO)。
 
 
 

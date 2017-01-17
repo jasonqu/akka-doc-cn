@@ -82,7 +82,8 @@ Transformers）](http://maven.apache.org/plugins/maven-shade-plugin/examples/res
 
 <span id="dakka-log-config-on-start"></span>
 ###自定义application.conf
-一个自定义的``application.conf`可能看起来像这样：
+
+一个自定义的`application.conf`可能看起来像这样：
 
 ```
   # In this file you can override any option defined in the reference files.
@@ -186,7 +187,7 @@ dev.conf:
 ###配置多个ActorSystem
 如果你有一个以上的``ActorSystem``（或你正在写一个库，有可能有一个独立于应用的 ``ActorSystem``） 你可能想要为每个系统进行单独配置。
 
-由于 ConfigFactory.load() 会合并classpath中所有匹配名称的资源, 最简单的方式是利用这一功能并在配置树中区分actor系统:
+由于 `ConfigFactory.load()` 会合并classpath中所有匹配名称的资源, 最简单的方式是利用这一功能并在配置树中区分actor系统:
 
 ```
   myapp1 {
