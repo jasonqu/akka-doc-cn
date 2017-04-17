@@ -2,7 +2,7 @@
 
 > 注：本节未经校验，如有问题欢迎提issue
 
-###为什么使用它们？
+### 为什么使用它们？
 线路断路器用于提供稳定性并防止在分布式系统中的级联故障。它们应该结合在远程系统之间的接口使用明智的超时，以防止单个组件的故障拖垮所有组件。
 
 作为一个例子，我们有一个web 应用程序与远程的第三方web服务进行交互。假如第三方已用完了他们的容量，他们的数据库也在高荷载作用下熔化。假设数据库在这种情况下失败，第三方 web 服务用了很长的时间来返回一个错误。这进一步使调用在长一段时间后失败。回到我们的 web 应用程序，用户已注意到其表单提交似乎比需要的使用了更长的时间。当然用户知道要做的是点击刷新按钮，将更多的请求添加到其已在运行的请求中。这最终导致 web 应用程序由于资源枯竭而失败。这将会影响所有用户，甚至是那些没有使用依赖于此第三方 web 服务的功能的。
@@ -11,7 +11,7 @@
 
 Akka库提供名为 `akka.pattern.CircuitBreaker`的断路器实现，具有如下所述的行为。
 
-###他们是做什么工作的？
+### 他们是做什么工作的？
 
 * 在正常操作期间，断路器处于`Closed`状态：
   * 异常或超过配置的 ``callTimeout`` 的调用增加一个失败计数
@@ -31,14 +31,14 @@ Akka库提供名为 `akka.pattern.CircuitBreaker`的断路器实现，具有如�
 
 ![](../images/circuit-breaker-states.png)
 
-###例子
-#####初始化
+### 例子
+##### 初始化
 下面是如何配置一个`CircuitBreaker`：
   * 最多失败5次
   * 调用超时时间为 10 秒
   * 重置超时时间为 1 分钟
 
-######Scala
+###### Scala
 ```scala
 import scala.concurrent.duration._
 import akka.pattern.CircuitBreaker
@@ -61,7 +61,7 @@ class DangerousActor extends Actor with ActorLogging {
     log.warning("My CircuitBreaker is now open, and will not close for one minute")
 ```
 
-######Java
+###### Java
 ```java
 import akka.actor.UntypedActor;
 import scala.concurrent.Future;
@@ -96,10 +96,10 @@ public class DangerousJavaActor extends UntypedActor {
   }
 ```
 
-#####调用保护
+##### 调用保护
 下面是如何将`CircuitBreaker`用于保护一个异步调用，以及一个同步调用：
 
-######Scala
+###### Scala
 ```scala
 def dangerousCall: String = "This really isn't that dangerous of a call after all"
 
@@ -111,7 +111,7 @@ def receive = {
 }
 ```
 
-######Java
+###### Java
 ```java
 public String dangerousCall() {
   return "This really isn't that dangerous of a call after all";

@@ -12,7 +12,7 @@ Akka的ZeroMQ模块是按照JZMQ中的API编写的，JZMQ使用JNI与本地ZeroM
 
 > ``zeromq-scala-bindings``当前所用的版本只兼容 zeromq 2 ；zeromq 3 不受支持。
 
-###连接
+### 连接
 
 ZeroMQ 支持多种连接模式, 每一种用来满足不同的需求。 目前这个模块支持发布－订阅型连接和基于Router－Dealer的连接. 为了发起连接或接收连接，必须创建一个socket. Socket都是用 akka.zeromq.ZeroMQExtension创建的, 例如:
 
@@ -47,7 +47,7 @@ val subSocket = system.newSocket(SocketType.Sub, Listener(listener), Connect("tc
 
 下面的章节将描述所支持的连接方式以及它们在Akka环境中的用法。但是，如果要详细了解各种连接方式，请参阅 ZeroMQ – The Guide.
 
-#####发布-订阅型连接
+##### 发布-订阅型连接
 在一个发布-订阅(pub-sub)型连接中, 一个发布者可以有多个订阅者. 每个订阅者订阅一个或多个主题 , 发布者向主题发布消息. 订阅者也可以订阅所有的主题. 在 Akka 环境中, 如果要向并不直接与某actor打交道的actor发布消息，需要使用pub-sub 连接.
 
 在使用 zeromq pub/sub 时你必须知道它需要多播 - 检查你的云环境 - 才能正确工作，同时对事件主题的过滤发生在客户端, 因此所有的事件都会广播到所有的订阅者.
@@ -72,7 +72,7 @@ subTopicSocket ! Unsubscribe("foo.bar")
 pubSocket ! ZMQMessage(Seq(Frame("foo.bar"), Frame(payload)))
 ```
 
-#####Pub-Sub实战
+##### Pub-Sub实战
 下例演示了一个有两个订阅者的发布者.
 
 发布者监视当前的堆使用量和系统负载并周期性在"health.heap" 主题上发布 Heap 事件， 在"health.load"主题上发布 Load 事件.
@@ -179,7 +179,7 @@ class HeapAlerter extends Actor with ActorLogging {
   system.actorOf(Props[HeapAlerter], name = "alerter")
 ```
 
-#####Router-Dealer Connection
+##### Router-Dealer Connection
 虽然 Pub/Sub 是很好的连接方式但zeromq的真正优势在于它象一个用于可靠消息通信的 “乐高玩具” . 而由于有如此多的集成方式，它的多语言支持是极好的. 当你使用ZeroMQ来集成多个系统时你可能需要创建自己的ZeroMQ机制。这时就轮到router 和 dealer socket 类型发挥作用了. 使用这些socket类型你可以创建自己的使用TCP/IP的可靠pub sub broker，并实现发布方的事件过滤.
 
 要创建配置了高水位的Router socket:
@@ -194,7 +194,7 @@ val highWatermarkSocket = system.newSocket(
 
 akka-zeromq 模块支持大部分zeromq socket的配置选项.
 
-#####推－拉型连接
+##### 推－拉型连接
 Akka ZeroMQ 模块支持 推-拉 型连接.
 
 创建 Push 连接:
@@ -211,7 +211,7 @@ def newPullSocket(socketParameters: Array[SocketOption]): ActorRef
 
 很快将提供有更多的文档和示例.
 
-#####请求－响应型连接
+##### 请求－响应型连接
 Akka ZeroMQ 模块支持 请求-响应 型连接.
 
 创建 响应 连接:

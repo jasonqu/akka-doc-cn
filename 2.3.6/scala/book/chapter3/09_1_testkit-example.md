@@ -1,4 +1,4 @@
-#TestKit实例(Scala)
+# TestKit实例(Scala)
 
 这是Ray Roestenburg 在 [他的博客](http://roestenburg.agilesquad.com/2011/02/unit-testing-akka-actors-with-testkit_12.html) 中的示例代码，作了改动以兼容 Akka 2.x。
 

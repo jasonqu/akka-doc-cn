@@ -2,10 +2,10 @@
 
 > 注：本节未经校验，如有问题欢迎提issue
 
-###简介
+### 简介
 在 Akka 中，一个[Future](http://en.wikipedia.org/wiki/Futures_and_promises)是用来获取某个并发操作结果的数据结构。这个结果可以以同步（阻塞）或异步（非阻塞）的方式访问。
 
-###执行上下文
+### 执行上下文
 为了运行回调和操作，Futures 需要有一个``ExecutionContext``，它与``java.util.concurrent.Executor``很相像. 如果你在作用域内有一个``ActorSystem``，它会把自己的派发器用作``ExecutionContext``，或者你也可以用``ExecutionContext``伴生对象提供的工厂方法来将``Executors``和``ExecutorServices``进行包装，或者甚至创建自己的实例。
 
 ```scala
@@ -21,7 +21,7 @@ val f = Promise.successful("foo")
 ec.shutdown()
 ```
 
-###在Actor中
+### 在Actor中
 每个actor都被配置为在``MessageDispatcher``上运行，且该调度器又被用作为``ExecutionContext``。如果被actor调用的Future的性质匹配或兼容与那个actor的活动（例如，全CPU绑定，也没有延迟要求），那么它可能是最容易重用派发器，只需要通过导入``context.dispatcher``来运行Futures。
 
 ```scala
@@ -34,7 +34,7 @@ class A extends Actor {
 }
 ```
 
-###用于 Actor
+### 用于 Actor
 通常有两种方法来从一个``Actor``获取回应：第一种是发送一个消息（``actor ! msg``，这种方法只在发送者是一个``Actor``时有效)，第二种是通过一个``Future``。
 
 使用``Actor``的``?``方法来发送消息会返回一个``Future``. 要等待并获取结果的最简单方法是:
@@ -68,7 +68,7 @@ import akka.pattern.pipe
 future pipeTo actor
 ```
 
-###直接使用
+### 直接使用
 Akka中的一个常见用例是在不需要额外使用``Actor``工具的情况下并发地执行计算. 如果你发现你只是为了并行地执行一个计算而创建了一堆``Actor``，下面是一种更好（也更快）的方法:
 
 ```scala
@@ -104,10 +104,10 @@ val theFuture = promise.future
 promise.success("hello")
 ```
 
-###函数式 Future
+### 函数式 Future
 Scala 的``Future``有一些 monadic 方法，与Scala集合所使用的方法非常相似. 这使你可以构造出可以传递结果的 ‘管道’ 或 ‘数据流’ 。
 
-#####Future 是 Monad
+##### Future 是 Monad
 让``Future``以函数式风格工作的第一个方法是``map``. 它需要一个``Function``来对``Future``的结果进行处理，返回一个新的结果。``map``方法的返回值是包含新结果的另一个``Future``:
 
 ```scala
@@ -170,7 +170,7 @@ val failedFilter = future1.filter(_ % 2 == 1).recover {
 failedFilter foreach println
 ```
 
-#####For Comprehensions
+##### For Comprehensions
 由于``Future``拥有``map``，``filter``和``flatMap``方法，它可以方便地用于 ‘for comprehension’:
 
 ```scala
@@ -189,7 +189,7 @@ f foreach println
 
 这样写代码的时候需要记住的是：虽然看上去上例的部分代码可以并发地运行，for comprehension的每一步实际是顺序执行的。每一步是在单独的线程中运行的，但是相较于将所有的计算在一个单独的``Future``中运行并没有太大好处。只有先创建``Future``，然后对其进行组合的情况下才能真正得到好处。
 
-#####组合 Futures
+##### 组合 Futures
 上例中的for comprehension 是对``Future``进行组合的例子. 这种方法的常见用例是将多个``Actor``的回应组合成一个单独的计算而不用调用``Await.result``或``Await.ready``来阻塞地获得每一个结果. 先看看使用``Await.result``的例子:
 
 ```scala
@@ -281,7 +281,7 @@ futureSum foreach println
 
 与``fold``一样，它是在最后一个``Future``完成后异步执行的，你也可以对这个过程进行并行化：将future分成子序列分别进行reduce，然后对reduce的结果再次reduce。
 
-###回调
+### 回调
 有时你只想要监听``Future``的完成事件，对其进行响应，不是创建新的``Future``，而仅仅是产生副作用. Scala为这种情况准备了``onComplete``，``onSuccess``和``onFailure``，其中后两者是第一项的特例。
 
 ```scala
@@ -307,7 +307,7 @@ future onComplete {
 }
 ```
 
-###定义次序
+### 定义次序
 由于回调的执行是无序的，而且可能是并发执行的，当你需要操作有序的时候代码行为往往很怪异。但有一个解决办法是使用``andThen``. 它会为指定的回调创建一个新的``Future``，这个``Future``与原先的``Future``拥有相同的结果，这样就可以像下例一样定义次序:
 
 ```scala
@@ -319,7 +319,7 @@ val result = Future { loadPage(url) } andThen {
 result foreach println
 ```
 
-###辅助方法
+### 辅助方法
 ``Future````fallbackTo``将两个``Futures``合并成一个新的``Future``，如果第一个``Future``失败了，它将持有第二个``Future``的成功值。
 
 ```scala
@@ -334,7 +334,7 @@ val future3 = future1 zip future2 map { case (a, b) => a + " " + b }
 future3 foreach println
 ```
 
-###异常
+### 异常
 由于``Future``的结果是与程序的其它部分并发生成的，因此异常需要作特殊的处理。不管是``Actor``或是派发器正在完成此``Future``，如果抛出了``Exception``，``Future``将持有这个异常而不是一个有效的值. 如果``Future``持有``Exception``，调用``Await.result``将导致此异常被再次抛出从而得到正确的处理。
 
 通过返回一个不同的结果来处理``Exception``也是可能的. 这是使用``recover``方法实现的. 例如:
@@ -359,7 +359,7 @@ val future = akka.pattern.ask(actor, msg1) recoverWith {
 future foreach println
 ```
 
-###After
+### After
 ``akka.pattern.after``使得在给定超时后完成一个``Future``，获取其值或异常比昂的很容易。
 
 ```scala

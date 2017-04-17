@@ -22,7 +22,7 @@ val manager = IO(Tcp)
 
 管理器是一个actor，来处理底层低级别 I/O 资源(selectors, channels)并为特定任务，如监听传入的连接，来实例化工作者。
 
-###连接
+### 连接
 
 ```scala
 object Client {
@@ -78,7 +78,7 @@ TCP 管理器然后将要么回复`CommandFailed`，要么产生一个内部的a
 
 上面的示例中actor使用`become`来从无连接状态切换到已连接状态，演示那种状态下被观察到的命令和事件。关于`CommandFailed`参见下文的讨论——[读写限流](#throttling-reads-and-writes)。`ConnectionClosed`是一个特质，它标志着不同的连接关闭事件。最后一行中以同样的方式处理所有的连接关闭事件。有可能监听更多的细粒度的连接关闭事件，请参阅下面的[关闭连接](#closing-connections)。
 
-###接受连接
+### 接受连接
 
 ```scala
 class Server extends Actor {
@@ -123,7 +123,7 @@ class SimplisticHandler extends Actor {
 
 对传出连接的唯一区别是内部actor管理监听端口 —— `Bound`消息的发件人 —— 观察在`Bind`消息中被指定为`Connected`消息接收者的那个actor。那个actor终止时监听端口将会封闭，与它相关的所有资源将都被释放 ；在这一点上，现有连接不会被终止。
 
-###关闭连接
+### 关闭连接
 可以通过发送``Close``, ``ConfirmedClose``或``Abort``之一的命令到连接actor关闭连接。
 
 通过发送``FIN``消息，``Close``将关闭该连接，但没有等待远端的确认。挂起的写操作将被执行(flush)。如果关闭成功, 监听器将收到``Closed``通知。
@@ -138,7 +138,7 @@ class SimplisticHandler extends Actor {
 
 所有关闭通知都是``ConnectionClosed``的子类型，所以不需要细粒度事件的监听器可以以相同的方式处理所有的关闭事件。
 
-###写入一个连接
+### 写入一个连接
 一旦连接建立，数据可以从任何actor通过 ``Tcp.WriteCommand`` 的形式发送给连接。``Tcp.WriteCommand`` 是一个抽象类，有三个具体的实现：
 
 * Tcp.Write
@@ -157,7 +157,7 @@ class SimplisticHandler extends Actor {
   2. 因为``WriteCommand``是原子的，你可以确定没有其他actor可以在你的写序列中"注入"其他写操作，如果你将它们组合为一个单一的 ``CompoundWrite``。在多个actor写入相同连接的情况下，这可以是一个重要的特性，通过别的方式很难实现。
   3. ``CompoundWrite``的"子写操作"是普通的``Write``或``WriteFile``命令，其本身可以请求"ack"事件。这些ACK会在相应的"子写操作"被完成时尽快发送。这允许你将附加多个ACK到``Write``或 ``WriteFile``（通过组合一个要求ACK的空写）或让连接actor通过在任意点发送中间ACK确认``CompoundWrite``的传输进度。
 
-###<a name="throttling-reads-and-writes"></a>读写限流
+### <a name="throttling-reads-and-writes"></a>读写限流
 TCP 连接actor的基本模型是它有没有内部缓冲 （即它一次只能处理一个写操作，意味着它可以缓冲一次写入，直到写入全部被传递到操作系统内核）。写入和读取的拥塞情况需要在用户级别上处理。
 
 高压写有三种操作模式
@@ -177,7 +177,7 @@ TCP 连接actor的基本模型是它有没有内部缓冲 （即它一次只能�
 
 > 显而易见，所有这些流控制方案只能在一对写者/读者和一个连接actor之间工作；一旦多个actor发送写命令到一个单独的连接，可以会出现不一致的结果。
 
-###基于ACK的高压写
+### 基于ACK的高压写
 为下面示例能恰当的工作，很重要的一点是当远端关闭其写入时，要配置连接保持半打开状态： 这允许 ``EchoHandler``在连接完全关闭之前将所有未提交数据写到客户端。它是使用连接激活的标志启用的 （观察`Register`消息）：
 
 ```scala
@@ -263,7 +263,7 @@ private def acknowledge(): Unit = {
 
 高压也可以传播，穿过读侧回到连接另一端的写侧，通过将`SuspendReading`命令发送到连接actor。这将导致不再从套接字读取任何数据 （尽管这会延迟发生，因为它需要一些时间，直到连接actor处理这个命令，因此适当的头部缓冲区应该出现) ，反过来这将导致我们这一端的操作系统内核缓冲区填满，然后 TCP 窗口机制将停止远端写，填满其写入缓冲区，直到最后另一端的写者无法推如任何数据到套接字中了。这是端到端高压如何在跨 TCP 连接实现的。
 
-###带有挂起的基于NACK高压写
+### 带有挂起的基于NACK高压写
 
 ```scala
 class EchoHandler(connection: ActorRef, remote: InetSocketAddress)
@@ -400,7 +400,7 @@ private def acknowledge(ack: Int): Unit = {
 }
 ```
 
-###带有拉取模式高压写
+### 带有拉取模式高压写
 当使用拉取读时，来自套接字的数据在可用时会被尽快发送到actor。在前面的Echo服务器示例中的情况下，这意味着我们需要维护一个传入数据缓冲区来保持它，因为写入的速度可能会低于新数据到达的速度。
 
 在拉取模式下这个缓冲区可以完全消除，如下面的代码段所示：
@@ -422,7 +422,7 @@ def receive = {
 IO(Tcp) ! Connect(listenAddress, pullMode = true)
 ```
 
-#####入站连接的拉取读模式
+##### 入站连接的拉取读模式
 前一节演示了如何为出站连接启用拉取读模式，但也可能创建一个监听器actor具有这种读模式，通过设置 ``Bind`` 命令的 ``pullMode`` 参数设置为 ``true``：
 
 ```scala

@@ -43,10 +43,10 @@ actor接收到的消息可以选择性的被持久化，并在actor启动或重�
 
 详情请参阅[Java](#TODO)和[Scala](../chapter3/08_persistence.md)相关章节.
 
-###Scala 和 Java APIs
+### Scala 和 Java APIs
 Akka同时提供 [Scala API](../README.md) 和 [Java API](#TODO)。
 
-###Akka的两种使用方式
+### Akka的两种使用方式
 
 以库的形式：在web应用中使用，放到 WEB-INF/lib 中或者作为一个普通的Jar包放进classpath。
 
@@ -54,7 +54,7 @@ Akka同时提供 [Scala API](../README.md) 和 [Java API](#TODO)。
 
 参阅[用例与部署场景](05_usecase_and_deployment_scenarios.md)了解细节。
 
-###商业支持
+### 商业支持
 Typesafe提供Akka的商业许可，提供开发和产品支持，详见[这里](http://www.typesafe.com/how/subscription)
 
 

@@ -10,7 +10,7 @@ Extensions 在每个 ``ActorSystem`` 中只会加载一次, 并被Akka所管理�
 
 > 由于扩展是hook到Akka自身的，所以扩展的实现者需要保证自己扩展的线程安全性。
 
-###构建一个扩展
+### 构建一个扩展
 现在我们来创建一个扩展示例，它的功能是对某件事发生的次数进行统计。
 
 首先定义 ``Extension`` 的功能:
@@ -88,7 +88,7 @@ class MyCounterActor extends Actor with Counting {
 
 这样就搞定了!
 
-###从配置中加载
+### 从配置中加载
 为了能够从Akka配置中加载扩展，你必须在为`ActorSystem`提供的配置文件中的 ``akka.extensions`` 部分加上 ``ExtensionId`` 或 ``ExtensionIdProvider``实现类的完整路径。
 
 ```
@@ -97,10 +97,10 @@ akka {
 }
 ```
 
-###实用性
+### 实用性
 充分发挥你的想象力，天空才是极限! 顺便提一下，你知道 Akka的``Typed Actor``, ``Serialization``和其它一些特性都是以Akka扩展的形式实现的吗？
 
-#####应用特定设置
+##### 应用特定设置
 可以用 [Configuration]() 来指定应用特有的设置。将这些设置放在一个扩展里是一个好习惯。
 
 配置示例:
