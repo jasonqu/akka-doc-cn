@@ -4,13 +4,13 @@
 
 Akka Actor的API与Scala Actor类似，它们都借鉴了Erlang的一些语法。
 
-###创建Actor
+### 创建Actor
 
 > 注意
 
 > 由于Akka采用强制性的父子监管，每一个actor都被监管着，并且（可能）是别的actor的监管者；我们建议你熟悉一下[Actor系统](../chapter2/02_actor_systems.md) 和 [监管与监控](../chapter2/04_supervision_and_monitoring.md)，阅读 [Actor引用，路径与地址](../chapter2/05_actor_references_paths_and_addresses.md)也有帮助。
 
-#####定义一个Actor类
+##### 定义一个Actor类
 要定义自己的Actor类，需要继承`Actor`并实现`receive`方法。`receive`方法需要定义一系列case语句（类型为``PartialFunction[Any, Unit]``）来描述你的Actor能够处理哪些消息（使用标准的Scala模式匹配），以及消息如何被处理。
 
 如下例：
@@ -36,7 +36,7 @@ sender, recipient)``被发布到Actor系统（`ActorSystem`）的事件流（`Ev
 
 `receive`方法的结果是一个偏函数对象，它存储在actor中作为其"最初的行为"，对actor构造完成后改变行为的进一步信息，请参阅[Become/Unbecome](#actor-hotswap)。
 
-#####<a name="props"></a>Props
+##### <a name="props"></a>Props
 `Props`是一个用来在创建actor时指定选项的配置类，可以把它看作是不可变的，因此在创建包含相关部署信息的actor时（例如使用哪一个调度器(dispatcher)，详见下文），是可以自由共享的。以下是如何创建`Props`实例的示例.
 
 ```scala
@@ -51,7 +51,7 @@ val props3 = Props(classOf[ActorWithArgs], "arg")
 
 最后一行展示了一种可能性，它在不关注上下文的情况下传递构造函数参数。在构造`Props`对象的时候，会检查是否存在匹配的构造函数，如果没有或存在多个匹配的构造函数，则会导致`IllegalArgumentEception`。
 
-#####危险的变量
+##### 危险的变量
 
 ```scala
 // 不建议在另一个actor内使用:
@@ -67,7 +67,7 @@ val props7 = Props(new MyActor)
 
 > 在另一个actor中声明一个actor是非常危险的，会打破actor的封装。永远不要将一个actor的``this``引用传进`Props`！
 
-#####推荐做法
+##### 推荐做法
 在每一个`Actor`的伴生对象中提供工厂方法是一个好主意，这有助于保持创建合适的`Props`，尽可能接近actor的定义。这也避免了使用``Props.apply(...)``方法将采用一个“按名”（by-name）参数的缺陷，因为伴生对象的给定代码块中将不会保留包含作用域的引用：
 
 ```scala
@@ -94,7 +94,7 @@ class SomeOtherActor extends Actor {
 }
 ```
 
-#####使用Props创建Actor
+##### 使用Props创建Actor
 Actor可以通过将`Props`实例传入`actorOf`工厂方法来创建，`ActorSystem`和`ActorContext`中都有该方法。
 
 ```scala
@@ -122,7 +122,7 @@ class FirstActor extends Actor {
 
 actor在创建时，会自动异步启动。
 
-#####依赖注入
+##### 依赖注入
 如果你的actor有带参数的构造函数，则这些参数也需要成为`Props`的一部分，如[上文](#props)所述。但有些情况下必须使用工厂方法，例如，当实际构造函数的参数由依赖注入框架决定。
 
 ```scala
@@ -149,7 +149,7 @@ val actorRef = system.actorOf(
 
 关于依赖注入极其Akka集成的更多内容情参见[“在Akka中使用依赖注入”](http://letitcrash.com/post/55958814293/akka-dependency-injection)指南和Typesafe Activator的[“Akka Java Spring”](http://www.typesafe.com/activator/template/akka-java-spring)教程。
 
-#####收件箱
+##### 收件箱
 当在actor外编写与actor交互的代码时，``ask``模式可以作为一个解决方案（见下文），但有两件事它不能做：接收多个答复（例如将`ActorRef`订阅到一个通知服务）和查看其他actor的生命周期。为达到这些目的可以使用`Inbox`类：
 
 ```scala
@@ -166,7 +166,7 @@ val i = inbox()
 i watch target
 ```
 
-###Actor API
+### Actor API
 `Actor` trait只定义了一个抽象方法，就是上面提到的`receive`，用来实现actor的行为。
 
 如果当前actor的行为与收到的消息不匹配，则会调用 `unhandled`，其缺省实现是向actor系统的事件流中发布一条``akka.actor.UnhandledMessage(message, sender, recipient)``（将配置项`akka.actor.debug.unhandled`设置为``on``来将它们转换为实际的调试消息）。
@@ -222,7 +222,7 @@ def postRestart(reason: Throwable): Unit = {
 以上代码所示的是`Actor` trait的缺省实现。
 
 <span id="actor-lifecycle-scala"></span>
-###Actor生命周期
+### Actor生命周期
 
 ![](../images/actor_lifecycle.png)
 
@@ -235,7 +235,7 @@ actor系统中的路径代表一个"地方"，这里可能会被活着的actor�
 相对地，`ActorSelection`指向路径（或多个路径，如果使用了通配符），且完全不关注有没有化身占据它。因此`ActorSelection` 不能被监视。获取某路径下的当前化身``ActorRef``是可能的，只要向该``ActorSelection``发送``Identify``，如果收到``ActorIdentity``回应，则正确的引用就包含其中（详见[通过Actor Selection确定Actor](#actorSelection-scala)）。也可以使用`ActorSelection`的``resolveOne``方法，它会返回一个包含匹配`ActorRef`的``Future``。
 
 <span id="deathwatch-scala"></span>
-#####使用DeathWatch进行生命周期监控
+##### 使用DeathWatch进行生命周期监控
 为了在其它actor终止时 (即永久停止，而不是临时的失败和重启)收到通知，actor可以将自己注册为其它actor在终止时所发布的`Terminated`消息的接收者（见[停止 Actor](#stopping-actors-scala)）。这个服务是由actor系统的`DeathWatch`组件提供的。
 
 注册一个监视器很简单：
@@ -263,7 +263,7 @@ class WatchActor extends Actor {
 可以使用``context.unwatch(target)``来停止对另一个actor生存状态的监控。即使`Terminated`已经加入邮箱，该操作仍有效；一旦调用`unwatch`，则被观察的actor的`Terminated`消息就都不会再被处理。
 
 <span id="start-hook-scala"></span>
-#####启动Hook
+##### 启动Hook
 actor启动后，它的`preStart`方法会被立即执行。
 
 ```scala
@@ -276,7 +276,7 @@ override def preStart() {
 在actor第一次创建时，将调用此方法。在重新启动期间，它被`postRestart`的默认实现调用，这意味着通过重写该方法，你可以选择是仅仅在初始化该actor时调用一次，还是为每次重新启动都调用。actor构造函数中的初始化代码将在每个actor实例创建的时候被调用，这也发生在每次重启时。
 
 <span id="restart-hook-scala"></span>
-#####重启Hook
+##### 重启Hook
 所有的actor都是被监管的，即与另一个使用某种失败处理策略的actor绑定在一起。如果在处理一个消息的时候抛出了异常，Actor将被重启（详见[监管与监控](../chapter2/04_supervision_and_monitoring.md)）。这个重启过程包括上面提到的Hook：
 
 1. 要被重启的actor被通知是通过调用`preRestart`，包含着导致重启的异常以及触发异常的消息；如果重启并不是因为消息处理而发生的，则所携带的消息为`None`，例如，当一个监管者没有处理某个异常继而被其监管者重启时，或者因其兄弟节点的失败导致的重启。如果消息可用，则消息的发送者通常也可用（即通过调用``sender``）。
@@ -292,11 +292,11 @@ actor的重启只会替换掉原来的actor对象；重启不影响邮箱的内�
 > 要知道失败通知与用户消息的相关顺序不是决定性的。尤其是，在失败以前收到的最后一条消息被处理之前，父节点可能已经重启其子节点了。详细信息请参见[“讨论：消息顺序”](../chapter2/08_message_delivery_reliability.md#message-ordering)。
 
 <span id="stop-hook-scala"></span>
-#####终止 Hook
+##### 终止 Hook
 一个Actor终止后，其`postStop` hook将被调用，它可以用来，例如取消该actor在其它服务中的注册。这个hook保证在该actor的消息队列被禁止后才运行，即之后发给该actor的消息将被重定向到`ActorSystem`的`deadLetters`中。
 
 <span id="actorSelection-scala"></span>
-###通过Actor Selection定位Actor
+### 通过Actor Selection定位Actor
 如[Actor引用, 路径与地址](../chapter2/05_actor_references_paths_and_addresses.md)中所述，每个actor都拥有一个唯一的逻辑路径，此路径是由从actor系统的根开始的父子链构成；它还拥有一个物理路径，如果监管链包含有远程监管者，此路径可能会与逻辑路径不同。这些路径用来在系统中查找actor，例如，当收到一个远程消息时查找收件者，但是它们更直接的用处在于：actor可以通过指定绝对或相对路径（逻辑的或物理的）来查找其它的actor，并随结果获取一个`ActorSelection`：
 
 ```scala
@@ -357,7 +357,7 @@ class Follower extends Actor {
 > `actorFor`因被`actorSelection`替代而废弃，因为`actorFor`对本地和远程的actor表现有所不同。对一个本地actor引用，被查找的actor需要在查找之前就存在，否则获得的引用是一个`EmptyLocalActorRef`。即使后来与实际路径相符的actor被创建，所获得引用仍然是这样。对于`actorFor`行为获得的远程actor
 引用则不同，每条消息的发送都会在远程系统中进行一次按路径的查找。
 
-###消息与不可变性
+### 消息与不可变性
 **重要**：消息可以是任何类型的对象，但必须是不可变的。（目前） Scala还无法强制不可变性，所以这一点必须作为约定。String、Int、Boolean这些原始类型总是不可变的。 除了它们以外，推荐的做法是使用Scala case class，它们是不可变的（如果你不专门暴露状态的话），并与接收侧的模式匹配配合得非常好。
 
 以下是一个例子:
@@ -370,7 +370,7 @@ case class Register(user: User)
 val message = Register(user)
 ```
 
-###发送消息
+### 发送消息
 向actor发送消息需使用下列方法之一。
 
 * ``!``意思是“fire-and-forget”，即异步发送一个消息并立即返回。也称为``tell``。
@@ -383,7 +383,7 @@ val message = Register(user)
 > 使用``ask``有一些性能内涵，因为需要跟踪超时，需要有桥梁将``Promise``转为`ActorRef`，并且需要在远程情况下可访问。所以为了性能应该总选择``tell``，除非只能选择``ask``。
 
 <span id="actors-tell-sender-scala"></span>
-#####Tell: Fire-forget
+##### Tell: Fire-forget
 这是发送消息的推荐方式。 不会阻塞地等待消息。它拥有最好的并发性和可扩展性。
 
 	actorRef ! message
@@ -392,7 +392,7 @@ val message = Register(user)
 
 如果**不**是从Actor实例发送的，sender成员缺省为 `deadLetters` actor引用。
 
-#####Ask: Send-And-Receive-Future
+##### Ask: Send-And-Receive-Future
 ``ask``模式既包含actor也包含future，所以它是一种使用模式，而不是`ActorRef`的方法:
 
 ```scala
@@ -461,12 +461,12 @@ val future = myActor ? "hello"
 
 > 在使用future回调如``onComplete``、``onSuccess``和``onFailure``时, 在actor内部你要小心避免捕捉该actor的引用，即不要在回调中调用该actor的方法或访问其可变状态。这会破坏actor的封装，会引用同步bug和竞态条件，因为回调会与此actor一同被并发调度。不幸的是目前还没有一种编译时的方法能够探测到这种非法访问。参阅: [Actor与共享可变状态](../chapter2/07_akka_and_the_java_memory_model.md#jmm-shared-state)
 
-#####转发消息
+##### 转发消息
 你可以将消息从一个actor转发给另一个。虽然经过了一个“中间人”，但最初的发送者地址/引用将保持不变。当实现类似路由器、负载均衡器、复制器等功能的actor时会很有用。
 
 	myActor.forward(message)
 
-###接收消息
+### 接收消息
 Actor必须实现``receive``方法来接收消息：
 
 	protected def receive: PartialFunction[Any, Unit]
@@ -488,7 +488,7 @@ class MyActor extends Actor {
 ```
 
 <span id="actor-reply"></span>
-###回应消息
+### 回应消息
 如果你需要一个用来发送回应消息的目标，可以使用``sender()``，它返回一个Actor引用。你可以用``sender() ! replyMsg``向这个引用发送回应消息。你也可以将这个ActorRef保存起来，将来再作回应或传给其它actor。如果没有`sender`（不是从actor发送的消息或者没有future上下文）那么`sender`缺省为 “死信”actor引用.
 
 ```scala
@@ -497,7 +497,7 @@ class MyActor extends Actor {
     sender() ! result       // will have dead-letter actor as default
 ```
 
-###接收超时
+### 接收超时
 
 `ActorContext`的`setReceiveTimeout`定义一个不活动时间，在这个时间到达后后，将触发一个`ReceiveTimeout`消息的发送。当指定超时时，接收函数应该能够处理`akka.actor.ReceiveTimeout`消息。最低支持的超时是 1 毫秒。
 
@@ -523,7 +523,7 @@ class MyActor extends Actor {
 }
 ```
 <span id="stopping-actors-scala"></span>
-###终止Actor
+### 终止Actor
 通过调用``ActorRefFactory``（即``ActorContext``或``ActorSystem``）的`stop`方法来终止一个actor。通常context用来终止子actor，而 system用来终止顶级actor。实际的终止操作是异步执行的，即`stop`可能在actor被终止之前返回。
 
 如果当前有正在处理的消息，对该消息的处理将在actor被终止之前完成，但是邮箱中的后续消息将不会被处理。缺省情况下这些消息会被送到`ActorSystem`的`deadLetters`中，但是这取决于邮箱的实现。
@@ -545,10 +545,10 @@ override def postStop() {
 > 由于actor的终止是异步的，你不能马上使用你刚刚终止的子actor的名字；这会导致`InvalidActorNameException`。你应该 监视`watch()`正在终止的actor，并在`Terminated`最终到达后作为回应创建它的替代者。
 
 <span id="poison-pill-scala"></span>
-#####PoisonPill
+##### PoisonPill
 你也可以向actor发送``akka.actor.PoisonPill``消息，这个消息处理完成后actor会被终止。``PoisonPill``与普通消息一样被放进队列，因此会在已经入队列的其它消息之后被执行。
 
-#####优雅地终止
+##### 优雅地终止
 如果你需要等待终止过程的结束，或者组合若干actor的终止次序，可以使用`gracefulStop`：
 
 ```scala
@@ -598,8 +598,8 @@ class Manager extends Actor {
 > 请记住，actor停止和其名称被注销是彼此异步发生的独立事件。因此，在``gracefulStop()``返回后。你会发现其名称仍可能在使用中。为了保证正确注销，只在你控制的监管者内，并且只在响应`Terminated`消息时重用名称，即不是用于顶级actor。
 
 <span id="actor-hotswap"></span>
-###Become/Unbecome
-#####升级
+### Become/Unbecome
+##### 升级
 Akka支持在运行时对Actor消息循环（即其实现）进行实时替换：在actor中调用``context.become``方法。`become`要求一个``PartialFunction[Any, Unit]``参数作为新的消息处理实现。 被替换的代码被保存在一个栈中，可以被push和pop。
 
 > 警告
@@ -661,10 +661,10 @@ object SwapperApp extends App {
 }
 ```
 
-#####对Scala Actors 嵌套接收消息进行编码而不会造成意外的内存泄露
+##### 对Scala Actors 嵌套接收消息进行编码而不会造成意外的内存泄露
 参阅[解嵌套接收消息示例](http://github.com/akka/akka/tree/v2.3.6/akka-docs/rst/scala/code/docs/actor/UnnestedReceives.scala)。
 
-###贮藏(Stash)
+### 贮藏(Stash)
 `Stash`特质使actor可以暂时贮藏消息，来跳过当前行为不能或不应该处理的消息。在actor的消息处理程序改变时，即调用``context.become``或``context.unbecome``前，所有贮藏的消息可以是“unstashed”，从而前置到actor的邮箱中。这种方式下，贮藏消息可以按照其原始接收顺序被处理。
 
 > 注意
@@ -708,7 +708,7 @@ class ActorWithProtocol extends Actor with Stash {
 > 如果你想强制你的actor只能在无界贮藏箱下工作，则你应该换用 ``UnboundedStash``特质。
 
 <span id="killing-actors-scala"></span>
-###杀死actor
+### 杀死actor
 你可以发送``Kill``消息来杀死actor。这将导致actor抛出`ActorKilledException`，触发失败。该actor将暂停操作，其主管也将会被问及如何处理这一失败，这可能意味着恢复actor、 重新启动或完全终止它。更多的信息，请参阅[监管的意思](../chapter2/04_supervision_and_monitoring.md#supervision-directives)。
 
 像这样使用``Kill``：
@@ -718,19 +718,19 @@ class ActorWithProtocol extends Actor with Stash {
 victim ! Kill
 ```
 
-###Actor与异常
+### Actor与异常
 在消息被actor处理的过程中可能会抛出异常，例如数据库异常。
 
-#####消息会怎样
+##### 消息会怎样
 如果消息处理过程中（即从邮箱中取出并交给当前行为后）发生了异常，这个消息将被丢失。必须明白它不会被放回到邮箱中。所以如果你希望重试对消息的处理，你需要自己抓住异常然后在异常处理流程中重试。请确保限制重试的次数，因为你不会希望系统产生活锁 (从而消耗大量CPU而于事无补)。另一种可能性请参见[PeekMailbox 模式](../chapter8/05_external_contributions.md#peek-mailbox#mailbox-acking)。
 
-#####邮箱会怎样
+##### 邮箱会怎样
 如果消息处理过程中发生异常，邮箱没有任何变化。如果actor被重启，仍然是相同的邮箱在那里。邮箱中的所有消息不会丢失。
 
-#####actor会怎样
+##### actor会怎样
 如果actor代码抛出了异常，actor会被暂停并启动监管过程（参见[监管与监控](../chapter2/04_supervision_and_monitoring.md)）。根据监管者的策略，actor可以被恢复（好像什么也没有发生过）、重启（消灭其内部状态并从零开始）或终止。
 
-###使用PartialFunction链来扩展actor
+### 使用PartialFunction链来扩展actor
 有时在一些actor中分享共同的行为，或通过若干小的函数构成一个actor的行为是很有用的。这由于actor的`receive`方法返回一个``Actor.Receive``（``PartialFunction[Any,Unit]``的类型别名）而使之成为可能，多个偏函数可以使用``PartialFunction#orElse``链接在一起。你可以根据需要链接尽可能多的功能，但是你要牢记"第一个匹配"获胜——这在组合可以处理同一类型的消息的功能时会很重要。
 
 例如，假设你有一组actor是生产者``Producers``或消费者``Consumers``，然而有时候需要actor分享这两种行为。这可以很容易实现而无需重复代码，通过提取行为的特质和并将actor的`receive`实现为这些偏函数的组合。
@@ -778,15 +778,15 @@ case class Give(thing: Any)
 
 不同于继承，相同的模式可以通过组合实现——可以简单地通过委托的偏函数组合成`receive`方法。
 
-###初始化模式
+### 初始化模式
 actor丰富的生命周期钩子（hook）提供一个有用的工具包，可用于实现各种初始化模式。在``ActorRef``的生命中，actor可能会经历多次重启，老的实例被替换为新的实例，除观察者以外是觉察不到的，只能看到一个``ActorRef``。
 
 一个人可能把新实例看做是"化身"。初始化对actor每个化身都是必要的，但有时你需要初始化只在第一个实例创建时，即``ActorRef``创建时发生。以下各节提供了满足不同的初始化需求的模式。
 
-#####通过构造函数初始化
+##### 通过构造函数初始化
 使用构造函数初始化有各种好处。首先，使得用``val``字段来存储在actor实例的生命周期内不变的状态成为可能，使actor的实现更加健壮。对actor的每个化身都会调用一次构造函数，因此，actor内部总是可以假定正确地完成初始化。这也是这种方法的缺点，例如当想要避免在重启时重新初始化内部状态的情况下。例如，跨重启保留子actor经常很有用。下面提供了该情况的一种模式。
 
-#####通过preStart初始化
+##### 通过preStart初始化
 actor的``preStart()``方法只在第一个实例的初始化时调用一次，即``ActorRef``创建时。在重新启动后，``preStart()``是由``postRestart()``调用，因此如果重写，``preStart()``对每个化身都会被调用。然而，重写``postRestart()``可以禁用此行为，并确保只有一个对``preStart()``的调用。
 
 这种模式的一个有用用法是禁止在重启期间为子actor创建新``ActorRefs``。这可以通过重写``preRestart()``实现：
@@ -813,7 +813,7 @@ override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
 
 有关更多信息，请参见[重启的含义](../chapter2/04_supervision_and_monitoring.md#supervision-restart)。
 
-#####通过消息传递初始化
+##### 通过消息传递初始化
 有些情况下不可能在构造函数中传入actor初始化所需要的所有信息，例如存在循环依赖关系。在这种情况下actor应该监听初始化消息，并使用``become()``或一个有限状态机状态转换来编码actor的初始化和未初始化状态。
 
 ```scala

@@ -6,7 +6,7 @@ akka文档中文翻译
 本文大量参考了[上海广谈信息技术有限公司](http://www.gtan.com/)的[《Akka 2.0文档》](http://www.gtan.com/welfare04.html)。
 [广谈公益](http://www.gtan.com/welfare.html)还有很多优秀的资源，如感兴趣请移步参考。
 
-###贡献力量
+### 贡献力量
 
 欢迎大家对该文档贡献力量，提出[宝贵意见](../../issues)，修改并提交[Pull Requests](../../pulls)。
 
@@ -17,9 +17,9 @@ akka文档中文翻译
 * **术语的一致**：以[《Akka 2.0文档》](http://www.gtan.com/welfare04.html)的术语为准，如果有更好的选择，欢迎[提出issue](../../issues)
 * **代码的一致**：书的内容放在`版本号/语言/`目录下，如`2.3.6/scala/`，生成的html文件放在`版本号/语言/book/`目录下。如非必要，不要提交其他无关内容或生成的内容。
 
-###翻译进度与状态
+### 翻译进度与状态
 
-#####2.3.6 scala
+##### 2.3.6 scala
 
 * [x] Introduction
 * [x] 引言

@@ -2,7 +2,7 @@
 
 如[Actor系统](../chapter2/02_actor_systems.md)中所述，每一个actor都是其子actor的监管者，而且每一个actor会定义一个处理错误的监管策略。这个策略制定以后就不能修改，因为它被集成为actor系统结构所必须的一部分。
 
-###错误处理实践
+### 错误处理实践
 首先我们来看一个例子，演示处理数据库错误的一种方法，数据库错误是真实应用中的典型错误类型。当然在实际的应用中这要依赖于当数据库发生错误时能做些什么， 在这个例子中，我们使用尽量重新连接的方法。
 
 阅读以下源码。其中的注释解释了错误处理的各个片段以及为什么要加上它们。我们还强烈建议运行这个例子，因为根据输出日志理解运行时发生的事情会比较容易。
@@ -10,7 +10,7 @@
 * [容错示例图片](03-1_fault_tolerance_sample.md)
 * [容错示例完整源代码](03-1_fault_tolerance_sample.md#full-source-code-of-the-fault-tolerance-sample)
 
-###创建一个监管策略
+### 创建一个监管策略
 以下章节更加深入地解释了错误处理机制和可选的方法。
 
 为了演示我们假设有这样的策略:
@@ -37,7 +37,7 @@ override val supervisorStrategy =
 
 > 如果在监管actor内部声明策略（而不是在伴生对象中），其决策者就能够以线程安全的方式访问actor的所有内部状态，包括获取对当前失败的子actor引用（作为失败消息的发送者）。
 
-#####缺省的监管机制
+##### 缺省的监管机制
 如果定义的监管机制没有覆盖抛出的异常，将使用``Escalate``上溯机制。
 
 如果某个actor没有定义监管机制，下列异常将被缺省地处理为：
@@ -64,20 +64,20 @@ override val supervisorStrategy =
   }
 ```
 
-#####停止监管策略
+##### 停止监管策略
 Erlang方式的策略是当actor失败时，终止它们，然后当DeathWatch通知子actor消失时，采取正确的措施。这一策略还提供了预打包为`SupervisorStrategy.stoppingStrategy`及伴随的`StoppingSupervisorStrategy`配置，当你想要使用``"/user"``监管者时可以使用它。
 
-#####actor失败的日志记录
+##### actor失败的日志记录
 默认情况下``SupervisorStrategy``会日志记录失败，除非他们被上溯升级。升级的失败应该被树形结构中更高级的监管者处理，即可能在那里记录日志。
 
 当实例化时，你可以通过将``loggingEnabled``设置为``false``来取消``SupervisorStrategy``的默认日志记录。自定义日志记录可以在``Decider``内完成。请注意当``SupervisorStrategy``是在监管actor内声明的时候，可以通过``sender``获取当前失败的子actor引用。
 
 你也可以通过重写``logFailure``方法在你自己的``SupervisorStrategy``实现定制日志记录。
 
-###监督顶级actor
+### 监督顶级actor
 顶级actor是指那些使用``system.actorOf()``创建的，而它们将是[User监管Actor](../chapter2/04_supervision_and_monitoring.md#user-guardian)的子actor。这里没有使用特殊规则，监管者只是应用了已配置的策略。
 
-###测试应用
+### 测试应用
 以下部分展示了实际中不同的指令的效果，为此我们需要创建一个测试环境。首先我们需要一个合适的监管者：
 
 ```scala

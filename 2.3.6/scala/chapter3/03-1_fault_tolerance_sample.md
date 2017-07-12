@@ -31,7 +31,7 @@
 | 13, 14 | 收到``Reconnect``消息后它创建一个新的``Storage``...|
 | 15, 16 | 并通知``Counter``使用新的``Storage``。|
 
-#####<a name="full-source-code-of-the-fault-tolerance-sample"></a>容错示例完整源代码
+##### <a name="full-source-code-of-the-fault-tolerance-sample"></a>容错示例完整源代码
 
 ```scala
 import akka.actor._

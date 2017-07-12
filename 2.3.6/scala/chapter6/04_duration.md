@@ -4,13 +4,13 @@
 
 Duration在Akka库中被广泛使用，这代表一个特殊的数据类型——`scala.concurrent.duration.Duration`。这个类型的值可以表示无限(`Duration.Inf`, `Duration.MinusInf`)或有限的时间段，或是`Duration.Undefined`。
 
-###有限与无限
+### 有限与无限
 试图将无限的duration转换成一个具体的时间单位，如秒，将引发异常，在编译时有不同类型可用于区分两者：
 
 * `FiniteDuration` 保证是有限的，调用 `toNanos` 和相关方法是安全的
 * `Duration`可以是有限或无限的，因此这种类型只用与有限性并不重要的场合 ；这是 `FiniteDuration` 的超类。
 
-###Scala
+### Scala
 在Scala，时间段可以通过一个迷你DSL来创建，并支持所有期望的算术操作：
 
 ```scala
@@ -45,7 +45,7 @@ assert diff.lt(fivesec);
 assert Duration.Zero().lt(Duration.Inf());
 ```
 
-###Deadline
+### Deadline
 Duration 有一个兄弟类，名为 `Deadline`, 表示一个持有绝对的时间点的类，并且支持通过计算当前时间到deadline之间的差距来生成Duration。当你想要保持一个总体的期限，而无需记录——自己关注使用时间时，这非常有用：
 
 ```scala

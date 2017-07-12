@@ -6,8 +6,8 @@ Akka 提供了内置的支持序列化的扩展, 你可以使用内置的序列�
 
 内置的序列化功能被Akka内部用来序列化消息，你也可以用它做其它的序列化工作。
 
-###用法
-#####配置
+### 用法
+##### 配置
 为了让 Akka 知道对什么任务使用哪个``Serializer``, 你需要编辑你的 [配置文件](../chapter2/09_configuration.md), 在 “akka.actor.serializers”一节将名称绑定为``akka.serialization.Serializer``的实现，像这样:
 
 ```
@@ -54,7 +54,7 @@ akka.actor.serialization-bindings {
 }
 ```
 
-###确认
+### 确认
 如果你希望确认你的消息是可以被序列化的，你可以打开这个配置项:
 
 ```
@@ -82,7 +82,7 @@ akka {
 
 > 我们推荐只在运行测试代码的时候才打开这个选项. 在其它的场景打开它完全没有道理.
 
-#####通过代码
+##### 通过代码
 如果你希望通过代码使用 Akka Serialization来进行序列化/反序列化, 以下是一些例子:
 
 ```scala
@@ -113,10 +113,10 @@ import com.typesafe.config.ConfigFactory
 
 更多信息请见 ``akka.serialization._`` 的 ``ScalaDoc``
 
-###自定义
+### 自定义
 如果你希望创建自己的 ``Serializer``, 应该已经看到配置例子中的 ``docs.serialization.MyOwnSerializer`` 了吧?
 
-#####创建新的 Serializer
+##### 创建新的 Serializer
 首先你需要为你的 ``Serializer`` 写一个类定义，像这样:
 
 ```scala
@@ -153,7 +153,7 @@ class MyOwnSerializer extends Serializer {
 
 然后你只需要做填空，在 [配置文件](../chapter2/09_configuration.md) 中将它绑定到一个名称， 然后列出需要用它来做序列化的类即可.
 
-#####Actor引用的序列化
+##### Actor引用的序列化
 所有的 ActorRef 都是用 JavaSerializer进行序列化的, 但如果你写了自己的serializer， 你可能想知道如何正确对它们进行序列化和反序列化。在一般情况下，要使用的本地地址取决于作为序列化信息收件人的远程地址的类型。像这样使用``Serialization.serializedActorPath(actorRef)``：
 
 ```scala
@@ -211,13 +211,13 @@ def serializeAkkaDefault(ref: ActorRef): String =
     addressForAkka)
 ```
 
-#####Actor的深度序列化
+##### Actor的深度序列化
 做内部actor状态深度序列化，推荐的方法是使用[Akka持久化](../chapter3/08_persistence.md)。
 
-###关于 Java 序列化
+### 关于 Java 序列化
 如果在做Java序列化时没有使用`JavaSerializer`, 你必须保证在动态变量``JavaSerializer.currentSystem``中提供一个有效的 ``ExtendedActorSystem`` . 它用在读取`ActorRef`表示时将其字符串表示转换成实际的引用. 动态变量``DynamicVariable`` 是一个 thread-local变量，所以在反序列化任何可能包含actor引用的数据时要保证这个变量有值.
 
-###外部 Akka Serializers
+### 外部 Akka Serializers
 
 [Akka-protostuff by Roman Levenstein](https://github.com/romix/akka-protostuff-serialization)
 

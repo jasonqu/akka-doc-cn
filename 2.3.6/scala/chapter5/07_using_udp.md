@@ -9,8 +9,8 @@ UDP 无连接的数据报协议，在JDK 级别上提供两种不同的通信方
 
 低级API中区分是——令人困惑地——通过是否在套接字上调用`connect`方法（甚至当`connect`被调用，协议仍然是无连接的）。UDP 使用的这两种形式是使用不同的 IO 扩展提供的，如下所述。
 
-###无连接UDP
-#####简单发送
+### 无连接UDP
+##### 简单发送
 
 ```scala
 class SimpleSender(remote: InetSocketAddress) extends Actor {
@@ -35,7 +35,7 @@ UDP 使用最简单的形式是只发送数据报，而不需要得到回复。�
 
 > 简单的发送者不会关闭本身，因为它无法知道什么时候完成工作了。当你想要关闭该发送者的短暂绑定的端口时，你需要发送一个 `PoisonPill`给它。
 
-#####绑定（和发送）
+##### 绑定（和发送）
 
 ```scala
 class Listener(nextActor: ActorRef) extends Actor {
@@ -64,7 +64,7 @@ class Listener(nextActor: ActorRef) extends Actor {
 
 接收的数据报发送到被`Bind`消息指定的actor，`Bound`消息将被发送给`Bind`的发送者。
 
-###连接的 UDP
+### 连接的 UDP
 通过基于连接的 UDP API 提供的服务，类似于我们前面所述的bind-and-send服务，但主要区别是连接只是能够将发送到它连接到de  ``remoteAddress``，并将只能从该地址接收数据报。
 
 ```scala

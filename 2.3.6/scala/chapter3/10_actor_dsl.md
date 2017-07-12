@@ -1,6 +1,6 @@
 # Actor DSL
 
-###The Actor DSL
+### The Actor DSL
 简单的actor——例如一次性worker甚或至在REPL中尝试的事物——可以更简洁地使用`Act`特质创建。支持的基础设施通过以下导入绑定：
 
 ```scala
@@ -41,7 +41,7 @@ val a = actor(new Act {
 
 请注意，调用 ``unbecome`` 比 ``becomeStacked`` 次数多将导致原始行为被安装，对`Act`特质来说是空行为（外部``become``只是在构造过程中替换它）。
 
-#####生命周期管理
+##### 生命周期管理
 
 生命周期挂钩也可以暴露为 DSL 元素使用 （见[启动Hook](01_actors.md#start-hook-scala)和[终止Hook](01_actors.md#stop-hook-scala)），在那里如下所示的调用方法可以取代各自挂钩的内容：
 
@@ -91,7 +91,7 @@ superviseWith(OneForOneStrategy() {
 })
 ```
 
-#####有`Stash`的actor
+##### 有`Stash`的actor
 
 最后并且很重要的一点是：还有一点像魔法一样方便的内置，可以检测静态给定的actor子类型的运行时类，是不是通过`Stash`特质扩展 `RequiresMessageQueue `特质（这是一个复杂表述，即``new Act with Stash``不能工作，因为它的运行时类型被擦除为``Act``的匿名子类型）。目的是为自动根据`Stash`的需要使用适当的基于deque的邮箱类型。如果你想要使用这个魔法，只需扩展 `ActWithStash`：
 

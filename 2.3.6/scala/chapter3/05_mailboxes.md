@@ -1,8 +1,8 @@
 # 邮箱
 一个Akka ``Mailbox``保存发往某个Actor的消息。通常每个Actor都拥有自己的邮箱，但也有例外，例如使用``BalancingPool``的所有路由子(routee)共享同一个邮箱实例。
 
-###邮箱选择
-#####为actor指定一个消息队列类型
+### 邮箱选择
+##### 为actor指定一个消息队列类型
 为某个特定类型的actor指定一个特定类型的消息队列是有可能的，只要通过actor扩展`RequiresMessageQueue`参数化特质即可。下面是一个示例：
 
 ```scala
@@ -33,7 +33,7 @@ akka.actor.mailbox.requirements {
 
 > 为actor创建的邮箱队列类型，会和特质中要求的类型进行检查，如果队列没有实现要求的类型，则actor创建会失败。
 
-#####为调度器指定一个消息队列类型
+##### 为调度器指定一个消息队列类型
 调度器也可能对actor使用的邮箱类型进行限制。一个例子是 BalancingDispatcher，它要求消息队列对多个并发的消费者是线程安全的。该约束是在配置的调度器一节中像下面这样设定：
 
 ```
@@ -44,7 +44,7 @@ akka.actor.mailbox.requirements {
 
 给定的约束是要求指定的类或者接口，必须是消息队列的实现的超类。如果出现冲突——例如如果actor要求的邮箱类型不能满足要求——则actor创建会失败。
 
-#####如何选择邮箱类型
+##### 如何选择邮箱类型
 当一个actor创建时，`ActorRefProvider`首先确定将执行它的调度器。然后，邮箱确定如下：
 
 1. 如果actor的部署配置节包含``mailbox``键，则其描述邮箱类型将被使用。
@@ -54,7 +54,7 @@ akka.actor.mailbox.requirements {
 5. 如果调度器需要一个邮箱类型，如上文所述，则该约束的映射将被用来确定要使用的邮箱类型。
 6. 将使用默认邮箱``akka.actor.default-mailbox``。
 
-#####默认邮箱
+##### 默认邮箱
 当未如上所述，指定使用邮箱时，将使用默认邮箱。默认情况它是无界的邮箱，由``java.util.concurrent.ConcurrentLinkedQueue``实现。
 
 ``SingleConsumerOnlyUnboundedMailbox``是一个更有效率的邮箱，而且它也可以用作默认邮箱，但它不能与 BalancingDispatcher一起使用。
@@ -67,10 +67,10 @@ akka.actor.mailbox.requirements {
   }
 ```
 
-#####哪项配置会传递给邮箱类型
+##### 哪项配置会传递给邮箱类型
 每个邮箱类型由扩展`MailboxType`并带两个构造函数参数的类实现：一个`ActorSystem.Settings`对象和一个`Config`对象。后者通过actor系统配置的指定配置节被计算出来，重写其指定邮箱类型的配置路径的``id``键，并添加一个到默认邮箱配置节的回退。
 
-###内置实现
+### 内置实现
 Akka自带有一些内置的邮箱实现：
 
 * UnboundedMailbox
@@ -104,7 +104,7 @@ Akka自带有一些内置的邮箱实现：
   * 有界: 是
   * 配置名称："akka.dispatch.BoundedPriorityMailbox"
 
-###邮箱配置示例
+### 邮箱配置示例
 如何创建一个PriorityMailbox：
 
 ```scala
@@ -205,7 +205,7 @@ import akka.actor.Props
 val myActor = context.actorOf(Props[MyActor].withMailbox("prio-mailbox"))
 ```
 
-###创建自己的邮箱类型
+### 创建自己的邮箱类型
 例子比文字更有说服力：
 
 ```scala
@@ -295,7 +295,7 @@ class MySpecialActor extends Actor
 }
 ```
 
-###``system.actorOf``的特殊语义
+### ``system.actorOf``的特殊语义
 为了使``system.actorOf``同步和非阻塞，并且返回类型保持为`ActorRef`（并且保持返回的ref是完全函数式的语义），这种情况下会进行特殊处理。在幕后，一种空心的actor引用会被构造，然后发送到系统的监管者，该监管者实际创建actor和它的上下文，并把它们传到引用内部。直到这些发生以后，发送到该`ActorRef`的消息会被本地排队，而只有当填入真实信息后，它们才会被传入真实的邮箱，因此，
 
 ```scala

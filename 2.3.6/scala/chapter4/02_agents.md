@@ -14,7 +14,7 @@ Agent是响应式的（reactive）. 对所有agent的更新操作在一个``Exec
 
 > Agent对创建它们的节点是本地的。这意味着你一般不应包括它们在消息中，因为可能会被传递到远程actor或作为远程actor的构造函数参数；那些远程Actor不能读取或更新Agent。
 
-###创建Agent
+### 创建Agent
 创建Agent时，调用 ``Agent(value)`` ，传入它的初始值并提供一个隐式的``ExecutionContext``供其使用，在这些例子中我们将使用默认的全局量，不过你的方法可能不同(YMMV : Your Method May Vary)：
 
 ```scala
@@ -23,7 +23,7 @@ import akka.agent.Agent
 val agent = Agent(5)
 ```
 
-###读取 Agent 的值
+### 读取 Agent 的值
 Agent可以用括号调用来去引用 (你可以获取一个Agent的值) ，像这样：
 
 ```scala
@@ -38,7 +38,7 @@ val result = agent.get
 
 读取Agent的当前值不包括任何消息传递，并立即执行。所以说虽然Agent的更新的异步的，对它的状态的读取却是同步的。
 
-###更新 Agent (send & alter)
+### 更新 Agent (send & alter)
 更新Agent有两种方法：send一个函数来转换当前的值，或直接send一个新值。Agent会自动异步地应用新的值或函数。更新是以一种“发射后不管”的方式完成的，唯一的保证是它会被应用。 至于什么时候应用则没有保证，但是从同一个线程发到Agent的操作将被顺序应用。你通过调用``send``函数来应用一个值或函数。
 
 ```scala
@@ -79,7 +79,7 @@ implicit val ec = someExecutionContext()
 val f4: Future[Int] = agent alterOff longRunningOrBlockingFunction
 ```
 
-###等待Agent的返回值
+### 等待Agent的返回值
 也可以获得一个Agent值的``Future``，将在所有当前排队的更新请求都完成以后完成:
 
 ```scala
@@ -88,7 +88,7 @@ val future = agent.future
 
 参考[Futures](01_futures.md)来获取``Future``的更多信息。
 
-###Monadic 用法
+### Monadic 用法
 Agent 也支持 monadic 操作, 这样你就可以用for-comprehensions对操作进行组合. 在 monadic 用法中, 旧的Agent不会变化，而是创建新的Agent。 所以老的值（Agents）仍像原来一样可用。这就是所谓的‘持久’.
 
 monadic 用法示例:
@@ -115,10 +115,10 @@ val agent5 = for {
 } yield value1 + value2
 ```
 
-###配置
+### 配置
 有一些配置属性是针对Agent模块的，请参阅[参考配置](../chapter2/09_configuration.md#config-akka-agent)。
 
-###废弃的事务性Agent
+### 废弃的事务性Agent
 Agent参与封闭 STM 事务是 2.3 废弃的功能。
 
 如果Agent在一个封闭的事务中使用，然后它将参与该事务。如果你在一个事务内发送到Agent，然后对该Agent的派发将暂停直到该事务被提交，如果事务中止则丢弃该派发。下面是一个示例：

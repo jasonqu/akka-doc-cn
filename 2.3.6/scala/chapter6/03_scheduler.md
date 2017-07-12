@@ -12,7 +12,7 @@
 
 > Akka中使用的``Scheduler``的默认实现是基于根据一个固定的时间表清空的工作桶。它不是在确切的时间执行任务，而是在每个时间刻度，它将运行 （结束） 到期的一切。可以通过``akka.scheduler.tick-duration``配置属性修改默认``Scheduler``的时间精度。
 
-##示例
+## 示例
 
 ```scala
 import akka.actor.Actor
@@ -60,7 +60,7 @@ cancellable.cancel()
 
 > 如果你计划函数或Runnable实例时应该多加小心，不要关闭(闭合包含)不稳定的引用。在实践中这意味着在Actor实例中，不要在闭包中使用``this``，不直接访问 ``sender()`` 并且不要直接调用actor实例的方法。如果你需要安排一个调用，则安排一个发往``self``的消息 （包含必需的参数），然后在收到消息时再调用方法。
 
-###来自 ``akka.actor.ActorSystem``
+### 来自 ``akka.actor.ActorSystem``
 
 ```scala
 /**
@@ -70,7 +70,7 @@ cancellable.cancel()
 def scheduler: Scheduler
 ```
 
-###Scheduler 接口
+### Scheduler 接口
 
 实际的调度程序实现是在 `ActorSystem` 启动时反射加载的，这意味着通过使用 ``akka.scheduler.implementation`` 配置属性它可能提供一个的不同实现。引用的类必须实现以下接口：
 
@@ -184,7 +184,7 @@ trait Scheduler {
 }
 ```
 
-###Cancellable 接口
+### Cancellable 接口
 它使你可以 取消 计划执行的任务。
 
 警告

@@ -2,7 +2,7 @@
 
 这一节将简述监管背后的概念、原语及语义。要了解这些如何转换成真实代码，请参阅相关的Scala和Java API章节。
 
-###<a name="supervision-directives"></a>监管的意思
+### <a name="supervision-directives"></a>监管的意思
 在 [Actor 系统](02_actor_systems.md) 中说过，监管描述的是actor之间的依赖关系：监管者将任务委托给下属，并相应地对下属的失败状况进行响应。当一个下属出现了失败（即抛出一个异常），它自己会将自己和自己所有的下属挂起，然后向自己的监管者发送一个提示失败的消息。基于所监管的工作的性质和失败的性质，监管者可以有4种基本选择：
 
 1. 恢复下属，保持下属当前积累的内部状态
@@ -20,25 +20,25 @@ Akka实现的是一种叫“父监管”的形式。Actor只能被其它的actor
 
 > 监管相关的父-子沟通，使用了特殊的系统消息及其固有的邮箱，从而和用户消息隔离开来。这意味着，监管相关的事件相对于普通的消息没有确定的顺序关系。在一般情况下，用户不能影响正常消息和失败通知的顺序。相关详细信息和示例，请参见讨论：[消息排序](08_message_delivery_reliability.md#message-ordering)。
 
-###顶级监管者
+### 顶级监管者
 
 ![](guardians.png)
 
 一个actor系统在其创建过程中至少要启动三个actor，如上图所示。有关actor路径及相关信息请参见[Actor路径的顶级作用域](05_actor_references_paths_and_addresses.md#toplevel-paths)。
 
-#####<a name="user-guardian"></a> `/user`: 守护Actor
+##### <a name="user-guardian"></a> `/user`: 守护Actor
 
 这个名为`"/user"`的守护者，作为所有用户创建actor的父actor，可能是需要打交道最多的。使用`system.actorOf()`创建的actor都是其子actor。这意味着，当该守护者终止时，系统中所有的普通actor都将被关闭。同时也意味着，该守护者的监管策略决定了普通顶级actor是如何被监督的。自Akka 2.1起就可以使用这个设定`akka.actor.guardian-supervisor-strategy`，以一个`SupervisorStrategyConfigurator`的完整类名进行配置。当这个守护者上升一个失败，根守护者的响应是终止该守护者，从而关闭整个actor系统。
 
-#####`/system`: 系统守护者
+##### `/system`: 系统守护者
 
 这个特殊的守护者被引入，是为了实现正确的关闭顺序，即日志（logging）要保持可用直到所有普通actor终止，即使日志本身也是用actor实现的。其实现方法是：系统守护者观察user守护者，并在收到`Terminated`消息初始化其自己的关闭过程。顶级的系统actor被监管的策略是，对收到的除`ActorInitializationException`和`ActorKilledException`之外的所有`Exception`无限地执行重启，这也将终止其所有子actor。所有其他`Throwable`被上升，然后将导致整个actor系统的关闭。
 
-#####`/`: 根守护者
+##### `/`: 根守护者
 
 根守护者所谓“顶级”actor的祖父，它监督所有在[Actor路径的顶级作用域](05_actor_references_paths_and_addresses.md#toplevel-paths)中定义的特殊actor，使用发现任何`Exception`就终止子actor的`SupervisorStrategy.stoppingStrategy`策略。其他所有Throwable都会被上升……但是上升给谁？所有的真实actor都有一个监管者，但是根守护者没有父actor，因为它就是整个树结构的根。因此这里使用一个虚拟的`ActorRef`，在发现问题后立即停掉其子actor，并在根守护者完全终止之后（所有子actor递归停止），立即把actor系统的`isTerminated`置为`true`。
 
-###<a name="supervision-restart"></a>重启的含义
+### <a name="supervision-restart"></a>重启的含义
 当actor在处理某条消息时失败时，失败的原因可以分成以下三类:
 
 * 对收到的特定消息的系统错误（即程序错误）
@@ -57,7 +57,7 @@ Akka实现的是一种叫“父监管”的形式。Actor只能被其它的actor
 1. 对步骤3中没有被杀死的所有子actor发送重启请求；重启的actor会遵循相同的过程，从步骤2开始
 1. 恢复这个actor
 
-###生命周期监控的含义
+### 生命周期监控的含义
 
 > 注意
 
@@ -71,7 +71,7 @@ Akka实现的是一种叫“父监管”的形式。Actor只能被其它的actor
 
 另一个常见的应用情况是，一个actor需要在没有外部资源时失败，该资源也可能是它的子actor之一。如果第三方通过`system.stop(child)`或发送`PoisonPill`的方式终止子actor，其监管者很可能会受到影响。
 
-###一对一策略 vs. 多对一策略
+### 一对一策略 vs. 多对一策略
 
 Akka中有两种类型的监管策略：`OneForOneStrategy` 和`AllForOneStrategy`。两者都配置有从异常类型监管指令间的映射（见[上文](04_supervision_and_monitoring.md#supervision-directives)），并限制了一个孩子被终止之前允许失败的次数。它们之间的区别在于，前者只将所获得的指令应用在发生故障的子actor上，而后者则是应用在所有孩子上。通常情况下，你应该使用`OneForOneStrategy`，这也是默认的策略。
 

@@ -15,7 +15,7 @@ Akka使用[Typesafe配置库](https://github.com/typesafehub/config)，它同样
 
 > 如果你在Scala REPL的2.9.x系列版本中使用Akka，并且你不提供自己的ClassLoader给ActorSystem，则需要以“-Yrepl-sync”选项启动REPL来解决上下文ClassLoader的缺陷。
 
-###配置读取的地方
+### 配置读取的地方
 
 Akka的所有配置都保存在`ActorSystem`的实例中，或者换一种说法，从外界来看，`ActorSystem`是配置信息的唯一消费者。在构造一个actor系统时，你可以选择传进一个`Config`对象，如果不传则等效于传入``ConfigFactory.load()``（通过正确的类加载器）。粗略的讲，这意味着默认会解析classpath根目录下所有的`application.conf`，`application.json`和`application.properties`文件——请参考前面提到的文档以获取细节。然后actor系统会合并classpath根目录下的所有 ``reference.conf``行成后备配置，也就是说，它在内部使用
 
@@ -31,7 +31,7 @@ Akka的所有配置都保存在`ActorSystem`的实例中，或者换一种说法
 
 > 如果你正在编写一个Akka 应用，将你的配置保存类路径的根目录下的``application.conf``文件中。如果你正在编写一个基于Akka的库，将其配置保存在JAR包根目录下的``reference.conf``文件中。
 
-###当使用JarJar,，OneJar，Assembly或任何jar打包命令（jar-bundler）
+### 当使用JarJar,，OneJar，Assembly或任何jar打包命令（jar-bundler）
 
 > 警告
 
@@ -81,7 +81,7 @@ Transformers）](http://maven.apache.org/plugins/maven-shade-plugin/examples/res
 ```
 
 <span id="dakka-log-config-on-start"></span>
-###自定义application.conf
+### 自定义application.conf
 
 一个自定义的`application.conf`可能看起来像这样：
 
@@ -121,7 +121,7 @@ Transformers）](http://maven.apache.org/plugins/maven-shade-plugin/examples/res
   }
 ```
 
-###<a name="including-files"></a>包含文件
+### <a name="including-files"></a>包含文件
 有时包含另一个配置文件内容的能力是非常有用的，例如假设你有一个``application.conf``包含所有环境独立设置，然后使用特定环境的设置覆写。
 
 用``-Dconfig.resource=/dev.conf``制定系统属性，将会加载``dev.conf``文件，并包含``application.conf``
@@ -139,7 +139,7 @@ dev.conf:
 更高级的包括和替换机制的解释在[HOCON](https://github.com/typesafehub/config/blob/master/HOCON.md)规范中。
 
 
-###配置日志
+### 配置日志
 如果系统或配置属性``akka.log-config-on-start`` 被设置为 ``on``，则在actor系统启动的时候，就完成了INFO级别的日志设置。当你不能确定使用何种配置时，这很有用。
 
 如果有疑问，你也可以在创建actor系统之前或之后，很容易很方便地检查配置对象：
@@ -174,17 +174,17 @@ dev.conf:
   // this is a shortcut for system.settings().config().root().render()
 ```
 
-###谈一谈类加载器
+### 谈一谈类加载器
 
 在配置文件的几个地方，可以通过制定类的全名来让Akka实例化该类。这是通过Java反射完成的，相应地用到了一个`ClassLoader`。在具有挑战性的环境中，如应用容器和OSGi绑定中，选择正确的类加载器并不总是一件简单的事情，Akka的现行做法是每个 `ActorSystem` 实现存储当前线程的上下文类加载器（如果可用，否则就使用他自己的加载器``this.getClass.getClassLoader``），并使用它为所有的反射访问服务。这意味着Akka放在引导类路径（boot class path）下，会从奇怪的地方产生`NullPointerException`： 这里就是不支持。
 
-###应用特定设置
+### 应用特定设置
 配置也可用于应用程序特定的设置。一个好的实践是将这些设置放在一个扩展中，像下面的章节所描述的：
 
  * Scala API: [应用特定设置](../chapter6/06_akka_extensions.md#extending-akka-scala-settings)
  * Java API: [应用特定设置](#TODO)
 
-###配置多个ActorSystem
+### 配置多个ActorSystem
 如果你有一个以上的``ActorSystem``（或你正在写一个库，有可能有一个独立于应用的 ``ActorSystem``） 你可能想要为每个系统进行单独配置。
 
 由于 `ConfigFactory.load()` 会合并classpath中所有匹配名称的资源, 最简单的方式是利用这一功能并在配置树中区分actor系统:
@@ -250,7 +250,7 @@ import com.typesafe.config.ConfigFactory
     val system = ActorSystem("MySystem", ConfigFactory.load(customConf))
 ```
 
-###从自定义位置读取配置
+### 从自定义位置读取配置
 你可以使用代码或系统属性，来替换或补充``application.conf`` 。
 
 如果你使用的方法是``ConfigFactory.load()``（Akka默认方式），你可以通过定义``-Dconfig.resource=whatever``、``-Dconfig.file=whatever``或
@@ -306,7 +306,7 @@ ActorSystem system =
 
 要记住，通常你只需要在``application.conf``添加一个``include``语句，而不是编写代码。在``application.conf``顶部引入的将被``application.conf``其余部分覆盖，而那些在底部的设置将覆盖以前的内容。
 
-###Actor部署配置
+### Actor部署配置
 可以在配置的``akka.actor.deployment``节中定义特定actor的部署设置。在部署部分有可能定义这些事物——调度器、邮箱、路由器设置和远程部署。在相应主题的章节中详细介绍了配置的这些特性。一个例子，可以如下所示：
 
 ```
@@ -347,13 +347,13 @@ prio-mailbox {
 
 你可以使用星号作为通配符匹配actor的路径部分，所以你可以指定：``/*/sampleActor``将匹配该树形结构中那个级别上的所有``sampleActor``。你也能把通配符放在最后来匹配某一级别的所有actor：``/someParent/*``。非通配符匹配总是有更高的优先级，所以：``/foo/bar``比``/foo/*`` **更具体**，并且只有最高优先的匹配才会被使用。请注意它**不能**用于部分匹配，像这样：``/foo*/bar``、``/f*o/bar`` 等。
 
-###参考配置清单
+### 参考配置清单
 
 每个Akka模块都有保存默认值的“reference”配置文件。
 
 <span id="config-akka-actor"></span>
 
-#####akka-actor
+##### akka-actor
 
 ```
 ####################################
@@ -1113,7 +1113,7 @@ akka {
 
 <span id="config-akka-camel"></span>
 
-#####akka-camel
+##### akka-camel
 
 ```
 ####################################
@@ -1161,7 +1161,7 @@ akka {
 
 <span id="config-akka-cluster"></span>
 
-#####akka-cluster
+##### akka-cluster
 
 ```
 ######################################
@@ -1409,7 +1409,7 @@ akka {
 
 <span id="config-akka-multi-node-testkit"></span>
 
-#####akka-multi-node-testkit
+##### akka-multi-node-testkit
 
 ```
 #############################################
@@ -1481,7 +1481,7 @@ akka {
 
 <span id="config-akka-persistence"></span>
 
-#####akka-persistence
+##### akka-persistence
 
 ```
 ##########################################
@@ -1670,7 +1670,7 @@ akka {
 
 <span id="config-akka-remote"></span>
 
-#####akka-remote
+##### akka-remote
 
 ```
 #####################################
@@ -2174,7 +2174,7 @@ akka {
 
 <span id="config-akka-testkit"></span>
 
-#####akka-testkit
+##### akka-testkit
 
 ```
 ######################################
@@ -2210,7 +2210,7 @@ akka {
 
 <span id="config-akka-zeromq"></span>
 
-#####akka-zeromq
+##### akka-zeromq
 
 ```
 #####################################

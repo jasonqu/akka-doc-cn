@@ -8,19 +8,19 @@ Akka持久化使有状态的actor能留存其内部状态，以便在因JVM崩�
 
 Akka持久化受[eventsourced](https://github.com/eligosource/eventsourced)启发，并且是其正式的替代者。它遵循[eventsourced](https://github.com/eligosource/eventsourced)相同的概念和体系结构，但在API和实现层上则显著不同。又见[《迁移指南：从Eventsourced到Akka Persistence 2.3》](http://doc.akka.io/docs/akka/2.3.6/project/migration-guide-eventsourced-2.3.x.html#migration-eventsourced-2-3)。
 
-###Akka 2.3.4的变化
+### Akka 2.3.4的变化
 在Akka 2.3.4中，较早版本中的几个概念被推倒和简化。大体上讲；``Processor``和``EventsourcedProcessor``被替换为``PersistentActor``。``Channel``和``PersistentChannel``被替换为``AtLeastOnceDelivery``。``View``被替换为``PersistentView``。
 
 更改的全部细节请参阅[《迁移指南：从Akka Persistence (experimental) 2.3.3到Akka Persistence 2.3.4 (和2.4.x)》](http://doc.akka.io/docs/akka/2.3.6/project/migration-guide-persistence-experimental-2.3.x-2.4.x.html#migration-guide-persistence-experimental-2-3-x-2-4-x)。老的类在一段时间内仍被包含并标记为废弃，以便用户顺利过渡。如果你需要的旧的文档，可以参考[这里](http://doc.akka.io/docs/akka/2.3.3/scala/persistence.html)。
 
-###依赖
+### 依赖
 Akka持久化是一个单独的jar文件。请确保你的项目中有以下依赖关系：
 
 ```
 "com.typesafe.akka" %% "akka-persistence-experimental" % "2.3.6"
 ```
 
-###体系结构
+### 体系结构
 
 * *PersistentActor*：是一个持久的、有状态的actor。它能够持久化消息到一个日志，并以线程安全的方式对它们作出响应。它是可被用于执行*命令[command]*和*事件来源[event sourced]*的actor。当一个持久化的actor被启动或重新启动时，该actor会被重播日志消息，从而可以从这些消息恢复内部状态。
 * *PersistentView*：一个视图是一个持久的、有状态的actor，来接收已经由另一个持久化actor写下的日志消息。视图本身并没有新的日志消息，相反，它只能从一个持久化actor复制消息流来更新内部状态。
@@ -28,7 +28,7 @@ Akka持久化是一个单独的jar文件。请确保你的项目中有以下依�
 * *Journal*：日志存储发送到一个持久化actor的消息序列。应用程序可以控制actor接收的消息中，哪些需要在日记中记录，哪些不需要。日志的存储后端是可插拔的。默认日志存储插件是写入本地文件系统，复制日志在[社区插件](http://akka.io/community/)中可以获得。
 * *Snapshot store*：快照存储区持久化一个持久化actor或一个视图的内部状态的快照。快照可用于优化恢复时间。快照存储区的存储后端是可插拔的。默认快照存储插件写入本地文件系统。
 
-###<a name="Event_sourcing"></a>事件来源 Event sourcing
+### <a name="Event_sourcing"></a>事件来源 Event sourcing
 
 [事件来源](http://martinfowler.com/eaaDev/EventSourcing.html)背后的基本思想很简单。一个持久化actor接收一个 (非持久化) 命令，它首先会被验证是否可以被应用到当前状态。在这里，验证可以意味着任何东西，例如从对命令消息字段的简单检查，到引用若干外部服务。如果验证成功，从该命令生成事件，表示命令的效果。然后这些事件被持久化，在成功的持久化后，用于改变actor的状态。当持久化actor需要恢复时，仅重播持久化的事件，因为我们知道他们可以被成功地应用。换句话说，与命令不同，被重播到一个持久化actor的事件不能失败。事件来源的actor当然也可以处理不改变应用程序状态的命令，例如查询命令。
 
@@ -93,17 +93,17 @@ class ExamplePersistentActor extends PersistentActor {
 
 > 还有可能在正常处理过程中使用不同的命令处理程序，并使用``context.become()``和``context.unbecome()``来恢复。恢复后使actor进入相同的状态，你需要特别谨慎地使用``receiveRecover``方法中的``become``和``unbecome``进行相同的状态转换，就像你会在命令处理程序中做的一样。
 
-#####标识符
+##### 标识符
 一个持久化actor必须具有跨不同actor化身而不改变的标识符。必须使用``persistenceId``方法定义该标识符。
 
 ```scala
 override def persistenceId = "my-stable-persistence-id"
 ```
 
-#####<a name="recovery"/>恢复
+##### <a name="recovery"/>恢复
 默认情况下，一个持久化actor通过在启动和重启时重放日志消息实现自动恢复。恢复过程中发送给持久化actor的新消息不会干扰重放消息。新消息只会在持久化actor恢复完成后被收到。
 
-######自定义恢复
+###### 自定义恢复
 通过使用空实现重写``preStart``，可以禁用启动时的自动恢复。
 
 
@@ -131,7 +131,7 @@ override def preStart() {
 override def preRestart(reason: Throwable, message: Option[Any]) = ()
 ```
 
-######恢复状态
+###### 恢复状态
 一个持久化actor可以通过以下方法查询自身的恢复状态
 
 ```scala
@@ -159,7 +159,7 @@ def recoveryCompleted(): Unit = {
 }
 ```
 
-#####放宽的局部一致性要求和高吞吐量的用例
+##### 放宽的局部一致性要求和高吞吐量的用例
 
 如果面临放宽的局部一致性要求和高吞吐量，有时``PersistentActor``及其``persist``在处理大量涌入的命令时可能会不够，因为它必须等待知道给定命令相关的所有事件都处理完成后，才开始处理下一条命令。虽然这种抽象在大多数的情况下非常有用，有时你可能会放宽一致性要求——例如你会想要尽可能快速地处理命令，假设事件最终会持久化并在后台恰当处理，并在需要时追溯性地回应持久性故障。
 
@@ -207,7 +207,7 @@ processor ! "b"
 
 > 如果在调用``persistAsync``和日志确定写操作之间，actor被重启（或停止）时，将不会调用回调。
 
-#####推迟行动，直到持久化处理程序已执行
+##### 推迟行动，直到持久化处理程序已执行
 
 使用``persistAsync``时，有时你会发现定义一些''在``persistAsync``处理程序调用之后发生''的行动是很好的。``PersistentActor``提供了一个工具方法``defer``，它类似于``persistAsync``，可是并不持久化过去的事件。推荐它用于*读取*的操作，和在你的域模型中没有相应事件的行动。
 
@@ -256,7 +256,7 @@ processor ! "b"
 
 > 如果该actor在调用``defer``和日志处理与确认所有写入之间的回调，将不会在actor重启（或停止）时调用。
 
-#####批处理写操作
+##### 批处理写操作
 为了优化吞吐量，一个持久化actor在高负荷下，会内部将一批事件先储存，然后再（作为一个批处理）写到日志中。批处理大小可以调整，从低和中等载荷作用下的1，动态增长到高负荷下可配置的最大大小（默认为``200``）。在使用``persistAsync``时，这极大地增加了最大吞吐量。
 
 ```
@@ -267,12 +267,12 @@ akka.persistence.journal.max-message-batch-size = 200
 
 批处理也在内部使用确保事件写操作的原子性。在单个命令上下文中的所有事件将作为单个批处理写入到日志中（即使在一个命令中多次调用``persist``）。因此，``PersistentActor``的恢复将永远不会部分完成 （只持久化单个命令中事件的一个子集）。
 
-#####删除邮件
+##### 删除邮件
 若要删除所有消息（由一个持久化actor记录) 到指定的序列号，持久化actor可以调用``deleteMessages``方法。
 
 一个可选的``permanent``参数指定是否应从日志中永久删除消息，或仅标记为已删除。在这两种情况下，消息都不会重播。Akka持久化以后的扩展将允许重播标记为已删除的消息，例如可用于调试。
 
-###持久化视图
+### 持久化视图
 
 持久化视图可以通过扩展``PersistentView``特质以及实现``receive``和``persistenceId``方法实现。
 
@@ -294,7 +294,7 @@ class MyView extends PersistentView {
 
 可以确定一条消息是从日志中发送，还是由用户定义的另一个调用``isPersistent``方法的actor发送。尽管有这样的功能，很多时候你根本不需要此信息，并可以简单地将相同的逻辑应用于这两种情况（跳过``if isPersistent``检查）。
 
-#####更新
+##### 更新
 actor系统的所有视图的默认更新间隔是可配置的：
 
 ```
@@ -318,15 +318,15 @@ akka.persistence.view.auto-update = off
 
 实现类可以通过重载``autoUpdate``方法重写配置的默认值。若要限制的每个更新请求的重播消息数量，应用程序可以配置自定义的``akka.persistence.view.auto-update-replay-max``值或重载``autoUpdateReplayMax``方法。手动更新的重播消息数目可以通过``Update``消息的``replayMax``参数进行限制。
 
-#####恢复
+##### 恢复
 持久化视图的初始化恢复过程和持久化actor的工作方式相同（即通过发送一个``Recover``消息到自己）。初始化恢复的最大重放消息数由``autoUpdateReplayMax``确定。关于自定义初始化恢复更多的可能性参见[恢复](#recovery)一节。
 
-#####标识符
+##### 标识符
 一个持久化视图必须具有跨不同actor化身而不改变的标识符。必须使用``viewId``方法定义该标识符。
 
 ``ViewId``必须不同于引用的``persistenceId``，除非[快照](#snapshots)视图和其持久化actor是共享的（即应用程序通常不需要做的东西）。
 
-###<a name="snapshots"/>快照
+### <a name="snapshots"/>快照
 
 快照可以大幅减少持久化actor和视图的恢复时间。下面讨论的快照内容是基于持久化actor的上下文，但这也同样适用于持久化视图。
 
@@ -378,10 +378,10 @@ processor ! Recover(fromSnapshot = SnapshotSelectionCriteria(
 
 如果未指定，他们默认为``SnapshotSelectionCriteria.Latest``，即选择最新（= 最小）的快照。若要禁用基于快照的恢复，应用程序应使用``SnapshotSelectionCriteria.None``。如果已保存的快照没有匹配指定的``SnapshotSelectionCriteria``，恢复时将重播所有日志消息。
 
-#####快照删除
+##### 快照删除
 一个持久化actor可以通过调用``deleteSnapshot``方法并指定快照的序列号与的时间戳作为参数，来删除单个快照。要批量删除匹配``SnapshotSelectionCriteria``的快照，持久化actor应该使用``deleteSnapshots``方法。
 
-###至少一次投递
+### 至少一次投递
 要在至少一次投递语义下发送消息到目的地，你可以在发送端的``PersistentActor``混入``AtLeastOnceDelivery``特质。如果他们在可配置的超时时间内未得到确认，它负责重新发送消息。
 
 > 注意
@@ -450,7 +450,7 @@ class MyDestination extends Actor {
 
 ``AtLeastOnceDelivery``特质将消息保留在内存中，直到他们成功投递已被确认。actor能保留在内存中的未经确认的消息的最大数目限制是由``maxUnconfirmedMessages``方法定义的。如果超过了此限制``deliver``方法将不会接受更多的消息，它将抛出``AtLeastOnceDelivery.MaxUnconfirmedMessagesExceededException``。可以用``akka.persistence.at-least-once-delivery.max-unconfirmed-messages``配置键配置其默认值。可以用实现类重写该方法来返回非默认值。
 
-###存储插件
+### 存储插件
 对于日志和快照存储的存储后端在Akka持久化中是可插拔的。默认日志插件将消息写入LevelDB（见[本地LevelDB日志](#local-leveldb-journal)）。默认快照存储插件将快照作为单独的文件写入本地文件系统（请参阅[本地快照存储区](#local-snapshot-store)）。应用程序可以通过实现一个插件API并通过配置激活它们来提供他们自己的插件。插件开发需要以下引入：
 
 ```scala
@@ -467,7 +467,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 ```
 
-#####日志插件API
+##### 日志插件API
 日志插件要扩展``SyncWriteJournal``或``AsyncWriteJournal``。``SyncWriteJournal``是一个actor，当存储后端的API只支持同步、阻塞写入时应扩展它。在这种情况下，要实现的方法是：
 
 ```scala
@@ -589,7 +589,7 @@ my-journal {
 
 指定的插件``class``必须具有一个无参数构造函数。``plugin-dispatcher``是用于插件actor的调度程序。如果未指定，则默认是对``SyncWriteJournal``插件的``akka.persistence.dispatchers.default-plugin-dispatcher``和对``AsyncWriteJournal``插件的``akka.actor.default-dispatcher``。
 
-#####快照存储插件API
+##### 快照存储插件API
 
 一个快照存储插件必须扩展``SnapshotStore``actor并实现以下方法：
 
@@ -651,7 +651,7 @@ my-snapshot-store {
 
 指定的插件``class``必须具有一个无参数构造函数。``plugin-dispatcher``是用于插件actor的调度程序。如果未指定，则默认为``akka.persistence.dispatchers.default-plugin-dispatcher``。
 
-#####插件TCK
+##### 插件TCK
 为了帮助开发人员构建正确和高质量存储插件，我们提供技术兼容性工具包 (简称[TCK](http://en.wikipedia.org/wiki/Technology_Compatibility_Kit)）。
 
 TCK可用于Java或Scala项目中，对Scala你需要引入``akka-persistence-tck-experimental``依赖关系：
@@ -710,9 +710,9 @@ class MyJournalSpec extends JournalSpec {
 
 我们*强烈建议*在你的测试套件包括这些规格，因为从头编写一个插件时，它们涵盖了广泛的，你可能会遗忘的测试用例。
 
-###预先包装好的插件
+### 预先包装好的插件
 
-#####<a name="local-leveldb-journal" />本地LevelDB日志
+##### <a name="local-leveldb-journal" />本地LevelDB日志
 默认日志插件是``akka.persistence.journal.leveldb``，它将消息写入到本地的LevelDB实例。LevelDB文件的默认位置是当前工作目录中一个名为``journal``的目录。此位置可以由配置中指定的相对或绝对的路径更改：
 
 ```scala
@@ -721,7 +721,7 @@ akka.persistence.journal.leveldb.dir = "target/journal"
 
 用这个插件，每个actor系统可运行其自己私有的LevelDB实例。
 
-#####共享LevelDB日志
+##### 共享LevelDB日志
 一个LevelDB实例还可以由多个actor系统（在相同或不同节点上）共享。它，例如，允许持久化actor进行故障转移到备份节点，并从备份节点继续使用共享的日志实例。
 
 > 警告
@@ -832,7 +832,7 @@ trait SharedStoreUsage extends Actor {
 
 内部日志命令（由持久化actor发送的）会缓冲直到注入完成。注入是幂等的，即只有第一次的注入被使用。
 
-#####<a name="local-snapshot-store" />本地快照存储区
+##### <a name="local-snapshot-store" />本地快照存储区
 
 默认快照存储插件是``akka.persistence.snapshot-store.local``。它将快照文件写入本地文件系统。默认的存储位置是当前工作目录中一个名为``snapshots`` 的目录。这可以通过配置中指定的相对或绝对的路径来更改：
 
@@ -840,7 +840,7 @@ trait SharedStoreUsage extends Actor {
 akka.persistence.snapshot-store.local.dir = "target/snapshots"
 ```
 
-###自定义序列化
+### 自定义序列化
 快照序列化和``Persistent``消息的有效载荷是可以通过Akka[序列化](serialization.md)基础架构配置的。例如，如果应用程序想要序列化
 
 * 有效载荷的``MyPayload``类型与自定义的``MyPayloadSerializer``和
@@ -863,7 +863,7 @@ akka.actor {
 
 在应用程序配置中。如果未指定，则使用默认的序列化程序。
 
-###测试
+### 测试
 运行测试时使用``sbt``的LevelDB默认设置，请确保在你的sbt项目中设置``fork := true``，否则你将看到一个``UnsatisfiedLinkError``。或者，你可以切换到一个LevelDB Java 端口，通过这样的设置
 
 ```
@@ -878,8 +878,8 @@ akka.persistence.journal.leveldb-shared.store.native = off
 
 在Akka配置中。LevelDB 的Java端口仅用于测试目的。
 
-###杂项
-#####状态机
+### 杂项
+##### 状态机
 状态机可以通过将``FSM``特质混入持久化actor来实现持久化。
 
 ```scala
@@ -901,7 +901,7 @@ class PersistentDoor extends Processor with FSM[String, Int] {
 }
 ```
 
-###配置
+### 配置
 配置中有几个属性为持久化模块使用，请参阅[参考配置](general/configuration.md#config-akka-persistence)。
 
 

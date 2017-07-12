@@ -2,10 +2,10 @@
 
 Akka ``MessageDispatcher``是维持 Akka Actor “运作”的部分, 可以说它是整个机器的引擎。所有的``MessageDispatcher``实现也同时也是一个``ExecutionContext``，这意味着它们可以用来执行任何代码，例如[Future(Scala)](../chapter4/01_futures.md)。
 
-###缺省派发器
+### 缺省派发器
 在没有为Actor作配置的情况下，每一个``ActorSystem``将有一个缺省的派发器。该缺省派发器可以被配置，默认是使用指定的``default-executor``的一个``Dispatcher``。如果一个ActorSystem是使用传入的ExecutionContext创建的，则该ExecutionContext将被用作所有派发器的默认执行器（“executor”）。如果没有给定ExecutionContext，则会回退使用``akka.actor.default-dispatcher.default-executor.fallback``指定的执行器。缺省情况下是使用“fork-join-executor”，它在大多数情况下拥有非常好的性能。
 
-###查找一个派发器
+### 查找一个派发器
 派发器实现了`ExecutionContext`接口，因此可以用来运行`Future`调用等。
 
 ```scala
@@ -13,7 +13,7 @@ Akka ``MessageDispatcher``是维持 Akka Actor “运作”的部分, 可以说�
 implicit val executionContext = system.dispatchers.lookup("my-dispatcher")
 ```
 
-###为Actor指定派发器
+### 为Actor指定派发器
 如果你希望为你的``Actor``设置非缺省的派发器，你需要做两件事，首先是配置派发器：
 
 ```
@@ -89,7 +89,7 @@ val myActor =
 
 > 你在``withDispatcher``中指定的调度器，和在部署文件指定的``dispatcher``设置其实是配置中的一个路径. 所以在这个例子中它位于配置的顶层，但你可以例如把它放在下面的层次，用“.”来代表子层次，象这样：``"foo.bar.my-dispatcher"``
 
-###派发器的类型
+### 派发器的类型
 
 一共有4种类型的消息派发器:
 
@@ -127,7 +127,7 @@ val myActor =
   * 使用场景：测试
   * 底层使用：调用的线程 (duh)
 
-#####更多 dispatcher 配置的例子
+##### 更多 dispatcher 配置的例子
 配置一个``PinnedDispatcher``：
 
 ```
